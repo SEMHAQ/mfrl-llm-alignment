@@ -18,21 +18,35 @@ LCSTS_CONFIG = {
 
 
 def load_lcsts(
-    subset: str = "default",
     split: str = "train",
     max_samples: Optional[int] = None,
 ) -> Dataset:
     """加载LCSTS中文摘要数据集。
 
+    HuggingFace上可用的LCSTS镜像：seamew/LCSTS, IsmaelMousa/LCSTS
+
     Args:
-        subset: 子集名称
         split: 数据分割（train/validation/test）
         max_samples: 最大样本数
 
     Returns:
-        HuggingFace Dataset
+        HuggingFace Dataset，包含 source 和 summary 字段
     """
-    dataset = load_dataset("lcsts", subset, split=split, trust_remote_code=True)
+    # 尝试多个可用的LCSTS数据集名称
+    lcsts_names = ["seamew/LCSTS", "IsmaelMousa/LCSTS", "xiaoda/LCSTS"]
+    dataset = None
+    for name in lcsts_names:
+        try:
+            dataset = load_dataset(name, split=split)
+            print(f"Loaded dataset: {name}")
+            break
+        except Exception:
+            continue
+
+    if dataset is None:
+        raise RuntimeError(
+            "Failed to load LCSTS dataset. Tried: " + ", ".join(lcsts_names)
+        )
 
     if max_samples:
         dataset = dataset.select(range(min(max_samples, len(dataset))))
@@ -56,7 +70,6 @@ def load_alpaca_chinese(
     dataset = load_dataset(
         "silk-road/alpaca-data-gpt4-chinese",
         split=split,
-        trust_remote_code=True,
     )
 
     if max_samples:
