@@ -28,10 +28,11 @@ outputs/
 *.pth
 *.ckpt
 
-# Datasets (download on experiment machine)
-data/*.json
+# Datasets (processed JSON files ARE committed for cross-machine sync)
+# data/*.json  <-- NOT ignored, these are committed
 data/*.jsonl
 data/lcsts/
+data/raw/
 data/alpaca_chinese/
 
 # Logs

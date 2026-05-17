@@ -239,9 +239,19 @@ def main():
     print("Loading model...")
     model, tokenizer = load_model(config["model"]["name"], config["model"]["dtype"])
 
-    # 加载数据集
+    # 加载数据集（优先从本地JSON加载，避免实验机联网）
     print("Loading dataset...")
-    if config["data"]["dataset"] == "lcsts":
+    dataset_name = config["data"]["dataset"]
+    local_json = os.path.join("data", f"{dataset_name}_train.json")
+
+    if os.path.exists(local_json):
+        print(f"Loading from local file: {local_json}")
+        with open(local_json, "r", encoding="utf-8") as f:
+            raw_data = json.load(f)
+        max_samples = config["data"]["max_train_samples"]
+        if max_samples and len(raw_data) > max_samples:
+            raw_data = raw_data[:max_samples]
+    elif dataset_name == "lcsts":
         dataset = load_lcsts(max_samples=config["data"]["max_train_samples"])
         raw_data = [
             {"input": item["source"], "reference": item["summary"]}
@@ -254,6 +264,7 @@ def main():
              "reference": item["output"]}
             for item in dataset
         ]
+    print(f"Loaded {len(raw_data)} samples")
 
     # 消融实验配置
     feedback_type = "both"
