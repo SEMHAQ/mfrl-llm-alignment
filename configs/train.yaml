@@ -47,8 +47,8 @@ feedback:
       rouge2: 0.3
       rougeL: 0.4
   model:
-    enabled: false  # 设为true启用模型反馈（需要额外GPU内存）
-    model_name: "Qwen/Qwen2.5-0.5B-Instruct"
+    enabled: false  # 设为true启用模型反馈（需要额外GPU内存）python scripts/run_experiment.py --config configs/train.yamlpython scripts/run_experiment.py --config configs/train.yamlpython scripts/run_experiment.py --config configs/train.yamlpython scripts/run_experiment.py --config configs/train.yaml
+    model_name: "models/Qwen2.5-0.5B-Instruct"
   num_candidates: 4
 
 # 数据配置
