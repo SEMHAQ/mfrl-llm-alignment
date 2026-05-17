@@ -22,18 +22,26 @@ def download_lcsts(max_samples: int, output_dir: str):
     """下载LCSTS数据集并保存为JSON。"""
     from datasets import load_dataset
 
-    lcsts_names = ["seamew/LCSTS", "IsmaelMousa/LCSTS", "xiaoda/LCSTS"]
+    lcsts_names = [
+        "hfl/lcsts",
+        "seamew/LCSTS",
+        "IsmaelMousa/LCSTS",
+        "xiaoda/LCSTS",
+        "lcsts",
+    ]
     dataset = None
     for name in lcsts_names:
         try:
+            print(f"Trying: {name} ...")
             dataset = load_dataset(name, split="train")
-            print(f"Loaded: {name}")
+            print(f"Success: {name}")
             break
-        except Exception:
+        except Exception as e:
+            print(f"  Failed: {e}")
             continue
 
     if dataset is None:
-        raise RuntimeError("Failed to load LCSTS from HuggingFace")
+        raise RuntimeError("Failed to load LCSTS. Check dataset names on huggingface.co/datasets")
 
     if max_samples:
         dataset = dataset.select(range(min(max_samples, len(dataset))))
