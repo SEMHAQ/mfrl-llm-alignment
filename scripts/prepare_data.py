@@ -47,11 +47,11 @@ def download_lcsts(max_samples: int, output_dir: str):
     columns = dataset.column_names
     print(f"Columns: {columns}")
 
-    # 映射到标准格式
+    # 映射到标准格式（suolyer/lcsts的字段是 input/output）
     data = []
     for item in dataset:
-        source = item.get("source", item.get("text", item.get("premise", item.get("sentence1", ""))))
-        summary = item.get("summary", item.get("hypothesis", item.get("sentence2", item.get("target", ""))))
+        source = item.get("input", item.get("source", item.get("text", "")))
+        summary = item.get("output", item.get("summary", item.get("target", "")))
         if source and summary:
             data.append({"input": str(source), "reference": str(summary)})
 
