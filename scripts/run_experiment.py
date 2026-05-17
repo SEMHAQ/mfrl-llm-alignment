@@ -54,7 +54,7 @@ def load_model(model_name: str, dtype: str = "bfloat16"):
 
     model = AutoModelForCausalLM.from_pretrained(
         model_name,
-        torch_dtype=dtype_map.get(dtype, torch.bfloat16),
+        dtype=dtype_map.get(dtype, torch.bfloat16),
         device_map="auto",
         trust_remote_code=True,
     )

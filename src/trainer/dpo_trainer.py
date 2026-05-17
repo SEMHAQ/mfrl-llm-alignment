@@ -86,7 +86,7 @@ class MFRLTrainer:
         }
         self.model = AutoModelForCausalLM.from_pretrained(
             self.config.model_name,
-            torch_dtype=dtype_map.get(self.config.model_dtype, torch.bfloat16),
+            dtype=dtype_map.get(self.config.model_dtype, torch.bfloat16),
             trust_remote_code=self.config.trust_remote_code,
         )
 
