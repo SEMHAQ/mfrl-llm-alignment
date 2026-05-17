@@ -1,0 +1,58 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+*.egg
+.eggs/
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Model weights & checkpoints (large files, sync via other means)
+outputs/
+*.bin
+*.safetensors
+*.pt
+*.pth
+*.ckpt
+
+# Datasets (download on experiment machine)
+data/*.json
+data/*.jsonl
+data/lcsts/
+data/alpaca_chinese/
+
+# Logs
+*.log
+wandb/
+runs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# LaTeX build artifacts
+paper/*.aux
+paper/*.bbl
+paper/*.blg
+paper/*.fdb_latexmk
+paper/*.fls
+paper/*.log
+paper/*.out
+paper/*.synctex.gz
+paper/*.toc
+paper/*.pdf
+
+# Journal references (copyrighted PDFs)
+journal_to_refer/

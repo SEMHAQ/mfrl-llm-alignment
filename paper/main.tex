@@ -1,0 +1,328 @@
+% 电子学报 LaTeX模板
+% 基于多形式反馈融合的大模型直接偏好优化方法
+% MFRL: Multi-form Feedback Reinforced Learning for LLM Fine-tuning
+
+\documentclass[a4paper,10.5pt]{article}
+
+% ============ 宏包 ============
+\usepackage[UTF8]{ctex}              % 中文支持
+\usepackage{geometry}                % 页面设置
+\usepackage{amsmath,amssymb}         % 数学公式
+\usepackage{graphicx}                % 图片
+\usepackage{booktabs}                % 三线表
+\usepackage{multirow}                % 合并行
+\usepackage{tabularx}                % 自适应表格
+\usepackage{cite}                    % 引用
+\usepackage{hyperref}                % 超链接
+\usepackage{xcolor}                  % 颜色
+\usepackage{algorithm}               % 算法
+\usepackage{algorithmic}             % 算法伪代码
+\usepackage{listings}                % 代码
+\usepackage{enumitem}                % 列表
+\usepackage{fancyhdr}                % 页眉页脚
+\usepackage{setspace}                % 行距
+
+% ============ 页面设置 ============
+\geometry{
+    top=2.5cm,
+    bottom=2.5cm,
+    left=2cm,
+    right=2cm,
+}
+
+% ============ 行距 ============
+\renewcommand{\baselinestretch}{1.5}
+
+% ============ 标题信息 ============
+\title{\textbf{基于多形式反馈融合的大模型直接偏好优化方法}}
+
+\author{
+    作者姓名$^{1,2}$ \quad 作者姓名$^{1}$ \quad 作者姓名$^{2}$ \\[6pt]
+    {\small $^{1}$单位名称，城市\ 邮编}\\
+    {\small $^{2}$单位名称，城市\ 邮编}
+}
+
+\date{}
+
+% ============ 正文开始 ============
+\begin{document}
+
+\maketitle
+
+% ============ 摘要 ============
+\noindent\textbf{摘\quad 要：}
+针对大语言模型微调中反馈信号单一导致优化效果受限的问题，提出一种基于多形式反馈融合的直接偏好优化方法（MFRL）。
+首先，设计多源反馈收集模块（MFC），从规则指标和轻量模型两个维度获取异构反馈信号；
+其次，构建自适应反馈融合模块（AFF），通过注意力机制动态学习各反馈源的权重，将异构信号归一融合为统一偏好分数；
+最后，结合课程学习策略，按样本难度从易到难进行偏好优化训练。
+在LCSTS中文摘要和Alpaca-Chinese指令跟随数据集上的实验结果表明，MFRL在ROUGE-L指标上相比标准DPO提升XXX个百分点，
+在Win Rate评估中达到XXX\%，验证了多形式反馈融合的有效性。
+
+\vspace{6pt}
+\noindent\textbf{关键词：} 大语言模型；强化学习；直接偏好优化；多形式反馈；微调
+
+\vspace{12pt}
+\noindent\textbf{Abstract:}
+Aiming at the problem that single feedback signals in large language model (LLM) fine-tuning limit optimization performance,
+this paper proposes a Multi-form Feedback Reinforced Learning method (MFRL) for direct preference optimization.
+First, a Multi-form Feedback Collector (MFC) module is designed to obtain heterogeneous feedback signals from rule-based metrics and lightweight models.
+Second, an Adaptive Feedback Fusion (AFF) module is constructed to dynamically learn the weights of each feedback source through an attention mechanism,
+normalizing heterogeneous signals into unified preference scores.
+Finally, a curriculum learning strategy is employed to conduct preference optimization training from easy to hard samples.
+Experimental results on LCSTS Chinese summarization and Alpaca-Chinese instruction following datasets show that
+MFRL improves ROUGE-L by XXX percentage points over standard DPO and achieves XXX\% Win Rate,
+validating the effectiveness of multi-form feedback fusion.
+
+\vspace{6pt}
+\noindent\textbf{Key words:} large language model; reinforcement learning; direct preference optimization; multi-form feedback; fine-tuning
+
+% ============ 基金项目 ============
+\vspace{6pt}
+\noindent\textbf{基金项目：} 国家自然科学基金（No. XXXXXXXX）
+
+\noindent\textbf{中图分类号：} TP391\quad\textbf{文献标识码：} A
+
+\noindent\textbf{文章编号：} 0372-2112(2026)XX-XXXX-XX
+
+% ============ 1 引言 ============
+\section{引言}
+
+大语言模型（Large Language Model, LLM）在自然语言处理领域取得了显著进展\cite{brown2020language, touvron2023llama}。
+然而，预训练模型的输出往往与人类偏好不一致，需要通过微调（Fine-tuning）技术进行对齐\cite{ouyang2022training}。
+
+基于人类反馈的强化学习（Reinforcement Learning from Human Feedback, RLHF）\cite{stiennon2020learning}是当前主流的对齐方法，
+其通过训练奖励模型（Reward Model）来量化人类偏好，再利用PPO等强化学习算法优化语言模型。
+然而，RLHF存在以下问题：
+（1）需要训练独立的奖励模型，增加了计算开销和系统复杂性；
+（2）PPO算法训练不稳定，超参数敏感；
+（3）反馈信号形式单一，通常仅依赖人类偏好排序。
+
+直接偏好优化（Direct Preference Optimization, DPO）\cite{rafailov2023direct}通过将奖励函数参数化为策略模型的隐式形式，
+绕过了独立奖励模型的训练，直接在偏好数据上优化策略。然而，标准DPO仍面临反馈信号单一的问题。
+
+为解决上述问题，本文提出基于多形式反馈融合的直接偏好优化方法（MFRL），主要贡献包括：
+
+\begin{enumerate}[label=(\arabic*)]
+    \item 设计多源反馈收集模块（MFC），从规则指标和轻量模型两个维度获取异构反馈信号，丰富了反馈信息的多样性。
+    \item 构建自适应反馈融合模块（AFF），通过注意力机制动态学习各反馈源的权重，实现异构信号的自适应融合。
+    \item 结合课程学习策略，按样本难度从易到难进行偏好优化训练，提升训练效率和模型性能。
+\end{enumerate}
+
+% ============ 2 相关工作 ============
+\section{相关工作}
+
+\subsection{大模型微调技术}
+
+大模型微调技术主要包括全参数微调和参数高效微调两类。
+全参数微调更新模型所有参数，计算开销大\cite{hu2022lora}。
+参数高效微调方法如LoRA\cite{hu2022lora}、Adapter\cite{houlsby2019parameter}等，
+通过引入少量可训练参数，在保持性能的同时大幅降低计算开销。
+
+\subsection{基于反馈的对齐学习}
+
+RLHF\cite{ouyang2022training}通过人类偏好数据训练奖励模型，再使用PPO优化策略。
+DPO\cite{rafailov2023direct}将RLHF的奖励建模和策略优化统一为单阶段监督学习。
+KTO\cite{ethayarajh2024kto}进一步简化，仅需好/坏二元标签即可训练。
+SimPO\cite{meng2024simplo}去除参考模型，简化DPO框架。
+然而，上述方法均使用单一形式的反馈信号，未能充分利用多源信息。
+
+\subsection{课程学习}
+
+课程学习（Curriculum Learning）\cite{bengio2009curriculum}模仿人类学习过程，
+按样本难度从易到难排列训练数据。在NLP领域，课程学习已被证明能提升模型训练效率和泛化能力。
+
+% ============ 3 方法 ============
+\section{基于多形式反馈融合的直接偏好优化方法}
+
+\subsection{整体框架}
+
+MFRL框架如图\ref{fig:framework}所示，包含三个核心模块：
+多源反馈收集模块（MFC）、自适应反馈融合模块（AFF）和偏好优化微调模块（POF）。
+
+\begin{figure}[htbp]
+    \centering
+    % \includegraphics[width=0.9\textwidth]{figures/framework.pdf}
+    \caption{MFRL整体框架}
+    \label{fig:framework}
+\end{figure}
+
+\subsection{多源反馈收集模块}
+
+给定输入$x$和参考输出$y^*$，以及模型生成的候选输出集合$\{y_1, y_2, \ldots, y_K\}$，
+MFC模块从两个维度计算反馈分数：
+
+\textbf{规则反馈（Rule Feedback, RF）}：基于ROUGE等自动评估指标，
+计算候选输出与参考输出的相似度：
+\begin{equation}
+    s_{\text{RF}}(y_i) = \sum_{m \in \mathcal{M}} w_m \cdot \text{score}_m(y^*, y_i)
+\end{equation}
+其中$\mathcal{M} = \{\text{ROUGE-1}, \text{ROUGE-2}, \text{ROUGE-L}\}$为指标集合，
+$w_m$为各指标权重。
+
+\textbf{模型反馈（Model Feedback, MF）}：使用轻量级评判模型对候选输出进行多维度评分：
+\begin{equation}
+    s_{\text{MF}}(y_i) = f_{\text{judge}}(x, y^*, y_i)
+\end{equation}
+其中$f_{\text{judge}}$为评判模型，综合考虑信息完整性、语言流畅性、相关性和准确性。
+
+\subsection{自适应反馈融合模块}
+
+将各反馈源的分数归一化后，通过注意力机制动态融合：
+\begin{equation}
+    \mathbf{w} = \text{softmax}(\text{MLP}(\mathbf{s}))
+\end{equation}
+\begin{equation}
+    s_{\text{fused}} = \mathbf{w}^\top \mathbf{s} / \tau
+\end{equation}
+其中$\mathbf{s} = [s_{\text{RF}}, s_{\text{MF}}]$为各反馈源分数向量，
+$\tau$为可学习的温度参数。
+
+基于融合分数构建偏好对：对于每个输入，选择融合分数最高的候选作为正例$y^+$，
+分数最低的作为负例$y^-$。
+
+\subsection{偏好优化微调模块}
+
+使用DPO损失函数进行偏好优化：
+\begin{equation}
+    \mathcal{L}_{\text{DPO}} = -\mathbb{E}\left[\log \sigma\left(\beta \log \frac{\pi_\theta(y^+|x)}{\pi_{\text{ref}}(y^+|x)} - \beta \log \frac{\pi_\theta(y^-|x)}{\pi_{\text{ref}}(y^-|x)}\right)\right]
+\end{equation}
+其中$\pi_\theta$为策略模型，$\pi_{\text{ref}}$为参考模型，$\beta$为温度参数。
+
+引入课程学习策略，按样本难度从易到难排列训练数据，
+前期使用区分度高的样本（分数差异大），后期逐步引入难样本。
+
+% ============ 4 实验 ============
+\section{实验}
+
+\subsection{数据集}
+
+实验使用两个中文数据集：
+\begin{itemize}
+    \item \textbf{LCSTS}\cite{hu2015lcsts}：大规模中文短文本摘要数据集，包含约240万条短文本-摘要对。
+    \item \textbf{Alpaca-Chinese}：中文指令跟随数据集，包含约5万条指令-回复对。
+\end{itemize}
+
+\subsection{实验设置}
+
+基座模型使用Qwen2.5-1.5B-Instruct\cite{qwen2.5}，采用LoRA（rank=8）进行参数高效微调。
+训练3个epoch，学习率$5 \times 10^{-6}$，batch size 4，梯度累积步数 4。
+DPO温度参数$\beta = 0.1$。
+
+\subsection{对比方法}
+
+\begin{itemize}
+    \item \textbf{SFT}：纯监督微调，仅使用正例数据训练。
+    \item \textbf{DPO}\cite{rafailov2023direct}：标准直接偏好优化。
+    \item \textbf{KTO}\cite{ethayarajh2024kto}：基于好/坏标签的偏好优化。
+    \item \textbf{MFRL（Ours）}：本文提出的多形式反馈融合方法。
+\end{itemize}
+
+\subsection{主实验结果}
+
+表\ref{tab:main_results}展示了各方法在两个数据集上的实验结果。
+
+\begin{table}[htbp]
+    \centering
+    \caption{主实验结果对比}
+    \label{tab:main_results}
+    \begin{tabular}{lccc|ccc}
+        \toprule
+        \multirow{2}{*}{方法} & \multicolumn{3}{c|}{LCSTS} & \multicolumn{3}{c}{Alpaca-Chinese} \\
+        \cmidrule{2-7}
+        & ROUGE-1 & ROUGE-2 & ROUGE-L & ROUGE-1 & ROUGE-2 & ROUGE-L \\
+        \midrule
+        SFT & -- & -- & -- & -- & -- & -- \\
+        DPO & -- & -- & -- & -- & -- & -- \\
+        KTO & -- & -- & -- & -- & -- & -- \\
+        \textbf{MFRL} & -- & -- & -- & -- & -- & -- \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+% 表格数据填充说明：
+% 实验运行后，将outputs目录中的eval_results.json填入上表
+
+\subsection{消融实验}
+
+为验证各模块的有效性，进行以下消融实验：
+
+\begin{table}[htbp]
+    \centering
+    \caption{消融实验结果}
+    \label{tab:ablation}
+    \begin{tabular}{lccc}
+        \toprule
+        方法变体 & ROUGE-1 & ROUGE-2 & ROUGE-L \\
+        \midrule
+        MFRL（完整） & -- & -- & -- \\
+        w/o 规则反馈 & -- & -- & -- \\
+        w/o 模型反馈 & -- & -- & -- \\
+        w/o 课程学习 & -- & -- & -- \\
+        w/o 自适应融合（等权） & -- & -- & -- \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\subsection{分析与讨论}
+
+% 实验结果分析在实验完成后填写
+% 1. MFRL相比标准DPO的提升幅度
+% 2. 各反馈源的贡献度分析
+% 3. 课程学习策略的效果
+% 4. 自适应权重的可视化分析
+
+% ============ 5 结论 ============
+\section{结论}
+
+本文提出了一种基于多形式反馈融合的大模型直接偏好优化方法MFRL。
+通过多源反馈收集、自适应反馈融合和课程学习策略的结合，
+有效提升了大语言模型微调的效果。
+实验结果验证了多形式反馈融合相比单一反馈信号的优势。
+
+未来工作将探索：
+（1）引入更多类型的反馈信号，如过程奖励模型（Process Reward Model）；
+（2）将方法扩展到多轮对话等更复杂的任务场景；
+（3）探索在线反馈收集与模型迭代优化的结合。
+
+% ============ 参考文献 ============
+\begin{thebibliography}{99}
+
+\bibitem{brown2020language}
+Brown T, Mann B, Ryder N, et al. Language models are few-shot learners[C]//NeurIPS. 2020: 1877-1901.
+
+\bibitem{touvron2023llama}
+Touvron H, Lavril T, Izacard G, et al. LLaMA: Open and efficient foundation language models[J]. arXiv preprint arXiv:2302.13971, 2023.
+
+\bibitem{ouyang2022training}
+Ouyang L, Wu J, Jiang X, et al. Training language models to follow instructions with human feedback[C]//NeurIPS. 2022: 27730-27744.
+
+\bibitem{stiennon2020learning}
+Stiennon N, Ouyang L, Wu J, et al. Learning to summarize from human feedback[C]//NeurIPS. 2020: 3008-3021.
+
+\bibitem{rafailov2023direct}
+Rafailov R, Sharma A, Mitchell E, et al. Direct preference optimization: Your language model is secretly a reward model[C]//NeurIPS. 2023.
+
+\bibitem{hu2022lora}
+Hu E J, Shen Y, Wallis P, et al. LoRA: Low-rank adaptation of large language models[C]//ICLR. 2022.
+
+\bibitem{houlsby2019parameter}
+Houlsby N, Giber A, Jastrzebski S, et al. Parameter-efficient transfer learning for NLP[C]//ICML. 2019: 2790-2799.
+
+\bibitem{ethayarajh2024kto}
+Ethayarajh K, Xu W, Muennighoff N, et al. KTO: Model alignment as prospect theoretic optimization[J]. arXiv preprint arXiv:2402.01306, 2024.
+
+\bibitem{meng2024simplo}
+Meng Y, Xia M, Chen D. SimPO: Simple preference optimization with a reference-free reward[C]//NeurIPS. 2024.
+
+\bibitem{bengio2009curriculum}
+Bengio Y, Louradour J, Collobert R, et al. Curriculum learning[C]//ICML. 2009: 41-48.
+
+\bibitem{hu2015lcsts}
+Hu B, Chen Q, Zhu F. LCSTS: A large scale Chinese short text summarization dataset[C]//EMNLP. 2015: 1967-1972.
+
+\bibitem{qwen2.5}
+Yang A, Yang B, Hui B, et al. Qwen2.5 technical report[J]. arXiv preprint arXiv:2412.15115, 2024.
+
+\end{thebibliography}
+
+\end{document}

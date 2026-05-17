@@ -1,0 +1,65 @@
+# MFRL训练配置
+# 适配单卡3090 (24GB)环境
+
+# 模型配置
+model:
+  name: "Qwen/Qwen2.5-1.5B-Instruct"
+  dtype: "bfloat16"
+  trust_remote_code: true
+
+# LoRA配置
+lora:
+  r: 8
+  alpha: 16
+  dropout: 0.05
+  target_modules:
+    - "q_proj"
+    - "k_proj"
+    - "v_proj"
+    - "o_proj"
+    - "gate_proj"
+    - "up_proj"
+    - "down_proj"
+
+# DPO训练配置
+dpo:
+  beta: 0.1
+  loss_type: "sigmoid"
+  learning_rate: 5.0e-6
+  num_epochs: 3
+  batch_size: 4
+  gradient_accumulation: 4
+  max_length: 512
+  max_prompt_length: 256
+
+# 课程学习配置
+curriculum:
+  enabled: true
+  warmup_ratio: 0.3
+
+# 反馈配置
+feedback:
+  rule:
+    enabled: true
+    metrics: ["rouge1", "rouge2", "rougeL"]
+    weights:
+      rouge1: 0.3
+      rouge2: 0.3
+      rougeL: 0.4
+  model:
+    enabled: false  # 设为true启用模型反馈（需要额外GPU内存）
+    model_name: "Qwen/Qwen2.5-0.5B-Instruct"
+  num_candidates: 4
+
+# 数据配置
+data:
+  dataset: "lcsts"  # lcsts 或 alpaca_chinese
+  max_train_samples: 2000
+  max_eval_samples: 500
+  max_test_samples: 500
+
+# 输出配置
+output:
+  dir: "outputs/mfrl"
+  logging_steps: 10
+  save_strategy: "epoch"

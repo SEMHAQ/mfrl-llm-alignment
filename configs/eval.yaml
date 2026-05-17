@@ -1,0 +1,30 @@
+# MFRL评估配置
+
+# 评估指标
+metrics:
+  rouge:
+    enabled: true
+    metrics: ["rouge1", "rouge2", "rougeL"]
+  win_rate:
+    enabled: true
+
+# 评估数据
+data:
+  dataset: "lcsts"
+  max_samples: 500
+
+# 生成配置
+generation:
+  max_new_tokens: 256
+  batch_size: 8
+  temperature: 1.0
+  do_sample: false
+
+# Baseline对比
+baselines:
+  - name: "sft"
+    path: "outputs/sft/final"
+  - name: "dpo"
+    path: "outputs/dpo/final"
+  - name: "kto"
+    path: "outputs/kto/final"
