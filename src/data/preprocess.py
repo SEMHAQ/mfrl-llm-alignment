@@ -4,7 +4,6 @@
 """
 
 import torch
-import random
 from typing import List, Dict, Optional
 from transformers import AutoTokenizer, AutoModelForCausalLM
 
@@ -16,12 +15,12 @@ def generate_candidates(
     num_candidates: int = 4,
     temperature: float = 0.8,
     top_p: float = 0.95,
-    max_new_tokens: int = 256,
-    batch_size: int = 8,
+    max_new_tokens: int = 128,
+    batch_size: int = 4,
 ) -> List[List[str]]:
     """为每个prompt生成多个候选输出。
 
-    使用不同的采样参数生成多样化候选，用于后续反馈评分和偏好对构建。
+    使用num_return_sequences批量生成，比逐个生成快数倍。
 
     Args:
         model: 语言模型
@@ -30,43 +29,62 @@ def generate_candidates(
         num_candidates: 每个prompt生成的候选数
         temperature: 采样温度
         top_p: nucleus sampling参数
-        max_new_tokens: 最大生成长度
-        batch_size: 批处理大小
+        max_new_tokens: 最大生成长度（摘要任务128足够）
+        batch_size: 每批处理的prompt数
 
     Returns:
         候选输出列表，shape [num_prompts, num_candidates]
     """
     model.eval()
     all_candidates = []
+    total = len(prompts)
 
-    for i in range(0, len(prompts), batch_size):
+    for i in range(0, total, batch_size):
         batch_prompts = prompts[i:i + batch_size]
+        batch_size_actual = len(batch_prompts)
 
+        # 为每个prompt构造chat格式
+        batch_texts = []
         for prompt in batch_prompts:
-            candidates = []
             messages = [{"role": "user", "content": prompt}]
-            input_text = tokenizer.apply_chat_template(
+            text = tokenizer.apply_chat_template(
                 messages, tokenize=False, add_generation_prompt=True
             )
-            inputs = tokenizer(input_text, return_tensors="pt").to(model.device)
+            batch_texts.append(text)
 
-            for _ in range(num_candidates):
-                with torch.no_grad():
-                    outputs = model.generate(
-                        **inputs,
-                        max_new_tokens=max_new_tokens,
-                        temperature=temperature,
-                        top_p=top_p,
-                        do_sample=True,
-                        pad_token_id=tokenizer.pad_token_id,
-                    )
+        # tokenize整个batch
+        inputs = tokenizer(
+            batch_texts, return_tensors="pt", padding=True, truncation=True,
+            max_length=256
+        ).to(model.device)
+
+        # 一次性生成num_candidates个候选（num_return_sequences）
+        with torch.no_grad():
+            outputs = model.generate(
+                **inputs,
+                max_new_tokens=max_new_tokens,
+                temperature=temperature,
+                top_p=top_p,
+                do_sample=True,
+                num_return_sequences=num_candidates,
+                pad_token_id=tokenizer.pad_token_id,
+            )
+
+        # 解码并按prompt分组
+        # outputs shape: [batch_size * num_candidates, seq_len]
+        input_len = inputs["input_ids"].shape[1]
+        for j in range(batch_size_actual):
+            candidates = []
+            for k in range(num_candidates):
+                idx = j * num_candidates + k
                 response = tokenizer.decode(
-                    outputs[0][inputs["input_ids"].shape[1]:],
-                    skip_special_tokens=True,
+                    outputs[idx][input_len:], skip_special_tokens=True
                 ).strip()
                 candidates.append(response)
-
             all_candidates.append(candidates)
+
+        if (i + batch_size) % 50 == 0 or i + batch_size >= total:
+            print(f"  Generated candidates for {min(i + batch_size, total)}/{total} prompts")
 
     return all_candidates
 
@@ -80,11 +98,6 @@ def preprocess_for_dpo(
 ) -> Dict:
     """完整的DPO数据预处理流程。
 
-    1. 提取输入和参考
-    2. 生成多个候选输出
-    3. 使用反馈模块评分和融合
-    4. 构建偏好对
-
     Args:
         model: 用于生成候选的模型
         tokenizer: 分词器
@@ -96,7 +109,6 @@ def preprocess_for_dpo(
         包含偏好对和统计信息的字典
     """
     from src.feedback.rule_feedback import RuleFeedback
-    from src.feedback.feedback_fusion import AdaptiveFeedbackFusion, normalize_scores
 
     if max_samples:
         raw_data = raw_data[:max_samples]
@@ -117,25 +129,14 @@ def preprocess_for_dpo(
         inputs, references, candidates_list
     )
 
-    # Step 3: 模型反馈（可选，需要额外的小模型）
-    # 这里先只用规则反馈，保持轻量
-    pairs_by_source = {"rule": rule_pairs}
-
-    # Step 4: 融合（单源时直接使用）
-    if len(pairs_by_source) == 1:
-        final_pairs = rule_pairs
-    else:
-        fusion = AdaptiveFeedbackFusion(num_feedback_sources=len(pairs_by_source))
-        final_pairs = fusion.fuse_preference_pairs(pairs_by_source)
-
     # 格式化为DPO训练格式
     dpo_data = []
-    for pair in final_pairs:
+    for pair in rule_pairs:
         dpo_data.append({
             "prompt": f"请为以下文本生成简洁准确的摘要：\n{pair['input']}\n摘要：",
             "chosen": pair["chosen"],
             "rejected": pair["rejected"],
-            "score_diff": pair.get("score_diff", pair.get("fused_score_diff", 0.0)),
+            "score_diff": pair.get("score_diff", 0.0),
         })
 
     return {
