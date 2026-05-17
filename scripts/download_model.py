@@ -24,7 +24,6 @@ def download_from_modelscope(model_id: str, local_dir: str):
         os.system("pip install modelscope -q")
         from modelscope import snapshot_download
 
-    # ModelScope的Qwen模型ID格式
     ms_model_map = {
         "Qwen/Qwen2.5-1.5B-Instruct": "Qwen/Qwen2.5-1.5B-Instruct",
         "Qwen/Qwen2.5-3B-Instruct": "Qwen/Qwen2.5-3B-Instruct",
@@ -33,7 +32,28 @@ def download_from_modelscope(model_id: str, local_dir: str):
     ms_model_id = ms_model_map.get(model_id, model_id)
 
     print(f"Downloading {ms_model_id} from ModelScope to {local_dir}...")
-    snapshot_download(ms_model_id, cache_dir=local_dir)
+    # 显式包含所有文件类型（权重、tokenizer、config）
+    snapshot_download(
+        ms_model_id,
+        local_dir=local_dir,
+        ignore_file_pattern=["*.md", "*.txt", ".gitattributes"],
+    )
+
+    # ModelScope可能嵌套目录，检查并修正
+    nested = os.path.join(local_dir, *ms_model_id.split("/"))
+    if os.path.isdir(nested) and os.path.isfile(os.path.join(nested, "config.json")):
+        print(f"Moving files from nested dir to {local_dir}...")
+        import shutil
+        for f in os.listdir(nested):
+            src = os.path.join(nested, f)
+            dst = os.path.join(local_dir, f)
+            if not os.path.exists(dst):
+                shutil.move(src, dst)
+        # 清理空目录
+        parent = os.path.dirname(nested)
+        if os.path.isdir(parent) and not os.listdir(parent):
+            os.rmdir(parent)
+
     print(f"Done! Model saved to {local_dir}")
     return local_dir
 

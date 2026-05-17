@@ -3,7 +3,7 @@
 
 # 模型配置
 model:
-  name: "Qwen/Qwen2.5-1.5B-Instruct"
+  name: "models/Qwen2.5-1.5B-Instruct"
   dtype: "bfloat16"
   trust_remote_code: true
 

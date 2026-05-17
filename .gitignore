@@ -20,6 +20,7 @@ env/
 *.swo
 
 # Model weights & checkpoints (large files, sync via other means)
+models/
 outputs/
 *.bin
 *.safetensors
