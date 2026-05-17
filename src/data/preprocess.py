@@ -36,6 +36,11 @@ def generate_candidates(
         候选输出列表，shape [num_prompts, num_candidates]
     """
     model.eval()
+    # decoder-only模型需要left-padding
+    tokenizer.padding_side = "left"
+    if tokenizer.pad_token is None:
+        tokenizer.pad_token = tokenizer.eos_token
+
     all_candidates = []
     total = len(prompts)
 
