@@ -55,33 +55,35 @@ python scripts/run_experiment.py --config configs/train.yaml --mode ablation --a
 ## 项目结构
 
 ```
-MFRL/
+.
 ├── README.md
+├── .gitignore
 ├── requirements.txt
 ├── configs/
-│   ├── train.yaml          # 训练配置
-│   └── eval.yaml           # 评估配置
+│   ├── train.yaml              # 训练配置
+│   └── eval.yaml               # 评估配置
 ├── src/
-│   ├── feedback/           # 反馈模块
+│   ├── feedback/               # 多形式反馈模块（核心创新）
 │   │   ├── rule_feedback.py    # 规则反馈（ROUGE等）
 │   │   ├── model_feedback.py   # 模型反馈（小模型评分）
 │   │   └── feedback_fusion.py  # 自适应反馈融合
-│   ├── trainer/            # 训练模块
-│   │   ├── dpo_trainer.py      # DPO训练器
+│   ├── trainer/                # 训练模块
+│   │   ├── dpo_trainer.py      # DPO训练器 + LoRA
 │   │   └── curriculum.py       # 课程学习调度
-│   ├── data/               # 数据处理
-│   │   ├── dataset.py          # 数据集加载
-│   │   └── preprocess.py       # 数据预处理
-│   └── eval/               # 评估模块
-│       ├── metrics.py          # 评估指标
+│   ├── data/                   # 数据处理
+│   │   ├── dataset.py          # LCSTS / Alpaca-Chinese加载
+│   │   └── preprocess.py       # 候选生成 + 偏好对构建
+│   └── eval/                   # 评估模块
+│       ├── metrics.py          # ROUGE + Win Rate
 │       └── evaluator.py        # 评估器
 ├── scripts/
-│   ├── run_experiment.py   # 主实验脚本
-│   └── run_baselines.py    # Baseline脚本
-├── data/                   # 数据目录
-├── outputs/                # 输出目录
-└── paper/                  # 论文
-    └── main.tex            # LaTeX论文模板
+│   ├── run_experiment.py       # 主实验 + 消融实验
+│   └── run_baselines.py        # SFT / DPO / KTO baseline
+├── paper/
+│   └── main.tex                # 电子学报 LaTeX模板
+├── data/                       # 数据集（gitignore，实验机下载）
+├── outputs/                    # 模型输出（gitignore）
+└── journal_to_refer/           # 参考论文（gitignore）
 ```
 
 ## 预计实验时间（单卡3090）
