@@ -22,16 +22,11 @@ def download_lcsts(max_samples: int, output_dir: str):
     """下载LCSTS数据集并保存为JSON。"""
     from datasets import load_dataset
 
-    # 尝试多个可用的中文摘要数据集
+    # HuggingFace上实际存在的LCSTS数据集（经API搜索确认）
     candidates = [
-        ("hfl/lcsts", "train"),
-        ("seamew/LCSTS", "train"),
-        ("IsmaelMousa/LCSTS", "train"),
-        ("xiaoda/LCSTS", "train"),
-        ("lcsts", "train"),
-        # 备选：其他中文数据集
-        ("shibing624/nli_zh", "train"),
-        ("HuggingFaceM4/zh_cls_fudan-news", "train"),
+        ("suolyer/lcsts", "train"),
+        ("hugcyp/LCSTS", "train"),
+        ("hongboyang/LCSTS_instruction1", "train"),
     ]
     dataset = None
     for name, split in candidates:

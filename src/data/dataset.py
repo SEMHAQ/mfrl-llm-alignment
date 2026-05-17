@@ -23,7 +23,7 @@ def load_lcsts(
 ) -> Dataset:
     """加载LCSTS中文摘要数据集。
 
-    HuggingFace上可用的LCSTS镜像：seamew/LCSTS, IsmaelMousa/LCSTS
+    HuggingFace上实际存在的LCSTS数据集（经API搜索确认）。
 
     Args:
         split: 数据分割（train/validation/test）
@@ -32,8 +32,7 @@ def load_lcsts(
     Returns:
         HuggingFace Dataset，包含 source 和 summary 字段
     """
-    # 尝试多个可用的LCSTS数据集名称
-    lcsts_names = ["seamew/LCSTS", "IsmaelMousa/LCSTS", "xiaoda/LCSTS"]
+    lcsts_names = ["suolyer/lcsts", "hugcyp/LCSTS"]
     dataset = None
     for name in lcsts_names:
         try:
