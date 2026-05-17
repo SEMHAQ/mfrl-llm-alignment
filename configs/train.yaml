@@ -26,7 +26,7 @@ dpo:
   beta: 0.1
   loss_type: "sigmoid"
   learning_rate: 5.0e-6
-  num_epochs: 1
+  num_epochs: 3
   batch_size: 2
   gradient_accumulation: 8
   max_length: 256
@@ -54,9 +54,9 @@ feedback:
 # 数据配置
 data:
   dataset: "lcsts"  # lcsts 或 alpaca_chinese
-  max_train_samples: 500
-  max_eval_samples: 100
-  max_test_samples: 100
+  max_train_samples: 2000
+  max_eval_samples: 500
+  max_test_samples: 500
 
 # 输出配置
 output:
