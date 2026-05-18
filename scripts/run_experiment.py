@@ -2,10 +2,10 @@
 
 执行流程：
 1. 加载数据集
-2. 生成候选输出
-3. 计算反馈分数
+2. 生成候选输出（需要策略模型）
+3. 计算反馈分数（规则+模型，7B评判模型单独加载）
 4. 融合反馈构建偏好对
-5. DPO训练
+5. DPO训练（策略模型）
 6. 评估
 
 使用方法：
@@ -15,13 +15,13 @@
 
 import os
 import sys
+import gc
 import json
 import argparse
 import yaml
 import torch
 from pathlib import Path
 
-# 添加项目根目录到路径
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from transformers import AutoTokenizer, AutoModelForCausalLM
@@ -29,20 +29,17 @@ from src.feedback.rule_feedback import RuleFeedback
 from src.feedback.model_feedback import ModelFeedback
 from src.feedback.feedback_fusion import AdaptiveFeedbackFusion
 from src.trainer.dpo_trainer import MFRLTrainer, MFRLConfig
-from src.trainer.curriculum import CurriculumScheduler
-from src.data.dataset import load_lcsts, load_alpaca_chinese, PreferenceDataset
+from src.data.dataset import load_lcsts, load_alpaca_chinese
 from src.data.preprocess import generate_candidates
 from src.eval.evaluator import Evaluator
 
 
 def load_config(config_path: str) -> dict:
-    """加载YAML配置文件。"""
     with open(config_path, "r", encoding="utf-8") as f:
         return yaml.safe_load(f)
 
 
 def load_model(model_name: str, dtype: str = "bfloat16"):
-    """加载模型和分词器。"""
     dtype_map = {
         "float16": torch.float16,
         "bfloat16": torch.bfloat16,
@@ -61,30 +58,36 @@ def load_model(model_name: str, dtype: str = "bfloat16"):
     return model, tokenizer
 
 
-def prepare_preference_data(
-    model,
-    tokenizer,
-    raw_data,
-    config,
-    feedback_type="both",
-):
-    """准备偏好数据。
+def unload_model(model, tokenizer):
+    """释放模型显存。"""
+    del model
+    del tokenizer
+    gc.collect()
+    torch.cuda.empty_cache()
 
-    Args:
-        model: 用于生成候选的模型
-        tokenizer: 分词器
-        raw_data: 原始数据
-        config: 配置
-        feedback_type: 反馈类型 ("rule", "model", "both")
-    """
+
+def prepare_preference_data(
+    model, tokenizer, raw_data, config, feedback_type="both",
+    judge_model_name=None,
+):
+    """准备偏好数据，支持顺序加载模型。"""
     num_candidates = config["feedback"]["num_candidates"]
+    gen_config = config.get("generation", {})
+    temperature = gen_config.get("temperature", 0.8)
+    top_p = gen_config.get("top_p", 0.95)
+    max_new_tokens = gen_config.get("max_new_tokens", 128)
+
     inputs = [item["input"] for item in raw_data]
     references = [item["reference"] for item in raw_data]
 
     # 生成候选
-    print(f"Generating {num_candidates} candidates per input...")
+    print(f"Generating {num_candidates} candidates per input (temp={temperature})...")
     candidates_list = generate_candidates(
-        model, tokenizer, inputs, num_candidates=num_candidates
+        model, tokenizer, inputs,
+        num_candidates=num_candidates,
+        temperature=temperature,
+        top_p=top_p,
+        max_new_tokens=max_new_tokens,
     )
 
     pairs_by_source = {}
@@ -102,17 +105,25 @@ def prepare_preference_data(
         pairs_by_source["rule"] = rule_pairs
         print(f"  Rule pairs: {len(rule_pairs)}")
 
-    # 模型反馈
+    # 模型反馈（使用单独的评判模型）
     if feedback_type in ("model", "both") and config["feedback"]["model"]["enabled"]:
         print("Computing model-based feedback...")
-        model_feedback = ModelFeedback(
-            model_name=config["feedback"]["model"]["model_name"]
-        )
-        model_pairs = model_feedback.generate_preference_pairs(
+        if judge_model_name:
+            print(f"  Loading judge model: {judge_model_name}")
+            judge_model = ModelFeedback(model_name=judge_model_name)
+        else:
+            judge_model = ModelFeedback(
+                model_name=config["feedback"]["model"]["model_name"]
+            )
+        model_pairs = judge_model.generate_preference_pairs(
             inputs, references, candidates_list
         )
         pairs_by_source["model"] = model_pairs
         print(f"  Model pairs: {len(model_pairs)}")
+        # 释放评判模型
+        del judge_model
+        gc.collect()
+        torch.cuda.empty_cache()
 
     # 融合
     if len(pairs_by_source) > 1:
@@ -142,7 +153,6 @@ def train_mfrl(dpo_data, config, output_dir):
     """执行MFRL训练。"""
     from datasets import Dataset
 
-    # 划分训练/验证集
     split_idx = int(len(dpo_data) * 0.9)
     train_data = dpo_data[:split_idx]
     eval_data = dpo_data[split_idx:]
@@ -150,7 +160,6 @@ def train_mfrl(dpo_data, config, output_dir):
     train_dataset = Dataset.from_list(train_data)
     eval_dataset = Dataset.from_list(eval_data)
 
-    # 配置训练
     mfrl_config = MFRLConfig(
         model_name=config["model"]["name"],
         model_dtype=config["model"]["dtype"],
@@ -181,13 +190,11 @@ def evaluate(model, tokenizer, test_data, output_dir):
     """评估模型。"""
     evaluator = Evaluator(model, tokenizer)
 
-    # ROUGE评估
     rouge_scores = evaluator.evaluate_rouge(test_data)
     print(f"\nROUGE Scores:")
     for metric, score in rouge_scores.items():
         print(f"  {metric}: {score:.4f}")
 
-    # 保存结果
     results = {"rouge": rouge_scores}
     save_path = os.path.join(output_dir, "eval_results.json")
     with open(save_path, "w", encoding="utf-8") as f:
@@ -202,7 +209,6 @@ def run_ablation(config, ablation_type):
     print(f"Running ablation: {ablation_type}")
     print(f"{'='*50}\n")
 
-    # 修改配置
     if ablation_type == "no_rule":
         config["feedback"]["rule"]["enabled"] = False
         config["feedback"]["model"]["enabled"] = True
@@ -229,17 +235,15 @@ def main():
                         choices=["full", "ablation", "eval_only"])
     parser.add_argument("--ablation_type", type=str, default=None,
                         choices=["no_rule", "no_model", "no_curriculum"])
+    parser.add_argument("--skip_generation", action="store_true",
+                        help="Skip candidate generation, load from cache")
     args = parser.parse_args()
 
     config = load_config(args.config)
     output_dir = config["output"]["dir"]
     os.makedirs(output_dir, exist_ok=True)
 
-    # 加载模型
-    print("Loading model...")
-    model, tokenizer = load_model(config["model"]["name"], config["model"]["dtype"])
-
-    # 加载数据集（优先从本地JSON加载，避免实验机联网）
+    # 加载数据集
     print("Loading dataset...")
     dataset_name = config["data"]["dataset"]
     local_json = os.path.join("data", f"{dataset_name}_train.json")
@@ -271,22 +275,43 @@ def main():
     if args.mode == "ablation" and args.ablation_type:
         output_dir, feedback_type = run_ablation(config, args.ablation_type)
 
-    # 准备偏好数据
-    print("Preparing preference data...")
-    dpo_data = prepare_preference_data(
-        model, tokenizer, raw_data, config, feedback_type
-    )
-    print(f"Total preference pairs: {len(dpo_data)}")
+    # 偏好数据缓存路径
+    preference_cache = os.path.join(output_dir, "preference_data.json")
 
-    # 保存偏好数据
-    with open(os.path.join(output_dir, "preference_data.json"), "w", encoding="utf-8") as f:
-        json.dump(dpo_data, f, ensure_ascii=False, indent=2)
+    if args.skip_generation and os.path.exists(preference_cache):
+        print(f"Loading cached preference data from {preference_cache}")
+        with open(preference_cache, "r", encoding="utf-8") as f:
+            dpo_data = json.load(f)
+    else:
+        # Step 1: 加载策略模型，生成候选
+        print("Loading policy model for candidate generation...")
+        model, tokenizer = load_model(config["model"]["name"], config["model"]["dtype"])
 
-    # 训练
+        # 检查是否需要单独的评判模型
+        judge_model_name = None
+        if (config["feedback"]["model"]["enabled"] and
+            config["feedback"]["model"]["model_name"] != config["model"]["name"]):
+            judge_model_name = config["feedback"]["model"]["model_name"]
+
+        print("Preparing preference data...")
+        dpo_data = prepare_preference_data(
+            model, tokenizer, raw_data, config, feedback_type,
+            judge_model_name=judge_model_name,
+        )
+        print(f"Total preference pairs: {len(dpo_data)}")
+
+        # 保存偏好数据
+        with open(preference_cache, "w", encoding="utf-8") as f:
+            json.dump(dpo_data, f, ensure_ascii=False, indent=2)
+
+        # 释放策略模型
+        unload_model(model, tokenizer)
+
+    # Step 2: DPO训练（重新加载策略模型）
     print("\nStarting MFRL training...")
     trainer = train_mfrl(dpo_data, config, output_dir)
 
-    # 评估
+    # Step 3: 评估
     print("\nEvaluating...")
     test_data = dpo_data[-config["data"]["max_test_samples"]:]
     evaluate(trainer.model, trainer.tokenizer, test_data, output_dir)
