@@ -192,8 +192,11 @@ def main():
     if args.mode == "ablation" and args.ablation_type:
         output_dir, feedback_type = run_ablation(config, args.ablation_type)
 
-    # 候选缓存路径
-    candidates_cache = os.path.join(output_dir, "candidates.json")
+    # 候选缓存（共享位置，跟样本数无关）
+    num_candidates = config["feedback"]["num_candidates"]
+    gen_config = config.get("generation", {})
+    temp = gen_config.get("temperature", 0.8)
+    shared_cache = os.path.join("data", f"candidates_k{num_candidates}_t{temp}.json")
     preference_cache = os.path.join(output_dir, "preference_data.json")
 
     if args.skip_generation and os.path.exists(preference_cache):
@@ -201,32 +204,53 @@ def main():
         with open(preference_cache, "r", encoding="utf-8") as f:
             dpo_data = json.load(f)
     else:
-        # Step 1: 生成候选（优先从缓存加载）
+        # Step 1: 加载或生成候选
         inputs = [item["input"] for item in raw_data]
         references = [item["reference"] for item in raw_data]
-        num_candidates = config["feedback"]["num_candidates"]
-        gen_config = config.get("generation", {})
+        n_needed = len(inputs)
 
-        if os.path.exists(candidates_cache):
-            print(f"Loading cached candidates from {candidates_cache}")
-            with open(candidates_cache, "r", encoding="utf-8") as f:
-                candidates_list = json.load(f)
-            print(f"  Loaded {len(candidates_list)} x {len(candidates_list[0])} candidates")
+        if os.path.exists(shared_cache):
+            with open(shared_cache, "r", encoding="utf-8") as f:
+                cached_candidates = json.load(f)
+            n_cached = len(cached_candidates)
+            print(f"Found cached candidates: {n_cached} samples, need {n_needed}")
+
+            if n_cached >= n_needed:
+                candidates_list = cached_candidates[:n_needed]
+                print(f"  Using {n_needed} from cache")
+            else:
+                # 缓存不够，补生成剩余部分
+                print(f"  Cache has {n_cached}, need {n_needed}. Generating {n_needed - n_cached} more...")
+                model, tokenizer = load_model(config["model"]["name"], config["model"]["dtype"])
+                extra_inputs = inputs[n_cached:]
+                extra_candidates = generate_candidates(
+                    model, tokenizer, extra_inputs,
+                    num_candidates=num_candidates,
+                    temperature=temp,
+                    top_p=gen_config.get("top_p", 0.95),
+                    max_new_tokens=gen_config.get("max_new_tokens", 128),
+                )
+                unload_model(model, tokenizer)
+                candidates_list = cached_candidates + extra_candidates
+                # 更新缓存
+                with open(shared_cache, "w", encoding="utf-8") as f:
+                    json.dump(candidates_list, f, ensure_ascii=False, indent=2)
+                print(f"  Updated cache: {len(candidates_list)} total")
         else:
+            # 全量生成
             print("Loading policy model for candidate generation...")
             model, tokenizer = load_model(config["model"]["name"], config["model"]["dtype"])
-            print(f"Generating {num_candidates} candidates per input...")
+            print(f"Generating {num_candidates} candidates for {n_needed} inputs...")
             candidates_list = generate_candidates(
                 model, tokenizer, inputs,
                 num_candidates=num_candidates,
-                temperature=gen_config.get("temperature", 0.8),
+                temperature=temp,
                 top_p=gen_config.get("top_p", 0.95),
                 max_new_tokens=gen_config.get("max_new_tokens", 128),
             )
-            # 缓存候选
-            with open(candidates_cache, "w", encoding="utf-8") as f:
+            with open(shared_cache, "w", encoding="utf-8") as f:
                 json.dump(candidates_list, f, ensure_ascii=False, indent=2)
-            print(f"  Saved candidates to {candidates_cache}")
+            print(f"  Saved {len(candidates_list)} candidates to {shared_cache}")
             unload_model(model, tokenizer)
 
         # Step 2: 计算反馈分数
