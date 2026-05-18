@@ -47,25 +47,25 @@ feedback:
       rouge2: 0.3
       rougeL: 0.4
   model:
-    enabled: true
-    model_name: "models/Qwen2.5-7B-Instruct"
-  num_candidates: 8
+    enabled: false
+    model_name: "models/Qwen2.5-0.5B-Instruct"
+  num_candidates: 4
 
 # 候选生成配置
 generation:
-  temperature: 1.2
+  temperature: 0.8
   top_p: 0.95
   max_new_tokens: 128
 
 # 数据配置
 data:
   dataset: "lcsts"
-  max_train_samples: 2000
+  max_train_samples: 5000
   max_eval_samples: 500
   max_test_samples: 500
 
 # 输出配置
 output:
-  dir: "outputs/mfrl_v2"
+  dir: "outputs/mfrl_v3"
   logging_steps: 10
   save_strategy: "epoch"
