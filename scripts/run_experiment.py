@@ -66,89 +66,6 @@ def unload_model(model, tokenizer):
     torch.cuda.empty_cache()
 
 
-def prepare_preference_data(
-    model, tokenizer, raw_data, config, feedback_type="both",
-    judge_model_name=None,
-):
-    """准备偏好数据，支持顺序加载模型。"""
-    num_candidates = config["feedback"]["num_candidates"]
-    gen_config = config.get("generation", {})
-    temperature = gen_config.get("temperature", 0.8)
-    top_p = gen_config.get("top_p", 0.95)
-    max_new_tokens = gen_config.get("max_new_tokens", 128)
-
-    inputs = [item["input"] for item in raw_data]
-    references = [item["reference"] for item in raw_data]
-
-    # 生成候选
-    print(f"Generating {num_candidates} candidates per input (temp={temperature})...")
-    candidates_list = generate_candidates(
-        model, tokenizer, inputs,
-        num_candidates=num_candidates,
-        temperature=temperature,
-        top_p=top_p,
-        max_new_tokens=max_new_tokens,
-    )
-
-    pairs_by_source = {}
-
-    # 规则反馈
-    if feedback_type in ("rule", "both") and config["feedback"]["rule"]["enabled"]:
-        print("Computing rule-based feedback...")
-        rule_feedback = RuleFeedback(
-            metrics=config["feedback"]["rule"]["metrics"],
-            weights=config["feedback"]["rule"]["weights"],
-        )
-        rule_pairs = rule_feedback.generate_preference_pairs(
-            inputs, references, candidates_list
-        )
-        pairs_by_source["rule"] = rule_pairs
-        print(f"  Rule pairs: {len(rule_pairs)}")
-
-    # 模型反馈（使用单独的评判模型）
-    if feedback_type in ("model", "both") and config["feedback"]["model"]["enabled"]:
-        print("Computing model-based feedback...")
-        if judge_model_name:
-            print(f"  Loading judge model: {judge_model_name}")
-            judge_model = ModelFeedback(model_name=judge_model_name)
-        else:
-            judge_model = ModelFeedback(
-                model_name=config["feedback"]["model"]["model_name"]
-            )
-        model_pairs = judge_model.generate_preference_pairs(
-            inputs, references, candidates_list
-        )
-        pairs_by_source["model"] = model_pairs
-        print(f"  Model pairs: {len(model_pairs)}")
-        # 释放评判模型
-        del judge_model
-        gc.collect()
-        torch.cuda.empty_cache()
-
-    # 融合
-    if len(pairs_by_source) > 1:
-        print("Fusing feedback signals...")
-        fusion = AdaptiveFeedbackFusion(num_feedback_sources=len(pairs_by_source))
-        final_pairs = fusion.fuse_preference_pairs(pairs_by_source)
-    elif len(pairs_by_source) == 1:
-        final_pairs = list(pairs_by_source.values())[0]
-    else:
-        raise ValueError(f"No feedback enabled for type: {feedback_type}")
-
-    # 格式化为DPO格式
-    dpo_data = []
-    for pair in final_pairs:
-        prompt = f"请为以下文本生成简洁准确的摘要：\n{pair['input']}\n摘要："
-        dpo_data.append({
-            "prompt": prompt,
-            "chosen": pair["chosen"],
-            "rejected": pair["rejected"],
-            "score_diff": pair.get("score_diff", pair.get("fused_score_diff", 0.0)),
-        })
-
-    return dpo_data
-
-
 def train_mfrl(dpo_data, config, output_dir):
     """执行MFRL训练。"""
     from datasets import Dataset
@@ -275,7 +192,8 @@ def main():
     if args.mode == "ablation" and args.ablation_type:
         output_dir, feedback_type = run_ablation(config, args.ablation_type)
 
-    # 偏好数据缓存路径
+    # 候选缓存路径
+    candidates_cache = os.path.join(output_dir, "candidates.json")
     preference_cache = os.path.join(output_dir, "preference_data.json")
 
     if args.skip_generation and os.path.exists(preference_cache):
@@ -283,29 +201,88 @@ def main():
         with open(preference_cache, "r", encoding="utf-8") as f:
             dpo_data = json.load(f)
     else:
-        # Step 1: 加载策略模型，生成候选
-        print("Loading policy model for candidate generation...")
-        model, tokenizer = load_model(config["model"]["name"], config["model"]["dtype"])
+        # Step 1: 生成候选（优先从缓存加载）
+        inputs = [item["input"] for item in raw_data]
+        references = [item["reference"] for item in raw_data]
+        num_candidates = config["feedback"]["num_candidates"]
+        gen_config = config.get("generation", {})
 
-        # 检查是否需要单独的评判模型
-        judge_model_name = None
-        if (config["feedback"]["model"]["enabled"] and
-            config["feedback"]["model"]["model_name"] != config["model"]["name"]):
-            judge_model_name = config["feedback"]["model"]["model_name"]
+        if os.path.exists(candidates_cache):
+            print(f"Loading cached candidates from {candidates_cache}")
+            with open(candidates_cache, "r", encoding="utf-8") as f:
+                candidates_list = json.load(f)
+            print(f"  Loaded {len(candidates_list)} x {len(candidates_list[0])} candidates")
+        else:
+            print("Loading policy model for candidate generation...")
+            model, tokenizer = load_model(config["model"]["name"], config["model"]["dtype"])
+            print(f"Generating {num_candidates} candidates per input...")
+            candidates_list = generate_candidates(
+                model, tokenizer, inputs,
+                num_candidates=num_candidates,
+                temperature=gen_config.get("temperature", 0.8),
+                top_p=gen_config.get("top_p", 0.95),
+                max_new_tokens=gen_config.get("max_new_tokens", 128),
+            )
+            # 缓存候选
+            with open(candidates_cache, "w", encoding="utf-8") as f:
+                json.dump(candidates_list, f, ensure_ascii=False, indent=2)
+            print(f"  Saved candidates to {candidates_cache}")
+            unload_model(model, tokenizer)
 
-        print("Preparing preference data...")
-        dpo_data = prepare_preference_data(
-            model, tokenizer, raw_data, config, feedback_type,
-            judge_model_name=judge_model_name,
-        )
+        # Step 2: 计算反馈分数
+        pairs_by_source = {}
+
+        if feedback_type in ("rule", "both") and config["feedback"]["rule"]["enabled"]:
+            print("Computing rule-based feedback...")
+            rule_feedback = RuleFeedback(
+                metrics=config["feedback"]["rule"]["metrics"],
+                weights=config["feedback"]["rule"]["weights"],
+            )
+            rule_pairs = rule_feedback.generate_preference_pairs(
+                inputs, references, candidates_list
+            )
+            pairs_by_source["rule"] = rule_pairs
+            print(f"  Rule pairs: {len(rule_pairs)}")
+
+        if feedback_type in ("model", "both") and config["feedback"]["model"]["enabled"]:
+            print("Computing model-based feedback...")
+            judge_model = ModelFeedback(
+                model_name=config["feedback"]["model"]["model_name"]
+            )
+            model_pairs = judge_model.generate_preference_pairs(
+                inputs, references, candidates_list
+            )
+            pairs_by_source["model"] = model_pairs
+            print(f"  Model pairs: {len(model_pairs)}")
+            del judge_model
+            gc.collect()
+            torch.cuda.empty_cache()
+
+        # 融合
+        if len(pairs_by_source) > 1:
+            print("Fusing feedback signals...")
+            fusion = AdaptiveFeedbackFusion(num_feedback_sources=len(pairs_by_source))
+            final_pairs = fusion.fuse_preference_pairs(pairs_by_source)
+        elif len(pairs_by_source) == 1:
+            final_pairs = list(pairs_by_source.values())[0]
+        else:
+            raise ValueError("No feedback enabled")
+
+        # 格式化为DPO格式
+        dpo_data = []
+        for pair in final_pairs:
+            prompt = f"请为以下文本生成简洁准确的摘要：\n{pair['input']}\n摘要："
+            dpo_data.append({
+                "prompt": prompt,
+                "chosen": pair["chosen"],
+                "rejected": pair["rejected"],
+                "score_diff": pair.get("score_diff", pair.get("fused_score_diff", 0.0)),
+            })
         print(f"Total preference pairs: {len(dpo_data)}")
 
         # 保存偏好数据
         with open(preference_cache, "w", encoding="utf-8") as f:
             json.dump(dpo_data, f, ensure_ascii=False, indent=2)
-
-        # 释放策略模型
-        unload_model(model, tokenizer)
 
     # Step 2: DPO训练（重新加载策略模型）
     print("\nStarting MFRL training...")
