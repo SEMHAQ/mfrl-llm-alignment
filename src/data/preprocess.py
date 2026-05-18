@@ -16,7 +16,7 @@ def generate_candidates(
     temperature: float = 0.8,
     top_p: float = 0.95,
     max_new_tokens: int = 128,
-    batch_size: int = 4,
+    batch_size: int = 16,
 ) -> List[List[str]]:
     """为每个prompt生成多个候选输出。
 
