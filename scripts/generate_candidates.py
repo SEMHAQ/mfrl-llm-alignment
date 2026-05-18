@@ -26,9 +26,9 @@ def main():
     parser = argparse.ArgumentParser(description="Generate candidates and save to cache")
     parser.add_argument("--config", type=str, default="configs/train.yaml")
     parser.add_argument("--max_samples", type=int, default=None,
-                        help="Override max samples (default: use config value)")
-    parser.add_argument("--batch_size", type=int, default=32,
-                        help="Generation batch size (default: 32)")
+                        help="Max samples to generate. 0 = use all data (default: config value)")
+    parser.add_argument("--batch_size", type=int, default=64,
+                        help="Generation batch size (default: 64)")
     args = parser.parse_args()
 
     with open(args.config, "r", encoding="utf-8") as f:
@@ -46,7 +46,10 @@ def main():
         print(f"ERROR: {local_json} not found. Run prepare_data.py first.")
         return
 
-    max_samples = args.max_samples or config["data"]["max_train_samples"]
+    if args.max_samples is not None:
+        max_samples = args.max_samples  # 0 means use all
+    else:
+        max_samples = config["data"]["max_train_samples"]
     if max_samples and len(raw_data) > max_samples:
         raw_data = raw_data[:max_samples]
 
