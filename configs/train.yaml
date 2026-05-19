@@ -26,11 +26,11 @@ dpo:
   beta: 0.1
   loss_type: "sigmoid"
   learning_rate: 5.0e-6
-  num_epochs: 3
-  batch_size: 4
-  gradient_accumulation: 4
-  max_length: 512
-  max_prompt_length: 256
+  num_epochs: 2
+  batch_size: 8
+  gradient_accumulation: 2
+  max_length: 256
+  max_prompt_length: 128
 
 # 课程学习配置
 curriculum:
@@ -61,9 +61,9 @@ generation:
 # 数据配置
 data:
   dataset: "lcsts"
-  max_train_samples: 5000
-  max_eval_samples: 500
-  max_test_samples: 500
+  max_train_samples: 2000
+  max_eval_samples: 200
+  max_test_samples: 200
 
 # 输出配置
 output:
