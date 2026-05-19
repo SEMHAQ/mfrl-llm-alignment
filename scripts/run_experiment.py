@@ -126,11 +126,7 @@ def run_ablation(config, ablation_type):
     print(f"Running ablation: {ablation_type}")
     print(f"{'='*50}\n")
 
-    if ablation_type == "no_rule":
-        config["feedback"]["rule"]["enabled"] = False
-        config["feedback"]["model"]["enabled"] = True
-        feedback_type = "model"
-    elif ablation_type == "no_model":
+    if ablation_type == "no_model":
         config["feedback"]["model"]["enabled"] = False
         feedback_type = "rule"
     elif ablation_type == "no_curriculum":
@@ -151,7 +147,7 @@ def main():
     parser.add_argument("--mode", type=str, default="full",
                         choices=["full", "ablation", "eval_only"])
     parser.add_argument("--ablation_type", type=str, default=None,
-                        choices=["no_rule", "no_model", "no_curriculum"])
+                        choices=["no_model", "no_curriculum"])
     parser.add_argument("--skip_generation", action="store_true",
                         help="Skip candidate generation, load from cache")
     args = parser.parse_args()
