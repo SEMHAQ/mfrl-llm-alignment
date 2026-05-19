@@ -364,6 +364,13 @@ def main():
         print(f"{name:<25} {scores['rouge1']:<12.4f} {scores['rouge2']:<12.4f} {scores['rougeL']:<12.4f}")
     print(f"\nTotal duration: {duration}")
 
+    # 自动推送结果
+    print("\nPushing results to remote...")
+    os.system("git add results/overnight_results.json")
+    os.system('git commit -m "results: overnight experiments"')
+    os.system("git push")
+    print("Done!")
+
 
 if __name__ == "__main__":
     main()
