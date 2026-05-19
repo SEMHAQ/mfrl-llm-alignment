@@ -27,8 +27,8 @@ def main():
     parser.add_argument("--config", type=str, default="configs/train.yaml")
     parser.add_argument("--max_samples", type=int, default=None,
                         help="Max samples to generate. 0 = use all data (default: config value)")
-    parser.add_argument("--batch_size", type=int, default=64,
-                        help="Generation batch size (default: 64)")
+    parser.add_argument("--batch_size", type=int, default=16,
+                        help="Generation batch size (default: 16)")
     args = parser.parse_args()
 
     with open(args.config, "r", encoding="utf-8") as f:
