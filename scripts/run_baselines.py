@@ -1,6 +1,7 @@
 """Baseline实验脚本
 
 运行SFT、DPO、KTO等baseline实验用于对比。
+评估时对比人工摘要，与MFRL使用相同的测试集。
 """
 
 import os
@@ -62,7 +63,7 @@ def setup_lora(model, r=8, alpha=16, dropout=0.05):
     return get_peft_model(model, lora_config)
 
 
-def run_sft_baseline(config, dpo_data, output_dir):
+def run_sft_baseline(config, train_data, output_dir):
     """SFT基线：只用chosen数据训练。"""
     print("\n" + "="*50)
     print("Running SFT Baseline")
@@ -71,16 +72,13 @@ def run_sft_baseline(config, dpo_data, output_dir):
     model, tokenizer = setup_model(config["model"]["name"], config["model"]["dtype"])
     model = setup_lora(model, config["lora"]["r"], config["lora"]["alpha"])
 
-    # 构造SFT数据
-    sft_data = []
-    for item in dpo_data:
-        sft_data.append({
-            "prompt": item["prompt"],
-            "completion": item["chosen"],
-        })
-    sft_dataset = Dataset.from_list(sft_data)
+    # 为SFT构造dummy rejected（长度为0的文本）
+    sft_dpo_data = [
+        {"prompt": item["prompt"], "chosen": item["chosen"], "rejected": ""}
+        for item in train_data
+    ]
+    sft_dataset = Dataset.from_list(sft_dpo_data)
 
-    # 使用DPO trainer但只用chosen（等效于SFT with preference signal）
     dpo_config = DPOConfig(
         output_dir=output_dir,
         learning_rate=config["dpo"]["learning_rate"],
@@ -89,20 +87,15 @@ def run_sft_baseline(config, dpo_data, output_dir):
         gradient_accumulation_steps=config["dpo"]["gradient_accumulation"],
         max_length=config["dpo"]["max_length"],
         max_prompt_length=config["dpo"]["max_prompt_length"],
-        beta=0.0,  # beta=0 等效于SFT
+        beta=0.0,
         logging_steps=10,
         save_strategy="epoch",
+        eval_strategy="no",
         bf16=(config["model"]["dtype"] == "bfloat16"),
+        fp16=(config["model"]["dtype"] == "float16"),
         gradient_checkpointing=True,
         report_to="none",
     )
-
-    # 为SFT构造dummy rejected（长度为0的文本）
-    sft_dpo_data = [
-        {"prompt": item["prompt"], "chosen": item["chosen"], "rejected": ""}
-        for item in dpo_data
-    ]
-    sft_dataset = Dataset.from_list(sft_dpo_data)
 
     trainer = DPOTrainer(
         model=model,
@@ -117,7 +110,7 @@ def run_sft_baseline(config, dpo_data, output_dir):
     return model, tokenizer
 
 
-def run_dpo_baseline(config, dpo_data, output_dir):
+def run_dpo_baseline(config, train_data, output_dir):
     """标准DPO基线（无多形式反馈融合）。"""
     print("\n" + "="*50)
     print("Running Standard DPO Baseline")
@@ -126,7 +119,7 @@ def run_dpo_baseline(config, dpo_data, output_dir):
     model, tokenizer = setup_model(config["model"]["name"], config["model"]["dtype"])
     model = setup_lora(model, config["lora"]["r"], config["lora"]["alpha"])
 
-    dataset = Dataset.from_list(dpo_data)
+    dataset = Dataset.from_list(train_data)
 
     dpo_config = DPOConfig(
         output_dir=output_dir,
@@ -140,7 +133,9 @@ def run_dpo_baseline(config, dpo_data, output_dir):
         loss_type=config["dpo"]["loss_type"],
         logging_steps=10,
         save_strategy="epoch",
+        eval_strategy="no",
         bf16=(config["model"]["dtype"] == "bfloat16"),
+        fp16=(config["model"]["dtype"] == "float16"),
         gradient_checkpointing=True,
         report_to="none",
     )
@@ -158,7 +153,7 @@ def run_dpo_baseline(config, dpo_data, output_dir):
     return model, tokenizer
 
 
-def run_kto_baseline(config, dpo_data, output_dir):
+def run_kto_baseline(config, train_data, output_dir):
     """KTO基线（只需要好/坏标签，不需要成对偏好）。"""
     print("\n" + "="*50)
     print("Running KTO Baseline")
@@ -169,7 +164,7 @@ def run_kto_baseline(config, dpo_data, output_dir):
 
     # KTO数据格式：prompt + completion + label（True/False）
     kto_data = []
-    for item in dpo_data:
+    for item in train_data:
         kto_data.append({
             "prompt": item["prompt"],
             "completion": item["chosen"],
@@ -192,7 +187,9 @@ def run_kto_baseline(config, dpo_data, output_dir):
         max_prompt_length=config["dpo"]["max_prompt_length"],
         logging_steps=10,
         save_strategy="epoch",
+        eval_strategy="no",
         bf16=(config["model"]["dtype"] == "bfloat16"),
+        fp16=(config["model"]["dtype"] == "float16"),
         gradient_checkpointing=True,
         report_to="none",
     )
@@ -211,13 +208,13 @@ def run_kto_baseline(config, dpo_data, output_dir):
 
 
 def evaluate_all(config, baselines, test_data):
-    """评估所有baseline并对比。"""
+    """评估所有baseline，对比人工摘要。"""
     results = {}
 
     for name, (model, tokenizer) in baselines.items():
         print(f"\nEvaluating {name}...")
         evaluator = Evaluator(model, tokenizer)
-        rouge_scores = evaluator.evaluate_rouge(test_data)
+        rouge_scores = evaluator.evaluate_rouge(test_data, reference_key="reference")
         results[name] = rouge_scores
         print(f"  ROUGE: {rouge_scores}")
 
@@ -242,7 +239,7 @@ def main():
     parser = argparse.ArgumentParser(description="MFRL Baseline Experiments")
     parser.add_argument("--config", type=str, default="configs/train.yaml")
     parser.add_argument("--data", type=str, required=True,
-                        help="Path to preference data JSON")
+                        help="Path to preference data JSON (must contain reference field)")
     parser.add_argument("--baselines", nargs="+",
                         default=["sft", "dpo", "kto"],
                         choices=["sft", "dpo", "kto"])
@@ -251,10 +248,17 @@ def main():
     config = load_config(args.config)
     dpo_data = load_data(args.data)
 
-    # 划分数据
-    split_idx = int(len(dpo_data) * 0.9)
-    train_data = dpo_data[:split_idx]
-    test_data = dpo_data[split_idx:]
+    # 验证数据包含reference字段
+    if "reference" not in dpo_data[0]:
+        print("ERROR: preference data missing 'reference' field. Regenerate with updated run_experiment.py")
+        return
+
+    # 划分数据（与MFRL相同的80/20划分）
+    test_size = config["data"]["max_test_samples"]
+    train_data = dpo_data[:-test_size]
+    test_data = dpo_data[-test_size:]
+
+    print(f"Train: {len(train_data)}, Test: {len(test_data)}")
 
     baselines = {}
 
@@ -276,7 +280,7 @@ def main():
         model, tokenizer = run_kto_baseline(config, train_data, kto_dir)
         baselines["kto"] = (model, tokenizer)
 
-    # 评估对比
+    # 评估对比（对比人工摘要）
     evaluate_all(config, baselines, test_data)
 
 
