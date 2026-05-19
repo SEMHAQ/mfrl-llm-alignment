@@ -121,7 +121,7 @@ class MFRLTrainer:
             loss_type=self.config.dpo_loss_type,
             logging_steps=self.config.logging_steps,
             save_strategy=self.config.save_strategy,
-            eval_strategy=self.config.eval_strategy if eval_dataset else "no",
+            eval_strategy="no",
             bf16=(self.config.model_dtype == "bfloat16"),
             fp16=(self.config.model_dtype == "float16"),
             gradient_checkpointing=True,
