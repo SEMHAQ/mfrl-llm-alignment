@@ -302,6 +302,14 @@ def main():
                 "rejected": pair["rejected"],
                 "score_diff": pair.get("score_diff", pair.get("fused_score_diff", 0.0)),
             })
+
+        # 过滤低质量偏好对
+        min_diff = config["feedback"].get("min_score_diff", 0.0)
+        if min_diff > 0:
+            before = len(dpo_data)
+            dpo_data = [d for d in dpo_data if d["score_diff"] >= min_diff]
+            print(f"Filtered by min_score_diff={min_diff}: {before} -> {len(dpo_data)} pairs")
+
         print(f"Total preference pairs: {len(dpo_data)}")
 
         # 保存偏好数据

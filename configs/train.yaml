@@ -49,11 +49,12 @@ feedback:
   model:
     enabled: false
     model_name: "models/Qwen2.5-0.5B-Instruct"
-  num_candidates: 4
+  num_candidates: 8
+  min_score_diff: 0.1
 
 # 候选生成配置
 generation:
-  temperature: 0.8
+  temperature: 1.2
   top_p: 0.95
   max_new_tokens: 128
 
