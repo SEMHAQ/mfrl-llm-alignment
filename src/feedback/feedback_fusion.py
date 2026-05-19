@@ -100,6 +100,7 @@ class AdaptiveFeedbackFusion(nn.Module):
                         "input": pair["input"],
                         "chosen": pair["chosen"],
                         "rejected": pair["rejected"],
+                        "reference": pair.get("reference", ""),
                         "scores": {},
                     }
                 aligned[key]["scores"][source] = pair["score_diff"]
@@ -124,6 +125,7 @@ class AdaptiveFeedbackFusion(nn.Module):
                 "input": item["input"],
                 "chosen": item["chosen"],
                 "rejected": item["rejected"],
+                "reference": item.get("reference", ""),
                 "fused_score_diff": result["fused_score"].item(),
                 "source_weights": {
                     source: result["weights"][0][i].item()

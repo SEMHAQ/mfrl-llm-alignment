@@ -92,6 +92,7 @@ class RuleFeedback:
                     "input": inp,
                     "chosen": chosen,
                     "rejected": rejected,
+                    "reference": ref,
                     "score_diff": chosen_score - rejected_score,
                     "chosen_score": chosen_score,
                     "rejected_score": rejected_score,

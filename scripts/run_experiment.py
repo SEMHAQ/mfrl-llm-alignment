@@ -1,16 +1,16 @@
 """MFRL完整实验脚本
 
 执行流程：
-1. 加载数据集
+1. 加载数据集，划分训练集/测试集
 2. 生成候选输出（需要策略模型）
 3. 计算反馈分数（规则+模型，7B评判模型单独加载）
 4. 融合反馈构建偏好对
 5. DPO训练（策略模型）
-6. 评估
+6. 评估（对比人工摘要）
 
 使用方法：
     python scripts/run_experiment.py --config configs/train.yaml
-    python scripts/run_experiment.py --mode ablation --ablation_type no_rule
+    python scripts/run_experiment.py --mode ablation --ablation_type no_filter
 """
 
 import os
@@ -104,10 +104,10 @@ def train_mfrl(dpo_data, config, output_dir):
 
 
 def evaluate(model, tokenizer, test_data, output_dir):
-    """评估模型。"""
+    """评估模型，对比人工摘要。"""
     evaluator = Evaluator(model, tokenizer)
 
-    rouge_scores = evaluator.evaluate_rouge(test_data)
+    rouge_scores = evaluator.evaluate_rouge(test_data, reference_key="reference")
     print(f"\nROUGE Scores:")
     for metric, score in rouge_scores.items():
         print(f"  {metric}: {score:.4f}")
@@ -186,6 +186,12 @@ def main():
         ]
     print(f"Loaded {len(raw_data)} samples")
 
+    # 划分训练集和测试集（80/20，在生成候选之前划分，避免数据泄露）
+    test_size = config["data"]["max_test_samples"]
+    train_raw = raw_data[:-test_size]
+    test_raw = raw_data[-test_size:]
+    print(f"Train: {len(train_raw)}, Test: {len(test_raw)}")
+
     # 消融实验配置
     feedback_type = "both"
     if args.mode == "ablation" and args.ablation_type:
@@ -203,9 +209,9 @@ def main():
         with open(preference_cache, "r", encoding="utf-8") as f:
             dpo_data = json.load(f)
     else:
-        # Step 1: 加载或生成候选
-        inputs = [item["input"] for item in raw_data]
-        references = [item["reference"] for item in raw_data]
+        # Step 1: 加载或生成候选（只用训练集）
+        inputs = [item["input"] for item in train_raw]
+        references = [item["reference"] for item in train_raw]
         n_needed = len(inputs)
 
         if os.path.exists(shared_cache):
@@ -218,7 +224,6 @@ def main():
                 candidates_list = cached_candidates[:n_needed]
                 print(f"  Using {n_needed} from cache")
             else:
-                # 缓存不够，补生成剩余部分
                 print(f"  Cache has {n_cached}, need {n_needed}. Generating {n_needed - n_cached} more...")
                 model, tokenizer = load_model(config["model"]["name"], config["model"]["dtype"])
                 extra_inputs = inputs[n_cached:]
@@ -231,12 +236,10 @@ def main():
                 )
                 unload_model(model, tokenizer)
                 candidates_list = cached_candidates + extra_candidates
-                # 更新缓存
                 with open(shared_cache, "w", encoding="utf-8") as f:
                     json.dump(candidates_list, f, ensure_ascii=False, indent=2)
                 print(f"  Updated cache: {len(candidates_list)} total")
         else:
-            # 全量生成
             print("Loading policy model for candidate generation...")
             model, tokenizer = load_model(config["model"]["name"], config["model"]["dtype"])
             print(f"Generating {num_candidates} candidates for {n_needed} inputs...")
@@ -291,7 +294,7 @@ def main():
         else:
             raise ValueError("No feedback enabled")
 
-        # 格式化为DPO格式
+        # 格式化为DPO格式（保留reference用于评估）
         dpo_data = []
         for pair in final_pairs:
             prompt = f"请为以下文本生成简洁准确的摘要：\n{pair['input']}\n摘要："
@@ -299,6 +302,7 @@ def main():
                 "prompt": prompt,
                 "chosen": pair["chosen"],
                 "rejected": pair["rejected"],
+                "reference": pair["reference"],
                 "score_diff": pair.get("score_diff", pair.get("fused_score_diff", 0.0)),
             })
 
@@ -315,13 +319,19 @@ def main():
         with open(preference_cache, "w", encoding="utf-8") as f:
             json.dump(dpo_data, f, ensure_ascii=False, indent=2)
 
-    # Step 2: DPO训练（重新加载策略模型）
+    # Step 3: DPO训练
     print("\nStarting MFRL training...")
     trainer = train_mfrl(dpo_data, config, output_dir)
 
-    # Step 3: 评估
+    # Step 4: 评估（使用测试集，对比人工摘要）
     print("\nEvaluating...")
-    test_data = dpo_data[-config["data"]["max_test_samples"]:]
+    test_data = []
+    for item in test_raw:
+        prompt = f"请为以下文本生成简洁准确的摘要：\n{item['input']}\n摘要："
+        test_data.append({
+            "prompt": prompt,
+            "reference": item["reference"],
+        })
     evaluate(trainer.model, trainer.tokenizer, test_data, output_dir)
 
     print(f"\nExperiment complete! Results saved to {output_dir}")
