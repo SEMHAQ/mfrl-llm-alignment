@@ -132,6 +132,9 @@ def run_ablation(config, ablation_type):
     elif ablation_type == "no_curriculum":
         config["curriculum"]["enabled"] = False
         feedback_type = "both"
+    elif ablation_type == "no_filter":
+        config["feedback"]["min_score_diff"] = 0.0
+        feedback_type = "both" if config["feedback"]["model"]["enabled"] else "rule"
     else:
         raise ValueError(f"Unknown ablation type: {ablation_type}")
 
@@ -147,7 +150,7 @@ def main():
     parser.add_argument("--mode", type=str, default="full",
                         choices=["full", "ablation", "eval_only"])
     parser.add_argument("--ablation_type", type=str, default=None,
-                        choices=["no_model", "no_curriculum"])
+                        choices=["no_model", "no_curriculum", "no_filter"])
     parser.add_argument("--skip_generation", action="store_true",
                         help="Skip candidate generation, load from cache")
     args = parser.parse_args()
