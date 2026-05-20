@@ -40,7 +40,7 @@ def setup_model(model_name, dtype="float16"):
     model = AutoModelForCausalLM.from_pretrained(
         model_name,
         dtype=dtype_map.get(dtype, torch.float16),
-        device_map="auto",
+        device_map={"": 0},
         trust_remote_code=True,
     )
     return model, tokenizer
@@ -87,7 +87,7 @@ def run_baseline(config, train_data, test_data, output_dir, baseline_type):
             num_train_epochs=config["dpo"]["num_epochs"],
             per_device_train_batch_size=config["dpo"]["batch_size"],
             gradient_accumulation_steps=config["dpo"]["gradient_accumulation"],
-            max_seq_length=config["dpo"]["max_length"],
+            max_length=config["dpo"]["max_length"],
             logging_steps=10,
             save_strategy="epoch",
             eval_strategy="no",
