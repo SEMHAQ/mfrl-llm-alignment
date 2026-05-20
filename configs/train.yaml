@@ -1,73 +1,58 @@
-# MFRL训练配置
-# 适配单卡3090 (24GB)环境
-
-# 模型配置
-model:
-  name: "models/Qwen2.5-1.5B-Instruct"
-  dtype: "float16"
-  trust_remote_code: true
-
-# LoRA配置
-lora:
-  r: 8
-  alpha: 16
-  dropout: 0.05
-  target_modules:
-    - "q_proj"
-    - "k_proj"
-    - "v_proj"
-    - "o_proj"
-    - "gate_proj"
-    - "up_proj"
-    - "down_proj"
-
-# DPO训练配置
-dpo:
-  beta: 0.1
-  loss_type: "sigmoid"
-  learning_rate: 5.0e-6
-  num_epochs: 2
-  batch_size: 8
-  gradient_accumulation: 2
-  max_length: 256
-  max_prompt_length: 128
-
-# 课程学习配置
 curriculum:
   enabled: true
   warmup_ratio: 0.3
-
-# 反馈配置
+data:
+  dataset: lcsts
+  max_eval_samples: 200
+  max_test_samples: 200
+  max_train_samples: 2000
+dpo:
+  batch_size: 8
+  beta: 0.1
+  gradient_accumulation: 2
+  learning_rate: 5.0e-06
+  loss_type: sigmoid
+  max_length: 256
+  max_prompt_length: 128
+  num_epochs: 3
 feedback:
+  min_score_diff: 0.0
+  model:
+    enabled: false
+    model_name: models/Qwen2.5-0.5B-Instruct
+  num_candidates: 4
   rule:
     enabled: true
-    metrics: ["rouge1", "rouge2", "rougeL"]
+    metrics:
+    - rouge1
+    - rouge2
+    - rougeL
     weights:
       rouge1: 0.3
       rouge2: 0.3
       rougeL: 0.4
-  model:
-    enabled: false
-    model_name: "models/Qwen2.5-0.5B-Instruct"
-  num_candidates: 4
-  min_score_diff: 0.1
-
-# 候选生成配置
 generation:
+  max_new_tokens: 128
+  multi_temperature: true
   temperature: 1.2
   top_p: 0.95
-  max_new_tokens: 50
-  multi_temperature: true
-
-# 数据配置
-data:
-  dataset: "lcsts"
-  max_train_samples: 2000
-  max_eval_samples: 200
-  max_test_samples: 200
-
-# 输出配置
+lora:
+  alpha: 16
+  dropout: 0.05
+  r: 8
+  target_modules:
+  - q_proj
+  - k_proj
+  - v_proj
+  - o_proj
+  - gate_proj
+  - up_proj
+  - down_proj
+model:
+  dtype: float16
+  name: models/Qwen2.5-1.5B-Instruct
+  trust_remote_code: true
 output:
-  dir: "outputs/mfrl_v3"
+  dir: outputs/mfrl_v3
   logging_steps: 10
-  save_strategy: "epoch"
+  save_strategy: epoch
