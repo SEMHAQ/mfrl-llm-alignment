@@ -17,7 +17,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from transformers import AutoTokenizer, AutoModelForCausalLM
 from peft import LoraConfig, get_peft_model, TaskType
-from trl import DPOTrainer, DPOConfig, KTOTrainer, KTOConfig
+from trl import DPOTrainer, DPOConfig, KTOTrainer, KTOConfig, SFTTrainer, SFTConfig
 from datasets import Dataset
 from src.eval.evaluator import Evaluator
 
@@ -76,20 +76,18 @@ def run_baseline(config, train_data, test_data, output_dir, baseline_type):
     model = setup_lora(model, config["lora"]["r"], config["lora"]["alpha"])
 
     if baseline_type == "sft":
-        sft_dpo_data = [
-            {"prompt": item["prompt"], "chosen": item["chosen"], "rejected": ""}
-            for item in train_data
-        ]
-        dataset = Dataset.from_list(sft_dpo_data)
-        dpo_config = DPOConfig(
+        sft_data = []
+        for item in train_data:
+            text = item["prompt"] + item["chosen"]
+            sft_data.append({"text": text})
+        dataset = Dataset.from_list(sft_data)
+        sft_config = SFTConfig(
             output_dir=output_dir,
             learning_rate=config["dpo"]["learning_rate"],
             num_train_epochs=config["dpo"]["num_epochs"],
             per_device_train_batch_size=config["dpo"]["batch_size"],
             gradient_accumulation_steps=config["dpo"]["gradient_accumulation"],
-            max_length=config["dpo"]["max_length"],
-            max_prompt_length=config["dpo"]["max_prompt_length"],
-            beta=0.0,
+            max_seq_length=config["dpo"]["max_length"],
             logging_steps=10,
             save_strategy="epoch",
             eval_strategy="no",
@@ -97,8 +95,9 @@ def run_baseline(config, train_data, test_data, output_dir, baseline_type):
             fp16=(config["model"]["dtype"] == "float16"),
             gradient_checkpointing=True,
             report_to="none",
+            dataset_text_field="text",
         )
-        trainer = DPOTrainer(model=model, args=dpo_config, train_dataset=dataset, processing_class=tokenizer)
+        trainer = SFTTrainer(model=model, args=sft_config, train_dataset=dataset, processing_class=tokenizer)
 
     elif baseline_type == "dpo":
         dataset = Dataset.from_list(train_data)
