@@ -52,7 +52,7 @@ def load_model(model_name: str, dtype: str = "bfloat16"):
     model = AutoModelForCausalLM.from_pretrained(
         model_name,
         dtype=dtype_map.get(dtype, torch.bfloat16),
-        device_map="auto",
+        device_map={"": 0},
         trust_remote_code=True,
     )
     return model, tokenizer
