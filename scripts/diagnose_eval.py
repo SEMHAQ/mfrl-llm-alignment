@@ -12,7 +12,7 @@ def main():
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
     model = AutoModelForCausalLM.from_pretrained(
-        model_name, torch_dtype=torch.float16, device_map="auto", trust_remote_code=True
+        model_name, dtype=torch.float16, device_map="auto", trust_remote_code=True
     )
 
     with open("data/lcsts_train.json", "r", encoding="utf-8") as f:
@@ -72,8 +72,28 @@ def main():
     gc.collect()
     torch.cuda.empty_cache()
 
-    lora_path = "outputs/mfrl_v3"
-    if os.path.exists(os.path.join(lora_path, "adapter_config.json")):
+    # 搜索adapter路径
+    lora_path = None
+    candidates = [
+        "outputs/mfrl_v3",
+        "outputs/overnight/mfrl_3ep",
+        "outputs/overnight/mfrl_5ep",
+    ]
+    for p in candidates:
+        if os.path.exists(os.path.join(p, "adapter_config.json")):
+            lora_path = p
+            break
+
+    if lora_path is None:
+        # 搜索outputs下所有adapter
+        for root, _dirs, files in os.walk("outputs"):
+            if "adapter_config.json" in files:
+                lora_path = root
+                break
+
+    print(f"\nAdapter path: {lora_path or 'NOT FOUND'}")
+
+    if lora_path and os.path.exists(os.path.join(lora_path, "adapter_config.json")):
         print("\n" + "=" * 60)
         print("FINE-TUNED MODEL (MFRL)")
         print("=" * 60)
@@ -81,7 +101,7 @@ def main():
         if tokenizer.pad_token is None:
             tokenizer.pad_token = tokenizer.eos_token
         model = AutoModelForCausalLM.from_pretrained(
-            model_name, torch_dtype=torch.float16, device_map="auto", trust_remote_code=True
+            model_name, dtype=torch.float16, device_map="auto", trust_remote_code=True
         )
         from peft import PeftModel
         model = PeftModel.from_pretrained(model, lora_path)
