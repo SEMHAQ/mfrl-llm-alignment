@@ -56,7 +56,7 @@ feedback:
 generation:
   temperature: 1.2
   top_p: 0.95
-  max_new_tokens: 128
+  max_new_tokens: 50
   multi_temperature: true
 
 # 数据配置

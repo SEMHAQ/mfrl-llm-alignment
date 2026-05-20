@@ -20,7 +20,7 @@ class Evaluator:
         self,
         model,
         tokenizer,
-        max_new_tokens: int = 256,
+        max_new_tokens: int = 50,
         batch_size: int = 8,
     ):
         self.model = model
