@@ -10,15 +10,18 @@ Write-Host "预计: 4-5小时" -ForegroundColor Cyan
 
 # Step 1: 更新配置
 Write-Host "`n[配置] 多温度生成, min_score_diff=0.0, 3 epochs" -ForegroundColor Yellow
-python -c "
+$pyCfg = @'
 import yaml
-with open('configs/train.yaml','r',encoding='utf-8') as f: c=yaml.safe_load(f)
-c['feedback']['min_score_diff']=0.0
-c['dpo']['num_epochs']=3
-c['generation']['multi_temperature']=True
-with open('configs/train.yaml','w',encoding='utf-8') as f: yaml.dump(c,f,allow_unicode=True)
-print('Config: multi_temperature=True, min_score_diff=0.0, epochs=3')
-"
+with open("configs/train.yaml", "r", encoding="utf-8") as f:
+    c = yaml.safe_load(f)
+c["feedback"]["min_score_diff"] = 0.0
+c["dpo"]["num_epochs"] = 3
+c["generation"]["multi_temperature"] = True
+with open("configs/train.yaml", "w", encoding="utf-8") as f:
+    yaml.dump(c, f, allow_unicode=True)
+print("Config: multi_temperature=True, min_score_diff=0.0, epochs=3")
+'@
+$pyCfg | python -
 
 # Step 2: 生成多温度候选（最慢的部分）
 Write-Host "`n[1/7] 生成多温度候选 (4 temps x 4 candidates = 16/input)" -ForegroundColor Yellow
@@ -51,51 +54,47 @@ python scripts/run_experiment.py --mode ablation --ablation_type no_curriculum
 Copy-Item outputs\mfrl_v3\ablation_no_curriculum\eval_results.json results\ablation_no_curriculum_eval.json -ErrorAction SilentlyContinue
 
 # 恢复配置
-python -c "
+$pyRestore = @'
 import yaml
-with open('configs/train.yaml','r',encoding='utf-8') as f: c=yaml.safe_load(f)
-c['feedback']['min_score_diff']=0.1
-c['dpo']['num_epochs']=2
-c['generation']['multi_temperature']=False
-with open('configs/train.yaml','w',encoding='utf-8') as f: yaml.dump(c,f,allow_unicode=True)
-print('Config restored')
-"
+with open("configs/train.yaml", "r", encoding="utf-8") as f:
+    c = yaml.safe_load(f)
+c["feedback"]["min_score_diff"] = 0.1
+c["dpo"]["num_epochs"] = 2
+c["generation"]["multi_temperature"] = False
+with open("configs/train.yaml", "w", encoding="utf-8") as f:
+    yaml.dump(c, f, allow_unicode=True)
+print("Config restored")
+'@
+$pyRestore | python -
 
 # Step 6: 打印结果汇总
 Write-Host "`n===== 结果汇总 =====" -ForegroundColor Green
-python -c "
+$pySummary = @'
 import json, os
 results = {}
-for name, path in [
-    ('MFRL', 'results/mfrl_v3_eval.json'),
-    ('SFT', 'results/baseline_eval.json'),
-]:
+files = [
+    ("MFRL", "results/mfrl_v3_eval.json"),
+    ("no_model", "results/ablation_no_model_eval.json"),
+    ("no_curriculum", "results/ablation_no_curriculum_eval.json"),
+]
+for name, path in files:
     if os.path.exists(path):
-        with open(path) as f: data = json.load(f)
-        if 'rouge' in data:
-            results[name] = data['rouge']
-        else:
-            results.update(data)
-for name in ['SFT', 'DPO', 'KTO']:
-    if name in results:
-        pass  # already loaded
-if os.path.exists('results/baseline_eval.json'):
-    with open('results/baseline_eval.json') as f:
-        bl = json.load(f)
-        results.update(bl)
-for name, path in [
-    ('no_model', 'results/ablation_no_model_eval.json'),
-    ('no_curriculum', 'results/ablation_no_curriculum_eval.json'),
-]:
-    if os.path.exists(path):
-        with open(path) as f: data = json.load(f)
-        if 'rouge' in data:
-            results[name] = data['rouge']
-print(f\"{'Method':<20} {'ROUGE-1':<12} {'ROUGE-2':<12} {'ROUGE-L':<12}\")
-print('-'*56)
+        with open(path) as f:
+            data = json.load(f)
+        if "rouge" in data:
+            results[name] = data["rouge"]
+if os.path.exists("results/baseline_eval.json"):
+    with open("results/baseline_eval.json") as f:
+        results.update(json.load(f))
+header = "{:<20} {:<12} {:<12} {:<12}".format("Method", "ROUGE-1", "ROUGE-2", "ROUGE-L")
+print(header)
+print("-" * 56)
 for name, scores in results.items():
-    print(f\"{name:<20} {scores['rouge1']:<12.4f} {scores['rouge2']:<12.4f} {scores['rougeL']:<12.4f}\")
-"
+    line = "{:<20} {:.4f}       {:.4f}       {:.4f}".format(
+        name, scores["rouge1"], scores["rouge2"], scores["rougeL"])
+    print(line)
+'@
+$pySummary | python -
 
 # Step 7: 推送结果
 $endTime = Get-Date
