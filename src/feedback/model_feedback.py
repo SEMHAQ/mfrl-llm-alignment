@@ -1,20 +1,24 @@
 """模型反馈模块（Model Feedback, MF）
 
-使用轻量级小模型作为评判者，对候选输出进行评分。
-相比人工标注，成本极低；相比纯规则，能捕捉语义质量。
+使用模型对候选输出进行评分。
+支持两种模式：
+1. 外部评判模型（如Qwen2.5-0.5B）
+2. Self-reward（使用策略模型自身的log-probability作为质量信号）
 """
 
 import torch
 import numpy as np
 from typing import List, Dict, Optional
 from transformers import AutoTokenizer, AutoModelForCausalLM
+from .rule_feedback import is_valid_candidate
 
 
 class ModelFeedback:
-    """基于轻量模型的反馈信号生成器。
+    """基于模型的反馈信号生成器。
 
-    使用小模型（如Qwen2.5-0.5B）对候选输出进行评分，
-    通过精心设计的prompt引导模型给出1-10分的评分。
+    支持两种模式：
+    1. 指定judge_model_name：加载外部评判模型
+    2. 传入已有model/tokenizer：使用self-reward（log-probability）
     """
 
     JUDGE_PROMPT = """你是一个文本质量评估专家。请对以下输出进行评分（1-10分）。
@@ -33,28 +37,38 @@ class ModelFeedback:
 
     def __init__(
         self,
-        model_name: str = "Qwen/Qwen2.5-0.5B-Instruct",
+        model_name: str = None,
+        model=None,
+        tokenizer=None,
         device: str = "cuda",
         max_length: int = 512,
     ):
         """初始化模型反馈模块。
 
         Args:
-            model_name: 评判模型名称
+            model_name: 评判模型名称（如果model未提供）
+            model: 已加载的模型（self-reward模式）
+            tokenizer: 已加载的tokenizer（self-reward模式）
             device: 设备
             max_length: 最大生成长度
         """
         self.device = device
         self.max_length = max_length
-        self.tokenizer = AutoTokenizer.from_pretrained(
-            model_name, trust_remote_code=True
-        )
-        self.model = AutoModelForCausalLM.from_pretrained(
-            model_name,
-            dtype=torch.float16,
-            device_map=device,
-            trust_remote_code=True,
-        )
+        self.use_self_reward = model is not None
+
+        if self.use_self_reward:
+            self.model = model
+            self.tokenizer = tokenizer
+        else:
+            self.tokenizer = AutoTokenizer.from_pretrained(
+                model_name, trust_remote_code=True
+            )
+            self.model = AutoModelForCausalLM.from_pretrained(
+                model_name,
+                dtype=torch.float16,
+                device_map=device,
+                trust_remote_code=True,
+            )
         self.model.eval()
 
     @torch.no_grad()
@@ -69,6 +83,40 @@ class ModelFeedback:
         Returns:
             归一化得分 [0, 1]
         """
+        if self.use_self_reward:
+            return self._score_logprob(input_text, candidate)
+        else:
+            return self._score_judge(input_text, reference, candidate)
+
+    def _score_logprob(self, prompt_text: str, candidate: str) -> float:
+        """Self-reward: 用模型的log-probability作为质量信号。"""
+        full_text = prompt_text + candidate
+        messages = [{"role": "user", "content": prompt_text}]
+        prompt_formatted = self.tokenizer.apply_chat_template(
+            messages, tokenize=False, add_generation_prompt=True
+        )
+        prompt_ids = self.tokenizer(prompt_formatted, return_tensors="pt").to(self.device)
+        prompt_len = prompt_ids["input_ids"].shape[1]
+
+        full_ids = self.tokenizer(full_text, return_tensors="pt").to(self.device)
+        input_ids = full_ids["input_ids"]
+
+        outputs = self.model(input_ids=input_ids)
+        logits = outputs.logits
+
+        # 计算candidate部分的平均log-probability
+        candidate_logits = logits[0, prompt_len - 1:-1, :]
+        candidate_ids = input_ids[0, prompt_len:]
+        log_probs = torch.log_softmax(candidate_logits, dim=-1)
+        token_log_probs = log_probs.gather(1, candidate_ids.unsqueeze(1)).squeeze(1)
+        avg_log_prob = token_log_probs.mean().item()
+
+        # 归一化到 [0, 1]（log-prob通常在-10到0之间）
+        score = max(0.0, min(1.0, (avg_log_prob + 10.0) / 10.0))
+        return score
+
+    def _score_judge(self, input_text: str, reference: str, candidate: str) -> float:
+        """外部评判模型：用prompt引导评分。"""
         prompt = self.JUDGE_PROMPT.format(
             input=input_text, reference=reference, candidate=candidate
         )
@@ -88,13 +136,12 @@ class ModelFeedback:
             outputs[0][inputs["input_ids"].shape[1]:], skip_special_tokens=True
         ).strip()
 
-        # 解析评分
         try:
             score = float(response)
             score = max(1.0, min(10.0, score))
-            return score / 10.0  # 归一化到 [0, 1]
+            return score / 10.0
         except ValueError:
-            return 0.5  # 解析失败返回中性分
+            return 0.5
 
     def score_batch(
         self,
@@ -127,13 +174,15 @@ class ModelFeedback:
         preference_pairs = []
 
         for inp, ref, candidates in zip(inputs, references, candidates_list):
-            if len(candidates) < 2:
+            # 过滤无效候选
+            valid_candidates = [c for c in candidates if is_valid_candidate(c)]
+            if len(valid_candidates) < 2:
                 continue
 
             # 对每个候选评分
-            scores = [self.score(inp, ref, c) for c in candidates]
+            scores = [self.score(inp, ref, c) for c in valid_candidates]
             ranked = sorted(
-                zip(candidates, scores), key=lambda x: x[1], reverse=True
+                zip(valid_candidates, scores), key=lambda x: x[1], reverse=True
             )
 
             # 取最高分和最低分构成偏好对

@@ -277,18 +277,15 @@ def main():
             print(f"  Rule pairs: {len(rule_pairs)}")
 
         if feedback_type in ("model", "both") and config["feedback"]["model"]["enabled"]:
-            print("Computing model-based feedback...")
-            judge_model = ModelFeedback(
-                model_name=config["feedback"]["model"]["model_name"]
-            )
-            model_pairs = judge_model.generate_preference_pairs(
+            print("Computing model-based feedback (self-reward)...")
+            model, tokenizer = load_model(config["model"]["name"], config["model"]["dtype"])
+            judge = ModelFeedback(model=model, tokenizer=tokenizer)
+            model_pairs = judge.generate_preference_pairs(
                 inputs, references, candidates_list
             )
             pairs_by_source["model"] = model_pairs
             print(f"  Model pairs: {len(model_pairs)}")
-            del judge_model
-            gc.collect()
-            torch.cuda.empty_cache()
+            unload_model(model, tokenizer)
 
         # 融合
         if len(pairs_by_source) > 1:
