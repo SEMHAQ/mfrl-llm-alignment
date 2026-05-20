@@ -60,7 +60,11 @@ def main():
     num_candidates = config["feedback"]["num_candidates"]
     gen_config = config.get("generation", {})
     temp = gen_config.get("temperature", 0.8)
-    cache_path = os.path.join("data", f"candidates_k{num_candidates}_t{temp}.json")
+    multi_temp = gen_config.get("multi_temperature", False)
+    if multi_temp:
+        cache_path = os.path.join("data", f"candidates_k{num_candidates}_multitemp.json")
+    else:
+        cache_path = os.path.join("data", f"candidates_k{num_candidates}_t{temp}.json")
 
     # 检查已有缓存
     n_cached = 0
@@ -96,7 +100,10 @@ def main():
     )
 
     # 生成
-    print(f"Generating {num_candidates} candidates per input, batch_size={args.batch_size}...")
+    if multi_temp:
+        print(f"Generating {num_candidates} candidates per temperature (4 temps), batch_size={args.batch_size}...")
+    else:
+        print(f"Generating {num_candidates} candidates per input, batch_size={args.batch_size}...")
     new_candidates = generate_candidates(
         model, tokenizer, inputs_to_gen,
         num_candidates=num_candidates,
@@ -104,6 +111,7 @@ def main():
         top_p=gen_config.get("top_p", 0.95),
         max_new_tokens=gen_config.get("max_new_tokens", 128),
         batch_size=args.batch_size,
+        multi_temperature=multi_temp,
     )
 
     # 合并并保存

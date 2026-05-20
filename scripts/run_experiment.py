@@ -201,7 +201,11 @@ def main():
     num_candidates = config["feedback"]["num_candidates"]
     gen_config = config.get("generation", {})
     temp = gen_config.get("temperature", 0.8)
-    shared_cache = os.path.join("data", f"candidates_k{num_candidates}_t{temp}.json")
+    multi_temp = gen_config.get("multi_temperature", False)
+    if multi_temp:
+        shared_cache = os.path.join("data", f"candidates_k{num_candidates}_multitemp.json")
+    else:
+        shared_cache = os.path.join("data", f"candidates_k{num_candidates}_t{temp}.json")
     preference_cache = os.path.join(output_dir, "preference_data.json")
 
     if args.skip_generation and os.path.exists(preference_cache):
@@ -233,6 +237,7 @@ def main():
                     temperature=temp,
                     top_p=gen_config.get("top_p", 0.95),
                     max_new_tokens=gen_config.get("max_new_tokens", 128),
+                    multi_temperature=multi_temp,
                 )
                 unload_model(model, tokenizer)
                 candidates_list = cached_candidates + extra_candidates
@@ -249,6 +254,7 @@ def main():
                 temperature=temp,
                 top_p=gen_config.get("top_p", 0.95),
                 max_new_tokens=gen_config.get("max_new_tokens", 128),
+                multi_temperature=multi_temp,
             )
             with open(shared_cache, "w", encoding="utf-8") as f:
                 json.dump(candidates_list, f, ensure_ascii=False, indent=2)
