@@ -8,6 +8,32 @@ import numpy as np
 from typing import List, Dict, Tuple
 from rouge_score import rouge_scorer
 
+REFUSAL_PATTERNS = [
+    "我不能", "我无法", "作为AI", "作为语言模型", "作为人工智能",
+    "请注意", "我不会", "我没有", "我不具备", "很抱歉",
+    "I cannot", "I can't", "As an AI", "I'm sorry",
+    "无法生成", "无法提供", "无法完成", "无法回答",
+]
+
+META_PATTERNS = [
+    "在本任务中", "这段文本", "以下是", "总结如下",
+    "根据上述", "以上是", "本文描述", "文本讲述", "该文本",
+    "给定文本", "用户提供的", "以下是给定",
+]
+
+
+def is_valid_candidate(text: str) -> bool:
+    """判断候选是否为有效摘要（非拒绝回复、非元描述）。"""
+    for p in REFUSAL_PATTERNS:
+        if p in text:
+            return False
+    for p in META_PATTERNS:
+        if text.startswith(p):
+            return False
+    if len(text.strip()) < 5:
+        return False
+    return True
+
 
 class RuleFeedback:
     """基于规则的反馈信号生成器。
@@ -75,13 +101,15 @@ class RuleFeedback:
         preference_pairs = []
 
         for inp, ref, candidates in zip(inputs, references, candidates_list):
-            if len(candidates) < 2:
+            # 过滤无效候选（拒绝回复、元描述、过短）
+            valid_candidates = [c for c in candidates if is_valid_candidate(c)]
+            if len(valid_candidates) < 2:
                 continue
 
             # 计算每个候选的得分
-            scores = [self.score(ref, c) for c in candidates]
+            scores = [self.score(ref, c) for c in valid_candidates]
             ranked = sorted(
-                zip(candidates, scores), key=lambda x: x[1], reverse=True
+                zip(valid_candidates, scores), key=lambda x: x[1], reverse=True
             )
 
             # 生成偏好对：top-k vs bottom-k
