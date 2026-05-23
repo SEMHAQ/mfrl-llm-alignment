@@ -107,8 +107,8 @@ plt.savefig(os.path.join(OUT, "fig4_alpaca_bars.eps"), format='eps')
 plt.close()
 print("Saved fig4_alpaca_bars.eps")
 
-# ====== Fig.5: Ablation ======
-alabels = ['Full MFRL', 'w/o Model\nFeedback', 'w/o Adaptive\nFusion']
+# ====== Fig.5: Ablation (Chinese labels) ======
+alabels = ['完整MFRL', '无模型反馈', '无自适应融合']
 avals = [0.171, 0.169, 0.170]
 ac = ['#c0504d', '#f4a940', '#9bbb59']
 
@@ -120,7 +120,7 @@ for bar, val in zip(bars, avals):
             f'{val:.3f}', ha='center', va='bottom', fontsize=10, fontweight='bold')
 ax.set_ylim(0.155, 0.178)
 ax.set_xticks(x)
-ax.set_xticklabels(alabels, fontsize=8)
+ax.set_xticklabels(alabels, fontsize=9)
 ax.set_ylabel('ROUGE-L', fontsize=9, fontweight='bold')
 ax.tick_params(labelsize=9)
 ax.yaxis.grid(True, linestyle='--', alpha=0.3)
@@ -132,66 +132,65 @@ plt.savefig(os.path.join(OUT, "fig5_ablation.eps"), format='eps')
 plt.close()
 print("Saved fig5_ablation.eps")
 
-# ====== Fig.1: Framework Diagram ======
-fig, ax = plt.subplots(figsize=(5.5, 4.5))
+# ====== Fig.1: Framework Diagram (Chinese) ======
+fig, ax = plt.subplots(figsize=(5.5, 4.8))
 ax.set_xlim(0, 1)
 ax.set_ylim(0, 1)
 ax.axis('off')
 
-def draw_box(x, y, w, h, title, subtitle='', color='#dce6f3', bold=False):
-    from matplotlib.patches import FancyBboxPatch
+from matplotlib.patches import FancyBboxPatch
+def dbox(x, y, w, h, title, sub='', color='#dce6f3', bold=False):
     box = FancyBboxPatch((x-w/2, y-h/2), w, h,
-        boxstyle="round,pad=4", facecolor=color, edgecolor='#4f81bd', linewidth=1.5)
+        boxstyle="round,pad=5", facecolor=color, edgecolor='#4f81bd', linewidth=1.5)
     ax.add_patch(box)
     fs = 11 if bold else 9
-    ax.text(x, y+0.01 if subtitle else y, title, ha='center', va='center',
+    ax.text(x, y+0.012 if sub else y, title, ha='center', va='center',
             fontsize=fs, fontweight='bold' if bold else 'normal')
-    if subtitle:
-        ax.text(x, y-0.02, subtitle, ha='center', va='center', fontsize=7, color='#4f81bd')
+    if sub:
+        ax.text(x, y-0.028, sub, ha='center', va='center', fontsize=7, color='#4f81bd')
 
-def draw_arrow(x, y1, y2):
+def darrow(x, y1, y2):
     ax.annotate('', xy=(x, y2), xytext=(x, y1),
         arrowprops=dict(arrowstyle='->', color='#555', lw=1.2))
 
-def draw_label(x, y, text):
+def dlabel(x, y, text):
     ax.text(x, y, text, ha='center', va='center', fontsize=7.5, color='#555',
-            bbox=dict(boxstyle='round,pad=2', facecolor='#fafafa', edgecolor='#ddd', linewidth=0.5))
+            bbox=dict(boxstyle='round,pad=3', facecolor='#fafafa', edgecolor='#ddd', linewidth=0.5))
 
 y = 0.94
-draw_box(0.5, y, 0.35, 0.06, 'Input: (x, y*)', bold=True)
-draw_arrow(0.5, y-0.03, y-0.09)
-draw_label(0.73, y-0.06, 'Multi-temperature Sampling')
+dbox(0.5, y, 0.35, 0.06, '输入: (x, y*)', bold=True)
+darrow(0.5, y-0.03, y-0.10)
+dlabel(0.73, y-0.065, '多温度采样\n+ 拒绝滤波')
 
-y2 = y - 0.13
-draw_box(0.5, y2, 0.4, 0.06, 'Candidates: {y1, y2, y3, y4}', color='#f5f5f5')
-draw_arrow(0.5, y2-0.03, y2-0.09)
+y2 = y - 0.14
+dbox(0.5, y2, 0.4, 0.06, '候选: {y1, y2, y3, y4}', color='#f5f5f5')
+darrow(0.5, y2-0.03, y2-0.10)
 
-y3 = y2 - 0.13
-draw_box(0.5, y3, 0.45, 0.07, 'MFC', 'Multi-form Feedback Collector', bold=True)
-# Sub-boxes
-draw_label(0.25, y3, 'ROUGE\nFeedback')
-draw_label(0.75, y3, 'Self-Reward\n(LogP)')
-draw_arrow(0.5, y3-0.04, y3-0.10)
+y3 = y2 - 0.14
+dbox(0.5, y3, 0.48, 0.07, 'MFC', '多源反馈收集模块', bold=True)
+dlabel(0.22, y3, 'ROUGE\n规则反馈')
+dlabel(0.78, y3, 'LogP\n模型自反馈')
+darrow(0.5, y3-0.035, y3-0.11)
 
-y4 = y3 - 0.15
-draw_box(0.5, y4, 0.45, 0.07, 'AFF', 'Adaptive Feedback Fusion', bold=True)
-draw_label(0.25, y4, 'Attention\nWeights')
-draw_label(0.75, y4, 'Score\nNormalization')
-draw_arrow(0.5, y4-0.04, y4-0.10)
+y4 = y3 - 0.16
+dbox(0.5, y4, 0.48, 0.07, 'AFF', '自适应反馈融合模块', bold=True)
+dlabel(0.22, y4, '注意力\n权重学习')
+dlabel(0.78, y4, '分数\n归一化')
+darrow(0.5, y4-0.035, y4-0.11)
 
-y5 = y4 - 0.14
-draw_label(0.5, y5, 'Preference Pairs: (x, y+, y-)')
-draw_arrow(0.5, y5-0.04, y5-0.10)
+y5 = y4 - 0.15
+dlabel(0.5, y5, '偏好对: (x, y+, y-)')
+darrow(0.5, y5-0.04, y5-0.11)
 
-y6 = y5 - 0.14
-draw_box(0.5, y6, 0.45, 0.07, 'POF', 'Preference Optimization Fine-tuning', bold=True)
-draw_label(0.25, y6, 'DPO Loss')
-draw_label(0.75, y6, 'LoRA (rank=8)')
-draw_arrow(0.5, y6-0.04, y6-0.10)
+y6 = y5 - 0.15
+dbox(0.5, y6, 0.48, 0.07, 'POF', '偏好优化微调模块', bold=True)
+dlabel(0.22, y6, 'DPO损失')
+dlabel(0.78, y6, 'LoRA (rank=8)')
+darrow(0.5, y6-0.035, y6-0.11)
 
-y7 = y6 - 0.14
-draw_box(0.5, y7, 0.35, 0.06, 'Output: Optimized pi_theta',
-         color='#4f81bd', bold=True)
+y7 = y6 - 0.15
+dbox(0.5, y7, 0.35, 0.06, '输出: 优化后模型',
+     color='#4f81bd', bold=True)
 
 plt.tight_layout()
 plt.savefig(os.path.join(OUT, "fig1_framework.eps"), format='eps')
