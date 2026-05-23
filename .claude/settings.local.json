@@ -1,0 +1,40 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "Bash(git clone *)",
+      "Bash(python -c \"import ast; ast.parse\\(open\\('models/FTMamba.py'\\).read\\(\\)\\); print\\('Syntax OK'\\)\")",
+      "Read(//e/Project/**)",
+      "Bash(ren \"new_project\" \"FTMamba\")",
+      "Bash(mv \"e:\\\\Project\\\\new_project\" \"e:\\\\Project\\\\FTMamba\" 2>&1; echo \"Done\")",
+      "PowerShell(Rename-Item -Path \"e:\\\\Project\\\\new_project\" -NewName \"FTMamba\" -Force)",
+      "Bash(mv \"new_project\" \"FTMamba\")",
+      "Bash(echo \"Exit: $?\")",
+      "Bash(git init *)",
+      "Bash(git remote *)",
+      "Bash(rm -rf \"e:\\\\Project\\\\FTMamba\\\\Time-Series-Library\\\\.git\" && echo \"Nested .git removed\")",
+      "Bash(git add *)",
+      "Bash(grep -iE '\\\\.\\(csv|pth|pt|ckpt|log|npy|pkl|data|h5\\)$')",
+      "Bash(git commit -m ' *)",
+      "Bash(git rm *)",
+      "Bash(git commit *)",
+      "Bash(git push *)",
+      "Bash(curl -sI \"https://raw.githubusercontent.com/thuml/Autoformer/main/datasets/weather/weather.csv\")",
+      "Bash(curl -sI \"https://raw.githubusercontent.com/zhouhaoyi/ETDataset/main/ETT-small/weather.csv\")",
+      "Bash(curl -sI \"https://raw.githubusercontent.com/thuml/Autoformer/9725212a9a4d3959e0a9a16f59dab7214c8c2e5c/datasets/weather/weather.csv\")",
+      "Bash(curl -sI \"https://raw.githubusercontent.com/thuml/Time-Series-Library/main/dataset/weather/weather.csv\")",
+      "Bash(curl -s \"https://raw.githubusercontent.com/thuml/Time-Series-Library/main/README.md\")",
+      "Bash(curl -sI \"https://huggingface.co/datasets/thuml/Time-Series-Library/resolve/main/Weather/weather.csv\")",
+      "Bash(curl -s \"https://huggingface.co/api/datasets/thuml/Time-Series-Library/tree/main\")",
+      "Bash(curl -s \"https://huggingface.co/api/datasets/thuml/Time-Series-Library/tree/main/weather\")",
+      "Bash(curl -sI \"https://huggingface.co/datasets/thuml/Time-Series-Library/resolve/main/weather/weather.csv\")",
+      "Bash(curl -sI \"https://huggingface.co/datasets/thuml/Time-Series-Library/resolve/main/ETT-small/ETTh1.csv\")",
+      "Bash(git pull:*)",
+      "Bash(git push)"
+    ],
+    "additionalDirectories": [
+      "e:\\Project",
+      "e:\\Project\\FTMamba\\Time-Series-Library\\.git"
+    ]
+  }
+}
