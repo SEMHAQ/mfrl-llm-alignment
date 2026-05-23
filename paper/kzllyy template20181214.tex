@@ -122,14 +122,17 @@ s_{\rm MF}(y_i|x)=\frac{1}{|y_i|}\sum_{t=1}^{|y_i|}\log P(y_{i,t}|x,y_{i,<t})
 
 注意力权重动态融合:
 \begin{equation}
-\mathbf{w}\!=\!{\mathrm{softmax}}(\mathbf{W}\!\cdot\![s_{\rm RF},s_{\rm MF}]^\top\!+\mathbf{b}),\; s_{\rm fused}\!=\!w_{\rm RF}s_{\rm RF}\!+\!w_{\rm MF}s_{\rm MF}
+\mathbf{w}\!=\!{\mathrm{softmax}}(\mathbf{W}\!\cdot\![s_{\rm RF},s_{\rm MF}]^\top\!+\mathbf{b})
+\end{equation}
+\begin{equation}
+s_{\rm fused}\!=\!w_{\rm RF}s_{\rm RF}\!+\!w_{\rm MF}s_{\rm MF}
 \end{equation}
 按$s_{\rm fused}$排序，最高/最低构成偏好对$(x, y^+, y^-)$。
 
 \subsection{偏好优化微调 (POF)}
 
 \begin{equation}
-\mathcal{L}_{\rm DPO}\!=\!-\mathbb{E}\!\left[\!\log\sigma\!\left(\!\beta\log\frac{\pi_\theta(y^+|x)}{\pi_{\rm ref}(y^+|x)}\!-\!\beta\log\frac{\pi_\theta(y^-|x)}{\pi_{\rm ref}(y^-|x)}\!\right)\!\right]
+\mathcal{L}_{\rm DPO}\!=\!-\mathbb{E}\!\left[\!\log\sigma\!\left(\beta\log\frac{\pi_\theta(y^+|x)}{\pi_{\rm ref}(y^+|x)}-\beta\log\frac{\pi_\theta(y^-|x)}{\pi_{\rm ref}(y^-|x)}\right)\!\right]
 \end{equation}
 
 LoRA$^{[15]}$: rank=8, alpha=16。超参: lr=5e-6, batch=4, grad\_accum=4, 3 epochs, $\beta$=0.1。
@@ -146,10 +149,11 @@ LoRA$^{[15]}$: rank=8, alpha=16。超参: lr=5e-6, batch=4, grad\_accum=4, 3 epochs
 {\CJKfamily{kai} 表~1~~LCSTS数据集ROUGE对比\\
 Table~1~~ROUGE comparison on LCSTS}\\
 \label{tab:1} \vskip 3pt
-{\fontsize{9.3pt}{11.6pt}\selectfont
-\begin{tabular}{@{ }lccccc@{ }}\toprule
-方法 & 偏好数据 & ROUGE-1 & ROUGE-2 & ROUGE-L \\\midrule
-Base & 无 & 0.162 & 0.019 & 0.162 \\
+{\fontsize{7.5pt}{9pt}\selectfont
+\renewcommand{\tabcolsep}{2.5pt}
+\begin{tabular}{lccccc}\toprule
+方法 & 数据来源 & ROUGE-1 & ROUGE-2 & ROUGE-L \\\midrule
+Base & -- & 0.162 & 0.019 & 0.162 \\
 SFT & 人工 & 0.151 & 0.013 & 0.151 \\
 DPO & 人工 & 0.158 & 0.013 & 0.158 \\
 KTO & 人工 & 0.163 & 0.013 & 0.163 \\
