@@ -83,13 +83,7 @@ class ModelFeedback:
     def _score_logprob_mega(
         self, prompts: List[str], candidates: List[str]
     ) -> List[float]:
-        """批量评分：多个不同prompt的(输入,候选)对在一次forward中完成。
-
-        Args:
-            prompts: 每个候选对应的输入文本（长度 = candidates）
-            candidates: 候选文本列表
-        """
-        # 构建所有序列并记录每个序列的prompt token长度
+        """批量评分：多个不同prompt的(输入,候选)对在一次forward中完成。"""
         full_texts = []
         prompt_lens = []
         for prompt, cand in zip(prompts, candidates):
@@ -101,7 +95,8 @@ class ModelFeedback:
             p_ids = self.tokenizer(prompt_formatted, return_tensors="pt")
             prompt_lens.append(p_ids["input_ids"].shape[1])
 
-        enc = self.tokenizer(full_texts, return_tensors="pt", padding=True)
+        enc = self.tokenizer(full_texts, return_tensors="pt", padding=True,
+                             truncation=True, max_length=self.max_length)
         input_ids = enc["input_ids"].to(self.device)
         attention_mask = enc["attention_mask"].to(self.device)
 
@@ -112,17 +107,22 @@ class ModelFeedback:
         for i in range(len(candidates)):
             actual_len = attention_mask[i].sum().item()
             p_len = prompt_lens[i]
-            cand_len = actual_len - p_len
+            cand_len = min(actual_len, self.max_length) - p_len
             if cand_len <= 0:
                 scores.append(0.0)
                 continue
 
-            cand_logits = logits[i, p_len - 1 : actual_len - 1, :]
-            cand_ids = input_ids[i, p_len:actual_len]
+            end_idx = min(actual_len, self.max_length)
+            cand_logits = logits[i, p_len - 1 : end_idx - 1, :]
+            cand_ids = input_ids[i, p_len:end_idx]
             log_probs = torch.log_softmax(cand_logits, dim=-1)
             token_log_probs = log_probs.gather(1, cand_ids.unsqueeze(1)).squeeze(1)
             avg_log_prob = token_log_probs.mean().item()
             scores.append(max(0.0, min(1.0, (avg_log_prob + 10.0) / 10.0)))
+
+        # 释放显存
+        del input_ids, attention_mask, outputs, logits
+        torch.cuda.empty_cache()
 
         return scores
 
@@ -174,7 +174,7 @@ class ModelFeedback:
     ) -> List[Dict]:
         """从多候选中生成基于模型评分的偏好对。"""
         preference_pairs = []
-        MEGA_BATCH = 1  # 逐个处理，稳定优先
+        MEGA_BATCH = 2  # 每次处理2个输入的候选
 
         # 预处理：过滤无效候选
         items = []
