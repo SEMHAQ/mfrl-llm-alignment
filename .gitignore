@@ -58,3 +58,7 @@ paper/*.pdf
 
 # Journal references (copyrighted PDFs)
 journal_to_refer/
+
+pics_to_refer/
+
+template/
