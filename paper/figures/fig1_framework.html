@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<style>
+body { margin: 40px; background: white; font-family: 'Times New Roman', 'SimSun', serif; }
+.wrapper { width: 700px; margin: 0 auto; }
+.row { display: flex; align-items: center; justify-content: center; margin: 4px 0; }
+.arrow { font-size: 22px; margin: 0 8px; color: #555; }
+
+.box {
+  display: inline-block; padding: 10px 18px; border-radius: 4px;
+  border: 1.5px solid #4f81bd; background: #dce6f3;
+  text-align: center; min-width: 80px;
+}
+.box .name { font-size: 15px; font-weight: bold; color: #1a3c6e; }
+.box .sub  { font-size: 10px; color: #4f81bd; margin-top: 2px; }
+.box-big  { padding: 14px 24px; }
+.box-big .name { font-size: 17px; }
+.box-sm   { padding: 6px 12px; background: #e8f0f8; }
+.box-sm .name { font-size: 12px; }
+
+.io-box {
+  display: inline-block; padding: 8px 22px; border-radius: 4px;
+  border: 1px solid #999; background: #fafafa;
+  text-align: center; font-size: 13px;
+}
+.data-box {
+  display: inline-block; padding: 5px 16px; border-radius: 3px;
+  border: 1px dashed #bbb; background: #f5f5f5;
+  font-size: 11px; color: #555;
+}
+
+.vline { display: flex; flex-direction: column; align-items: center; }
+.vline .arrow { font-size: 24px; }
+
+.module-row { display: flex; gap: 10px; justify-content: center; margin: 4px 0; }
+
+h2 { text-align: center; font-size: 16px; margin-bottom: 2px; color: #333; }
+.caption { text-align: center; font-size: 12px; color: #666; margin-top: 8px; }
+</style>
+</head>
+<body>
+<div class="wrapper">
+<h2>MFRL Framework</h2>
+
+<div class="row">
+  <div class="io-box"><b>Input:</b> (x, y*)</div>
+</div>
+<div class="vline"><div class="arrow">&#8595;</div></div>
+<div class="row">
+  <div class="data-box">Multi-temperature Sampling + Rejection Filter</div>
+</div>
+<div class="vline"><div class="arrow">&#8595;</div></div>
+<div class="row">
+  <div class="data-box">Candidates: {y&#8321;, y&#8322;, y&#8323;, y&#8324;}</div>
+</div>
+<div class="vline"><div class="arrow">&#8595;</div></div>
+
+<!-- MFC -->
+<div class="module-row">
+  <div class="box box-big">
+    <div class="name">MFC</div>
+    <div class="sub">Multi-form Feedback Collector</div>
+  </div>
+</div>
+<div class="module-row">
+  <div class="box box-sm"><div class="name">Rule Feedback (ROUGE)</div></div>
+  <div class="box box-sm" style="background:#fef2f2;border-color:#f4a940;">
+    <div class="name">Self-Reward (LogP)</div></div>
+</div>
+<div class="vline"><div class="arrow">&#8595;</div></div>
+<div class="row">
+  <div class="data-box">s_RF + s_MF</div>
+</div>
+<div class="vline"><div class="arrow">&#8595;</div></div>
+
+<!-- AFF -->
+<div class="module-row">
+  <div class="box box-big">
+    <div class="name">AFF</div>
+    <div class="sub">Adaptive Feedback Fusion</div>
+  </div>
+</div>
+<div class="module-row">
+  <div class="box box-sm"><div class="name">Attention Weights</div></div>
+  <div class="box box-sm"><div class="name">Score Normalization</div></div>
+</div>
+<div class="vline"><div class="arrow">&#8595;</div></div>
+<div class="row">
+  <div class="data-box">Preference Pairs: (x, y+, y-)</div>
+</div>
+<div class="vline"><div class="arrow">&#8595;</div></div>
+
+<!-- POF -->
+<div class="module-row">
+  <div class="box box-big">
+    <div class="name">POF</div>
+    <div class="sub">Preference Optimization Fine-tuning</div>
+  </div>
+</div>
+<div class="module-row">
+  <div class="box box-sm"><div class="name">DPO Loss</div></div>
+  <div class="box box-sm"><div class="name">LoRA (rank=8)</div></div>
+</div>
+<div class="vline"><div class="arrow">&#8595;</div></div>
+<div class="row">
+  <div class="io-box" style="background:#4f81bd;color:white;border-color:#4f81bd;">
+    <b>Output:</b> Optimized Model &#960;<sub>&#952;</sub></div>
+</div>
+
+<div class="caption">Fig. 1 &nbsp; The MFRL framework</div>
+</div>
+</body>
+</html>

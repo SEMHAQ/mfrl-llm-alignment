@@ -24,16 +24,26 @@ loss_path = os.path.join(OUT, "loss_curve.json")
 if os.path.exists(loss_path):
     with open(loss_path) as f:
         data = json.load(f)
-    steps = [d["step"] for d in data]
-    losses = [d["loss"] for d in data]
-    epochs = [d["epoch"] for d in data]
+
+    # Filter: only training steps (skip eval/save entries)
+    train_data = [d for d in data if d.get("loss", 0) > 0.05]
+    steps = [d["step"] for d in train_data]
+    losses = [d["loss"] for d in train_data]
+    epochs = [d["epoch"] for d in train_data]
+
+    # Smooth with moving average
+    window = 10
+    smooth = np.convolve(losses, np.ones(window)/window, mode='valid')
+    smooth_steps = steps[window//2 : window//2 + len(smooth)]
 
     fig, ax = plt.subplots(figsize=(4.5, 2.6))
-    ax.plot(steps, losses, color=C[0], linewidth=1.0)
+    ax.plot(steps, losses, color='#cccccc', linewidth=0.5, alpha=0.6, label='Raw')
+    ax.plot(smooth_steps, smooth, color=C[0], linewidth=1.2, label='Smoothed')
     ax.set_xlabel("Step", fontsize=9)
     ax.set_ylabel("DPO Loss", fontsize=9)
     ax.tick_params(labelsize=8)
     ax.grid(True, linestyle='--', alpha=0.3)
+    ax.legend(fontsize=7, loc='upper right')
     epoch_bounds = [0]
     for i in range(1, len(epochs)):
         if epochs[i] != epochs[i-1]:
@@ -43,7 +53,7 @@ if os.path.exists(loss_path):
     plt.tight_layout()
     plt.savefig(os.path.join(OUT, "fig2_loss_curve.eps"), format='eps')
     plt.close()
-    print("Saved fig2_loss_curve.eps")
+    print(f"Saved fig2_loss_curve.eps ({len(steps)} raw pts, {len(smooth)} smoothed)")
 
 # ====== Fig.3: LCSTS ======
 methods = ['Base', 'SFT', 'DPO', 'KTO', 'MFRL(w/o MF)', 'MFRL']
@@ -106,9 +116,9 @@ fig, ax = plt.subplots(figsize=(3.5, 2.5))
 x = np.arange(len(alabels))
 bars = ax.bar(x, avals, width=0.4, color=ac, edgecolor='white', linewidth=0.5)
 for bar, val in zip(bars, avals):
-    ax.text(bar.get_x()+bar.get_width()/2, bar.get_height()+0.003,
+    ax.text(bar.get_x()+bar.get_width()/2, bar.get_height()+0.0015,
             f'{val:.3f}', ha='center', va='bottom', fontsize=10, fontweight='bold')
-ax.set_ylim(0.155, 0.180)
+ax.set_ylim(0.155, 0.178)
 ax.set_xticks(x)
 ax.set_xticklabels(alabels, fontsize=8)
 ax.set_ylabel('ROUGE-L', fontsize=9, fontweight='bold')
