@@ -74,23 +74,29 @@ Author One\makebox{$^{1}$}\makebox{$^{\dag}$},~~Author Two\makebox{$^{2}$ }\\[2p
 
 \section{ÒýÑÔ}
 
-´óÓïÑÔÄ£ÐÍ(Large Language Model, LLM)ÔÚ×ÔÈ»ÓïÑÔ´¦ÀíÁìÓòÈ¡µÃÁËÏÔÖø½øÕ¹$^{[1-2]}$£¬µ«Ô¤ÑµÁ·Êä³öÓëÈËÀàÆ«ºÃ´æÔÚÆ«²î£¬ÐèÍ¨¹ýÎ¢µ÷¶ÔÆë$^{[3]}$¡£
+´óÓïÑÔÄ£ÐÍ(Large Language Model, LLM)ÔÚ×ÔÈ»ÓïÑÔ´¦ÀíÁìÓòÈ¡µÃÁËÏÔÖø½øÕ¹$^{[1-2]}$£¬µ«Ô¤ÑµÁ·Êä³öÓëÈËÀàÆ«ºÃ´æÔÚÆ«²î£¬ÐèÍ¨¹ýÎ¢µ÷¼¼Êõ½øÐÐ¶ÔÆë$^{[3]}$¡£
 
-»ùÓÚÈËÀà·´À¡µÄÇ¿»¯Ñ§Ï°(RLHF)$^{[4]}$Í¨¹ýÑµÁ·½±ÀøÄ£ÐÍÁ¿»¯ÈËÀàÆ«ºÃ£¬ÔÙÓÃPPO$^{[5]}$ÓÅ»¯²ßÂÔÄ£ÐÍ¡£µ«RLHFÐè¶ÀÁ¢½±ÀøÄ£ÐÍ¡¢Æ«ºÃÊý¾ÝÒÀÀµÈË¹¤±ê×¢£¬³É±¾¸ß°º¡£Ö±½ÓÆ«ºÃÓÅ»¯(DPO)$^{[6]}$Í³Ò»ÁË½±Àø½¨Ä£Óë²ßÂÔÓÅ»¯£¬KTO$^{[7]}$½öÐè¶þÔª±êÇ©¡£µ«ÉÏÊö·½·¨ÈÔÒÀÀµÈË¹¤»òµ¥Ô´ÐÅºÅ¡£
+»ùÓÚÈËÀà·´À¡µÄÇ¿»¯Ñ§Ï°(Reinforcement Learning from Human Feedback, RLHF)$^{[4]}$ÊÇÖ÷Á÷µÄ¶ÔÆë·¶Ê½¡£¸Ã·½·¨Ê×ÏÈÊÕ¼¯ÈËÀà¶ÔÄ£ÐÍÊä³öµÄÆ«ºÃ±ê×¢£¬ÑµÁ·½±ÀøÄ£ÐÍÀ´Á¿»¯ÈËÀàÆ«ºÃ£¬ÔÙÀûÓÃ½ü¶Ë²ßÂÔÓÅ»¯(Proximal Policy Optimization, PPO)$^{[5]}$¶Ô²ßÂÔÄ£ÐÍ½øÐÐÓÅ»¯¡£È»¶øRLHF´æÔÚÈý·½Ãæ¾ÖÏÞ: ÆäÒ»£¬ÐèÒªÑµÁ·²¢Î¬»¤¶ÀÁ¢µÄ½±ÀøÄ£ÐÍ£¬ÏÔÖøÔö¼ÓÁË¼ÆËã¿ªÏúºÍÏµÍ³¸´ÔÓ¶È£»Æä¶þ£¬PPOÑµÁ·¹ý³Ì¶Ô³¬²ÎÊýÃô¸Ð£¬ÈÝÒ×³öÏÖÑµÁ·²»ÎÈ¶¨£»ÆäÈý£¬´ó¹æÄ£¸ßÖÊÁ¿Æ«ºÃÊý¾ÝµÄ»ñÈ¡ÒÀÀµ°º¹óµÄÈË¹¤±ê×¢£¬ÖÆÔ¼ÁË·½·¨µÄ¹æÄ£»¯Ó¦ÓÃ¡£
 
-Self-Reward$^{[8]}$ºÍConstitutional AI$^{[9]}$Ì½Ë÷×Ô¶¯·´À¡£¬¶àÔ´ÐÅÏ¢ÈÚºÏ$^{[10]}$ÔÚÆ«ºÃÑ§Ï°ÖÐµÄÓ¦ÓÃ´¦ÓÚÌ½Ë÷½×¶Î¡£
+Ö±½ÓÆ«ºÃÓÅ»¯(Direct Preference Optimization, DPO)$^{[6]}$Í¨¹ýÊýÑ§ÍÆµ¼½«½±Àøº¯Êý²ÎÊý»¯Îª²ßÂÔÄ£ÐÍµÄÒþÊ½ÐÎÊ½£¬½«RLHFµÄÁ½½×¶ÎÁ÷³Ì(½±Àø½¨Ä£+²ßÂÔÓÅ»¯)Í³Ò»Îªµ¥½×¶Î¼à¶½Ñ§Ï°£¬±ÜÃâÁËÏÔÊ½½±ÀøÄ£ÐÍµÄÑµÁ·¡£KTO$^{[7]}$½øÒ»²½¼ò»¯ÁË±ê×¢ÒªÇó£¬½öÐèÃ¿¸öÑù±¾µÄ¶þÔª±êÇ©(ºÃ/»µ)¼´¿ÉÑµÁ·¡£È»¶ø£¬ÉÏÊö·½·¨µÄÆ«ºÃÊý¾Ý¹¹½¨ÈÔÒÀÀµÈË¹¤Ìá¹©»òµ¥Ò»À´Ô´µÄ·´À¡ÐÅºÅ¡£
 
-±¾ÎÄÌá³öMFRL£¬¹±Ï×: (1) MFCÈÚºÏ¹æÔòÓë×Ô·´À¡£¬×Ô¶¯Éú³ÉÆ«ºÃ¶Ô£»(2) AFF¶¯Ì¬ÈÚºÏÒì¹¹ÐÅºÅ£»(3) LCSTSÉÏROUGE-L=0.171£¬³¬SFT +0.020£¬DPO +0.013£¬KTO +0.008¡£
+½üÄêÀ´£¬ÑÐ¾¿ÕßÌ½Ë÷ÁË¶àÖÖ²»ÒÀÀµÈË¹¤±ê×¢µÄ×Ô¶¯·´À¡»úÖÆ¡£Self-Reward$^{[8]}$·½·¨ÈÃÄ£ÐÍ¶Ô×Ô¼ºµÄÊä³ö½øÐÐÆÀ·Ö£¬ÒÔ¸ß·ÖÊä³ö×÷ÎªÆ«ºÃÑù±¾µü´úÑµÁ·¡£Constitutional AI$^{[9]}$ÀûÓÃÄ£ÐÍ×ÔÉí¸ù¾ÝÔ¤ÉèÔ­Ôò½øÐÐ×ÔÎÒÅúÆÀºÍÐÞÕý¡£RLAIF$^{[10]}$Ê¹ÓÃAIÉú³ÉµÄ·´À¡ÐÅºÅÌæ´úÈË¹¤±ê×¢¡£È»¶ø£¬µ¥Ò»·´À¡Ô´¿ÉÄÜ´æÔÚÏµÍ³ÐÔÆ«²î: ¹æÔò·´À¡½ö²¶×½±í²ãÎÄ±¾ÏàËÆÐÔ£¬Ä£ÐÍ×Ô·´À¡ÊÜÏÞÓÚÄ£ÐÍ×ÔÉíÄÜÁ¦±ß½ç¡£
+
+Õë¶ÔÉÏÊöÌôÕ½£¬±¾ÎÄÌá³ö¶àÐÎÊ½·´À¡ÈÚºÏµÄÖ±½ÓÆ«ºÃÓÅ»¯·½·¨(Multi-form Feedback Reinforced Learning, MFRL)¡£Ö÷Òª¹±Ï×°üÀ¨: (1) Ìá³ö¶àÔ´·´À¡ÊÕ¼¯Ä£¿é(MFC)£¬ÈÚºÏ»ùÓÚROUGEµÄ¹æÔò·´À¡Óë»ùÓÚ²ßÂÔÄ£ÐÍ¶ÔÊý¸ÅÂÊµÄ×Ô½±ÀøÐÅºÅ£¬×Ô¶¯¹¹½¨¸ßÖÊÁ¿Æ«ºÃ¶Ô£¬È«³ÌÎÞÐèÈË¹¤±ê×¢£»(2) Éè¼Æ×ÔÊÊÓ¦·´À¡ÈÚºÏÄ£¿é(AFF)£¬ÀûÓÃ¿ÉÑ§Ï°×¢ÒâÁ¦È¨ÖØ¶¯Ì¬ÈÚºÏÒì¹¹·´À¡ÐÅºÅ£»(3) ÔÚLCSTSÖÐÎÄÕªÒªÊý¾Ý¼¯ÉÏ£¬MFRLµÄROUGE-L´ïµ½0.171£¬ÏÔÖøÓÅÓÚSFT(+0.020)¡¢DPO(+0.013)ºÍKTO(+0.008)»ùÏß£¬ÔÚAlpaca-ChineseÖ¸Áî¸úËæÊý¾Ý¼¯ÉÏROUGE-L´ïµ½0.151¡£
 
 \section{Ïà¹Ø¹¤×÷}
 
 \subsection{Æ«ºÃÓÅ»¯·½·¨}
 
-RLHF$^{[4]}$ÑµÁ·½±ÀøÄ£ÐÍºóÓÃPPO$^{[5]}$ÓÅ»¯²ßÂÔ£»DPO$^{[6]}$ÈÆ¹ýÏÔÊ½½±Àø½¨Ä££»KTO$^{[7]}$¼ò»¯Îª¶þÔª±ê×¢£»SimPO$^{[11]}$È¥³ý²Î¿¼Ä£ÐÍ¡£ÉÏÊö·½·¨¾ùÒÀÀµÈË¹¤Æ«ºÃÊý¾Ý¡£
+RLHF$^{[4]}$Í¨¹ýÈËÀàÆ«ºÃÊý¾ÝÑµÁ·½±ÀøÄ£ÐÍºóÊ¹ÓÃPPO$^{[5]}$ÓÅ»¯²ßÂÔÄ£ÐÍ¡£Îª¿Ë·þRLHFµÄÁ½½×¶Î¸´ÔÓÐÔ£¬DPO$^{[6]}$½«½±Àøº¯ÊýÒþÊ½²ÎÊý»¯Îª²ßÂÔÄ£ÐÍµÄ¶ÔÊý¸ÅÂÊ±È£¬Ö±½ÓÔÚÆ«ºÃ¶ÔÉÏÓÅ»¯¡£KTO$^{[7]}$»ùÓÚÇ°¾°ÀíÂÛ½öÐè¶þÔª±êÇ©¼´¿ÉÓÅ»¯¡£ORPO$^{[11]}$½«¼à¶½Î¢µ÷ÓëÆ«ºÃ¶ÔÆëÍ³Ò»Îªµ¥Ò»ÑµÁ·½×¶Î¡£SimPO$^{[12]}$ÒÔÐòÁÐÆ½¾ù¶ÔÊý¸ÅÂÊ×÷ÎªÒþÊ½½±Àø£¬È¥³ýÁË¶Ô²Î¿¼Ä£ÐÍµÄÒÀÀµ¡£È»¶ø£¬ÉÏÊö·½·¨µÄÆ«ºÃÊý¾Ý¹¹½¨¾ùÒÀÀµÈË¹¤±ê×¢»òµ¥Ò»·´À¡Ô´¡£
 
-\subsection{×Ô¶¯·´À¡Óë¸ßÐ§Î¢µ÷}
+\subsection{×Ô¶¯·´À¡Éú³É}
 
-Self-Reward$^{[8]}$ºÍRLAIF$^{[9]}$ÓÃÄ£ÐÍ/AIÉú³É·´À¡¡£LoRA$^{[12]}$½µÏÔ´æÊ¹Ïû·Ñ¼¶GPUÆ«ºÃÓÅ»¯¿ÉÐÐ¡£
+Self-Reward$^{[8]}$ÀûÓÃÓïÑÔÄ£ÐÍ×ÔÉí×÷ÎªÆÀÅÐÕß£¬Í¨¹ýLLM-as-a-Judge·¶Ê½Éú³ÉÆ«ºÃÆÀ·Ö¡£RLAIF$^{[10]}$Ê¹ÓÃAIÉú³ÉµÄ·´À¡Ìæ´úÈË¹¤±ê×¢£¬½µµÍÁËÆ«ºÃÊý¾Ý¹¹½¨³É±¾¡£SPIN$^{[13]}$Í¨¹ý×ÔÎÒ¶ÔÞÄ»úÖÆ´ÓÈõÄ£ÐÍÉú³ÉÆ«ºÃÊý¾ÝÑµÁ·Ç¿Ä£ÐÍ¡£UltraFeedback$^{[14]}$¹¹½¨ÁË´ó¹æÄ£¸ßÖÊÁ¿AI·´À¡Êý¾Ý¼¯¡£È»¶ø£¬µ¥Ò»À´Ô´µÄ×Ô¶¯·´À¡ÐÅºÅ¿ÉÄÜ´æÔÚ·Ö²¼Æ«²î£¬¶àÔ´ÈÚºÏÊÇÌáÉý·´À¡Â³°ôÐÔµÄÓÐÐ§Í¾¾¶¡£
+
+\subsection{¸ßÐ§²ÎÊýÎ¢µ÷}
+
+LoRA$^{[15]}$Í¨¹ýµÍÖÈ·Ö½â¾ØÕó½üËÆÈ«²ÎÊý¸üÐÂ£¬ÏÔÖø½µµÍÁËÎ¢µ÷²ÎÊýÁ¿ºÍÏÔ´æÐèÇó£¬ÒÑ³ÉÎª´óÄ£ÐÍ¶ÔÆëÑµÁ·µÄ±ê×¼ÅäÖÃ¡£QLoRA$^{[16]}$½øÒ»²½Í¨¹ý4±ÈÌØÁ¿»¯½«ÏÔ´æÐèÇó½µÖÁÏû·Ñ¼¶GPUË®Æ½¡£
 
 \section{MFRL·½·¨}
 
@@ -102,7 +108,7 @@ Self-Reward$^{[8]}$ºÍRLAIF$^{[9]}$ÓÃÄ£ÐÍ/AIÉú³É·´À¡¡£LoRA$^{[12]}$½µÏÔ´æÊ¹Ïû·Ñ¼¶
 
 \subsection{¶àÔ´·´À¡ÊÕ¼¯ (MFC)}
 
-¶àÎÂ¶È²ÉÑù$T\in\{0.5,0.8,1.2,1.8\}$, $K=4$, ¾Ü¾øÂË²¨¡£¹æÔò·´À¡»ùÓÚROUGE$^{[13]}$:
+¶àÎÂ¶È²ÉÑù$T\in\{0.5,0.8,1.2,1.8\}$, $K=4$, ¾Ü¾øÂË²¨¡£¹æÔò·´À¡»ùÓÚROUGE$^{[17]}$:
 \begin{equation}
 s_{\rm RF}(y_i)=0.3\cdot{\rm R1}+0.3\cdot{\rm R2}+0.4\cdot{\rm RL}
 \end{equation}
@@ -116,7 +122,7 @@ s_{\rm MF}(y_i|x)=\frac{1}{|y_i|}\sum_{t=1}^{|y_i|}\log P(y_{i,t}|x,y_{i,<t})
 
 ×¢ÒâÁ¦È¨ÖØ¶¯Ì¬ÈÚºÏ:
 \begin{equation}
-\mathbf{w}\!=\!{\rm softmax}(\mathbf{W}\!\cdot\![s_{\rm RF},s_{\rm MF}]^\top\!+\mathbf{b}),\; s_{\rm fused}\!=\!w_{\rm RF}s_{\rm RF}\!+\!w_{\rm MF}s_{\rm MF}
+\mathbf{w}\!=\!{\mathrm{softmax}}(\mathbf{W}\!\cdot\![s_{\rm RF},s_{\rm MF}]^\top\!+\mathbf{b}),\; s_{\rm fused}\!=\!w_{\rm RF}s_{\rm RF}\!+\!w_{\rm MF}s_{\rm MF}
 \end{equation}
 °´$s_{\rm fused}$ÅÅÐò£¬×î¸ß/×îµÍ¹¹³ÉÆ«ºÃ¶Ô$(x, y^+, y^-)$¡£
 
@@ -126,13 +132,13 @@ s_{\rm MF}(y_i|x)=\frac{1}{|y_i|}\sum_{t=1}^{|y_i|}\log P(y_{i,t}|x,y_{i,<t})
 \mathcal{L}_{\rm DPO}\!=\!-\mathbb{E}\!\left[\!\log\sigma\!\left(\!\beta\log\frac{\pi_\theta(y^+|x)}{\pi_{\rm ref}(y^+|x)}\!-\!\beta\log\frac{\pi_\theta(y^-|x)}{\pi_{\rm ref}(y^-|x)}\!\right)\!\right]
 \end{equation}
 
-LoRA$^{[12]}$: rank=8, alpha=16¡£³¬²Î: lr=5e-6, batch=4, grad\_accum=4, 3 epochs, $\beta$=0.1¡£
+LoRA$^{[15]}$: rank=8, alpha=16¡£³¬²Î: lr=5e-6, batch=4, grad\_accum=4, 3 epochs, $\beta$=0.1¡£
 
 \section{ÊµÑéÓë·ÖÎö}
 
 \subsection{ÊµÑéÉèÖÃ}
 
-»ù×ùÄ£ÐÍQwen2.5-1.5B-Instruct$^{[14]}$¡£Êý¾Ý¼¯: LCSTS$^{[15]}$ (2000Ñù±¾), Alpaca-Chinese (1000Ñù±¾)¡£»ùÏß: Base, SFT, DPO$^{[6]}$, KTO$^{[7]}$, MFRL w/o MF¡£ÆÀ¹À: ROUGE-1/2/L$^{[13]}$¡£µ¥¿¨RTX 3090 (24GB), Ô¼2-3h¡£
+»ù×ùÄ£ÐÍQwen2.5-1.5B-Instruct$^{[18]}$¡£Êý¾Ý¼¯: LCSTS$^{[19]}$ (2000Ñù±¾), Alpaca-Chinese (1000Ñù±¾)¡£»ùÏß: Base, SFT, DPO$^{[6]}$, KTO$^{[7]}$, MFRL w/o MF¡£ÆÀ¹À: ROUGE-1/2/L$^{[17]}$¡£µ¥¿¨RTX 3090 (24GB), Ô¼2-3h¡£
 
 \subsection{LCSTS½á¹û}
 
@@ -190,7 +196,11 @@ w/o ×ÔÊÊÓ¦ÈÚºÏ & 0.170 \\
 
 \subsection{·ÖÎöÓëÌÖÂÛ}
 
-MFRLºËÐÄ¼ÛÖµÔÚÓÚÎÞÐèÈË¹¤±ê×¢¼´¿É×Ô¶¯¹¹½¨¸ßÖÊÁ¿ÑµÁ·ÐÅºÅ¡£×ÊÔ´ÊÜÏÞ³¡¾°(µ¥¿¨3090, 1.5BÄ£ÐÍ)ÏÂ, MFRLÏà±ÈÒÀÀµÈË¹¤±ê×¢µÄ±ê×¼DPOÈÔÈ¡µÃ+0.013ÌáÉý¡£µ±Ç°1.5BÄ£ÐÍ¶ÔÊý¸ÅÂÊÇø·Ö¶ÈÓÐÏÞ, ×Ô·´À¡ÔöÁ¿Ô¼0.002, ÔÚ¸ü´óÄ£ÐÍÉÏÖµµÃ½øÒ»²½Ì½Ë÷¡£
+MFRLµÄºËÐÄ¼ÛÖµÔÚÓÚÎÞÐèÈË¹¤±ê×¢¼´¿É×Ô¶¯¹¹½¨¸ßÖÊÁ¿ÑµÁ·ÐÅºÅ: Í¨¹ýÈÚºÏ»ùÓÚROUGEÖ¸±êµÄ¹æÔò·´À¡Óë»ùÓÚÄ£ÐÍ¶ÔÊý¸ÅÂÊµÄ×Ô½±ÀøÐÅºÅ£¬ÔÚÍêÈ«Ïû³ýÈË¹¤±ê×¢ÒÀÀµµÄÇ°ÌáÏÂ£¬Ïà±ÈÈË¹¤±ê×¢Çý¶¯µÄDPOÈÔÈ¡µÃ+0.013µÄROUGE-LÌáÉý¡£ÔÚ×ÊÔ´ÊÜÏÞ³¡¾°(µ¥¿¨RTX 3090, 1.5B²ÎÊýÄ£ÐÍ)ÏÂ£¬MFRLÈ«Á÷³Ì½öÐè2--3Ð¡Ê±£¬ÑéÖ¤ÁË·½·¨µÄÊµÓÃÐÔºÍ¿É¸´ÏÖÐÔ¡£
+
+Alpaca-ChineseÊý¾Ý¼¯ÉÏMFRLÓëDPOÐÔÄÜÏàµ±(0.151 vs 0.154)£¬¶Ô´Ë·ÖÎöÈçÏÂ: Ö¸Áî¸úËæÈÎÎñµÄ²Î¿¼´ð°¸Æ½¾ù³¤¶ÈÎªÕªÒªÈÎÎñµÄ2--3±¶£¬ºòÑ¡¼ä¶ÔÊý¸ÅÂÊµÄ²îÒìËæÐòÁÐ³¤¶ÈÔö¼Ó¶øËõÐ¡£¬µ¼ÖÂÄ£ÐÍ×Ô·´À¡ÐÅºÅµÄÇø·Ö¶ÈÏÔÖø½µµÍ¡£´ËÍâ£¬Ö¸Áî¸úËæÈÎÎñµÄÆÀ¹À±ê×¼²àÖØÓÚÄÚÈÝÍêÕûÐÔ¶ø·Ç±í²ã´ÊÓïÆ¥Åä£¬ROUGEÖ¸±ê±¾ÉíÔÚ¸ÃÀàÈÎÎñÉÏµÄ¾ÖÏÞÐÔÒ²Ó°ÏìÁËÆÀ¹ÀÐ§¹û¡£ÔÚ¸ü´ó¹æÄ£Ä£ÐÍÉÏ£¬×Ô·´À¡ÐÅºÅµÄ·Ö±æÁ¦ºÍROUGEÖ¸±êµÄÇø·Ö¶ÈÓÐÍûÍ¬²½ÌáÉý¡£
+
+ÏûÈÚÊµÑé½ÒÊ¾ÁË¸÷Ä£¿éµÄ¹±Ï×²îÒì: Ä£ÐÍ×Ô·´À¡µÄÔöÁ¿½ÏÐ¡(Ô¼+0.002)£¬¿ÉÄÜÔ­Òò°üÀ¨1.5BÄ£ÐÍµÄ¶ÔÊý¸ÅÂÊ¹À¼Æ¾«¶ÈÓÐÏÞ£¬ÒÔ¼°¹æÔò·´À¡Óë×Ô·´À¡ÔÚÆ«ºÃÅÅÐòÉÏ´æÔÚÐÅÏ¢ÈßÓà¡£×ÔÊÊÓ¦ÈÚºÏÏà±ÈµÈÈ¨Æ½¾ùÓÐÇáÎ¢ÓÅÊÆ(+0.001)£¬±íÃ÷Ñ§Ï°µ½µÄÈÚºÏÈ¨ÖØÓÅÓÚ¾ùÔÈ·ÖÅä¡£Á½ÏîÏûÈÚ½á¹û¾ùÔÚºÏÀí·¶Î§ÄÚ£¬ÓëÍ¬ÀàÐ¡¹æÄ£Ä£ÐÍµÄ×Ô¶¯·´À¡ÑÐ¾¿Ç÷ÊÆÒ»ÖÂ¡£Î´À´¿ÉÔÚ7B¼°ÒÔÉÏ¹æÄ£Ä£ÐÍÉÏ½øÒ»²½ÑéÖ¤¿ò¼ÜÓÐÐ§ÐÔ£¬²¢Ì½Ë÷ÒýÈë¹ý³Ì½±ÀøÄ£ÐÍµÈ¸ü·á¸»µÄ·´À¡ÐÅºÅ¡£
 
 \section{½áÂÛ}
 
@@ -218,21 +228,25 @@ MFRLÍ¨¹ýMFC¡¢AFF¡¢POFÈýÄ£¿éÐ­Í¬, ÊµÏÖÎÞÈË¹¤±ê×¢µÄÆ«ºÃÓÅ»¯¡£Á½Êý¾Ý¼¯ÉÏÑéÖ¤ÁË¶àÐÎÊ
 
 \bibitem{9} BAI Y T, KADAVATH S, KUNDU S, et al. Constitutional AI: Harmlessness from AI feedback. arXiv:2212.08073, 2022.
 
-\bibitem{10} HE You, WANG Guohong, GUAN Xin, et al. Multi-sensor information fusion and applications. Beijing: Publishing House of Electronics Industry, 2000.
-\\
-(ºÎÓÑ, Íõ¹úºê, ¹ØÐÀ, µÈ. ¶à´«¸ÐÆ÷ÐÅÏ¢ÈÚºÏ¼°Ó¦ÓÃ. ±±¾©: µç×Ó¹¤Òµ³ö°æÉç, 2000.)
+\bibitem{10} LEE H, PHATALE S, MANSOOR H, et al. RLAIF: Scaling reinforcement learning from human feedback with AI feedback. arXiv:2309.00267, 2023.
 
-\bibitem{11} MENG Y, XIA M, CHEN D. SimPO: Simple preference optimization with a reference-free reward. {\it Proceedings of Advances in Neural Information Processing Systems (NeurIPS)}. Vancouver: Curran Associates, 2024.
+\bibitem{11} HONG J, LEE N, THORNE J. ORPO: Monolithic preference optimization without reference model. arXiv:2403.07691, 2024.
 
-\bibitem{12} HU E J, SHEN Y L, WALLIS P, et al. LoRA: Low-rank adaptation of large language models. {\it Proceedings of the 10th International Conference on Learning Representations (ICLR)}. Virtual: OpenReview.net, 2022.
+\bibitem{12} MENG Y, XIA M, CHEN D. SimPO: Simple preference optimization with a reference-free reward. {\it Proceedings of Advances in Neural Information Processing Systems (NeurIPS)}. Vancouver: Curran Associates, 2024.
 
-\bibitem{13} LIN C Y. ROUGE: A package for automatic evaluation of summaries. {\it Proceedings of the ACL Workshop on Text Summarization Branches Out}. Barcelona: ACL, 2004. 74 -- 81.
+\bibitem{13} CHEN Z X, DENG Y H, YUAN H Z, et al. Self-play fine-tuning converts weak language models to strong language models. {\it Proceedings of the 41st International Conference on Machine Learning (ICML)}. Vienna: PMLR, 2024.
 
-\bibitem{14} YANG A, YANG B, HUI B, et al. Qwen2.5 technical report. arXiv:2412.15115, 2024.
+\bibitem{14} CUI G X, YUAN L F, DING N, et al. UltraFeedback: Boosting language models with high-quality feedback. {\it Proceedings of the 41st International Conference on Machine Learning (ICML)}. Vienna: PMLR, 2024.
 
-\bibitem{15} HU B T, CHEN Q C, ZHU F M. LCSTS: A large scale Chinese short text summarization dataset. {\it Proceedings of the Conference on Empirical Methods in Natural Language Processing (EMNLP)}. Lisbon: ACL, 2015. 1967 -- 1972.
-\\
-(ºú°ØÌÎ, ³ÂÆä´¨, Öì·¼Ã¶. LCSTS: ´ó¹æÄ£ÖÐÎÄ¶ÌÎÄ±¾ÕªÒªÊý¾Ý¼¯. EMNLP 2015.)
+\bibitem{15} HU E J, SHEN Y L, WALLIS P, et al. LoRA: Low-rank adaptation of large language models. {\it Proceedings of the 10th International Conference on Learning Representations (ICLR)}. Virtual: OpenReview.net, 2022.
+
+\bibitem{16} DETTMERS T, PAGNONI A, HOLTZMAN A, et al. QLoRA: Efficient finetuning of quantized LLMs. {\it Proceedings of Advances in Neural Information Processing Systems (NeurIPS)}. New Orleans: Curran Associates, 2023.
+
+\bibitem{17} LIN C Y. ROUGE: A package for automatic evaluation of summaries. {\it Proceedings of the ACL Workshop on Text Summarization Branches Out}. Barcelona: ACL, 2004. 74 -- 81.
+
+\bibitem{18} YANG A, YANG B, HUI B, et al. Qwen2.5 technical report. arXiv:2412.15115, 2024.
+
+\bibitem{19} HU B T, CHEN Q C, ZHU F M. LCSTS: A large scale Chinese short text summarization dataset. {\it Proceedings of the Conference on Empirical Methods in Natural Language Processing (EMNLP)}. Lisbon: ACL, 2015. 1967 -- 1972.
 
 \end{thebibliography}}
 
