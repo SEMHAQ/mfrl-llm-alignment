@@ -1,61 +1,54 @@
-# 通宵实验脚本 - 跑完自动推送
-# 用法: powershell -ExecutionPolicy Bypass -File scripts\run_overnight.ps1
+# Overnight: LoRA rank sensitivity
+# Powershell -ExecutionPolicy Bypass -File scripts\run_overnight.ps1
 
-Write-Host "===== 通宵实验开始 =====" -ForegroundColor Green
-Write-Host "时间: $(Get-Date)" -ForegroundColor Cyan
+Write-Host "=== Overnight: Rank Sensitivity ===" -ForegroundColor Green
+Write-Host "Start: $(Get-Date)"
 
-# Step 1: 更新配置（去掉过滤，5 epochs）
-Write-Host "`n[配置] 去掉min_score_diff过滤，5 epochs" -ForegroundColor Yellow
-python -c "
-import yaml
-with open('configs/train.yaml','r',encoding='utf-8') as f: c=yaml.safe_load(f)
-c['feedback']['min_score_diff']=0.0
-c['dpo']['num_epochs']=5
-with open('configs/train.yaml','w',encoding='utf-8') as f: yaml.dump(c,f,allow_unicode=True)
-print('Config updated: min_score_diff=0.0, num_epochs=5')
-"
+# Run rank=4 ablation using existing preference data
+Write-Host "`n[1/2] Rank=4 training..." -ForegroundColor Cyan
+python scripts/quick_ablate_rank.py 4
+if ($LASTEXITCODE -ne 0) { Write-Host "Rank=4 FAILED" -ForegroundColor Red }
 
-# Step 2: MFRL主实验（5 epochs，无过滤）
-Write-Host "`n[1/6] MFRL (5 epochs, no filter)" -ForegroundColor Yellow
-Remove-Item outputs\mfrl_v3\preference_data.json -ErrorAction SilentlyContinue
-python scripts/run_experiment.py --config configs/train.yaml --skip_generation
-Copy-Item outputs\mfrl_v3\eval_results.json results\mfrl_v3_eval.json -ErrorAction SilentlyContinue
+# Run rank=16 ablation
+Write-Host "`n[2/2] Rank=16 training..." -ForegroundColor Cyan
+python scripts/quick_ablate_rank.py 16
+if ($LASTEXITCODE -ne 0) { Write-Host "Rank=16 FAILED" -ForegroundColor Red }
 
-# Step 3: Baselines（逐个跑，避免OOM）
-Write-Host "`n[2/6] Baseline: SFT" -ForegroundColor Yellow
-python scripts/run_baselines.py --config configs/train.yaml --baselines sft
+# Evaluate both
+Write-Host "`nEvaluating..." -ForegroundColor Cyan
+python -c @'
+import json, yaml, torch, os, sys
+sys.path.insert(0, '.')
+from transformers import AutoTokenizer, AutoModelForCausalLM
+from peft import PeftModel
+from src.eval.evaluator import Evaluator
 
-Write-Host "`n[3/6] Baseline: DPO" -ForegroundColor Yellow
-python scripts/run_baselines.py --config configs/train.yaml --baselines dpo
+with open("configs/train.yaml", encoding="utf-8") as f:
+    cfg = yaml.safe_load(f)
+tok = AutoTokenizer.from_pretrained(cfg["model"]["name"], trust_remote_code=True)
+tok.pad_token = tok.eos_token
 
-Write-Host "`n[4/6] Baseline: KTO" -ForegroundColor Yellow
-python scripts/run_baselines.py --config configs/train.yaml --baselines kto
-Copy-Item outputs\mfrl_v3\baseline_comparison.json results\baseline_eval.json -ErrorAction SilentlyContinue
+with open("data/lcsts_train.json", encoding="utf-8") as f:
+    data = json.load(f)
+test = data[-200:]
+td = [{"prompt": "请为以下文本生成简洁准确的摘要：\n"+item["input"]+"\n摘要：",
+       "reference": item["reference"]} for item in test]
 
-# Step 4: 消融实验
-Write-Host "`n[5/6] Ablation: no_model" -ForegroundColor Yellow
-python scripts/run_experiment.py --mode ablation --ablation_type no_model --skip_generation
-Copy-Item outputs\mfrl_v3\ablation_no_model\eval_results.json results\ablation_no_model_eval.json -ErrorAction SilentlyContinue
+os.makedirs("results", exist_ok=True)
+for rank in [4, 8, 16]:
+    path = f"outputs/ablation_rank{rank}/final"
+    if os.path.exists(os.path.join(path, "adapter_config.json")):
+        base = AutoModelForCausalLM.from_pretrained(cfg["model"]["name"], dtype=torch.float16, trust_remote_code=True).to("cuda")
+        model = PeftModel.from_pretrained(base, path)
+        evaluator = Evaluator(model, tok)
+        scores = evaluator.evaluate_rouge(td, reference_key="reference")
+        print(f"rank={rank}: ROUGE-L={scores['rougeL']:.4f}")
+        with open(f"results/rank{rank}_eval.json", "w") as f:
+            json.dump(scores, f)
+        del model, base
+        torch.cuda.empty_cache()
+print("Done")
+'@
 
-Write-Host "`n[6/6] Ablation: no_curriculum" -ForegroundColor Yellow
-python scripts/run_experiment.py --mode ablation --ablation_type no_curriculum --skip_generation
-Copy-Item outputs\mfrl_v3\ablation_no_curriculum\eval_results.json results\ablation_no_curriculum_eval.json -ErrorAction SilentlyContinue
-
-# 恢复配置
-python -c "
-import yaml
-with open('configs/train.yaml','r',encoding='utf-8') as f: c=yaml.safe_load(f)
-c['dpo']['learning_rate']=5e-6
-c['dpo']['num_epochs']=2
-c['feedback']['min_score_diff']=0.1
-with open('configs/train.yaml','w',encoding='utf-8') as f: yaml.dump(c,f,allow_unicode=True)
-"
-
-# Step 5: 推送结果
-Write-Host "`n===== 推送结果 =====" -ForegroundColor Green
-git add results/
-git commit -m "results: overnight experiments (MFRL + baselines + ablations)"
-git push
-
-Write-Host "`n===== 全部完成! =====" -ForegroundColor Green
-Write-Host "时间: $(Get-Date)" -ForegroundColor Cyan
+Write-Host "`n=== Complete: $(GetDate) ===" -ForegroundColor Green
+Write-Host "Run: git add -A && git commit -m 'results: rank sensitivity' && git push"
