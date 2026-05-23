@@ -116,6 +116,18 @@ def main():
             model, tokenizer, test_data, "results/ablation_no_model_eval.json", "no_model")
         unload_model(model, tokenizer)
 
+    # 5. Ablation no_curriculum
+    cur_path = "outputs/mfrl_v3/ablation_no_curriculum/final"
+    if os.path.exists(os.path.join(cur_path, "adapter_config.json")):
+        print("=" * 50)
+        print("Ablation: no_curriculum")
+        print("=" * 50)
+        model, tokenizer = setup_model(model_name, config["model"]["dtype"])
+        model = PeftModel.from_pretrained(model, cur_path)
+        all_results["no_curriculum"] = evaluate_model(
+            model, tokenizer, test_data, "results/ablation_no_curriculum_eval.json", "no_curriculum")
+        unload_model(model, tokenizer)
+
     # 打印汇总
     print(f"\n{'='*60}")
     print("RESULTS (max_new_tokens=50)")
