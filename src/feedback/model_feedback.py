@@ -76,51 +76,53 @@ class ModelFeedback:
     def score(self, input_text: str, reference: str, candidate: str) -> float:
         """对单个候选输出评分。"""
         if self.use_self_reward:
-            return self._score_logprob(input_text, [candidate])[0]
+            return self._score_logprob_mega([input_text], [candidate])[0]
         else:
             return self._score_judge(input_text, reference, candidate)
 
-    def _score_logprob(self, prompt_text: str, candidates: List[str]) -> List[float]:
-        """Self-reward: 批量计算多个候选的log-probability分数。
+    def _score_logprob_mega(
+        self, prompts: List[str], candidates: List[str]
+    ) -> List[float]:
+        """批量评分：多个不同prompt的(输入,候选)对在一次forward中完成。
 
-        同一prompt的多个candidate在一次forward pass中完成。
+        Args:
+            prompts: 每个候选对应的输入文本（长度 = candidates）
+            candidates: 候选文本列表
         """
-        messages = [{"role": "user", "content": prompt_text}]
-        prompt_formatted = self.tokenizer.apply_chat_template(
-            messages, tokenize=False, add_generation_prompt=True
-        )
+        # 构建所有序列并记录每个序列的prompt token长度
+        full_texts = []
+        prompt_lens = []
+        for prompt, cand in zip(prompts, candidates):
+            messages = [{"role": "user", "content": prompt}]
+            prompt_formatted = self.tokenizer.apply_chat_template(
+                messages, tokenize=False, add_generation_prompt=True
+            )
+            full_texts.append(prompt + cand)
+            p_ids = self.tokenizer(prompt_formatted, return_tensors="pt")
+            prompt_lens.append(p_ids["input_ids"].shape[1])
 
-        # 构建 batch: prompt_formatted + each candidate
-        full_texts = [prompt_text + c for c in candidates]
-        # Tokenize prompt alone to get prompt length
-        prompt_ids = self.tokenizer(prompt_formatted, return_tensors="pt")
-        prompt_len = prompt_ids["input_ids"].shape[1]
-
-        # Tokenize full texts with padding
         enc = self.tokenizer(full_texts, return_tensors="pt", padding=True)
         input_ids = enc["input_ids"].to(self.device)
         attention_mask = enc["attention_mask"].to(self.device)
 
         outputs = self.model(input_ids=input_ids, attention_mask=attention_mask)
-        logits = outputs.logits  # [B, seq, vocab]
+        logits = outputs.logits
 
         scores = []
         for i in range(len(candidates)):
-            # Find actual length (excluding padding)
             actual_len = attention_mask[i].sum().item()
-            cand_len = actual_len - prompt_len
+            p_len = prompt_lens[i]
+            cand_len = actual_len - p_len
             if cand_len <= 0:
                 scores.append(0.0)
                 continue
 
-            cand_logits = logits[i, prompt_len - 1:actual_len - 1, :]
-            cand_ids = input_ids[i, prompt_len:actual_len]
+            cand_logits = logits[i, p_len - 1 : actual_len - 1, :]
+            cand_ids = input_ids[i, p_len:actual_len]
             log_probs = torch.log_softmax(cand_logits, dim=-1)
             token_log_probs = log_probs.gather(1, cand_ids.unsqueeze(1)).squeeze(1)
             avg_log_prob = token_log_probs.mean().item()
-
-            score = max(0.0, min(1.0, (avg_log_prob + 10.0) / 10.0))
-            scores.append(score)
+            scores.append(max(0.0, min(1.0, (avg_log_prob + 10.0) / 10.0)))
 
         return scores
 
@@ -172,38 +174,57 @@ class ModelFeedback:
     ) -> List[Dict]:
         """从多候选中生成基于模型评分的偏好对。"""
         preference_pairs = []
+        MEGA_BATCH = 32  # 一次forward处理32个输入的所有候选
 
-        for inp, ref, candidates in tqdm(
-            zip(inputs, references, candidates_list),
-            total=len(inputs),
-            desc="Model feedback",
-        ):
-            valid_candidates = [c for c in candidates if is_valid_candidate(c)]
-            if len(valid_candidates) < 2:
-                continue
+        # 预处理：过滤无效候选
+        items = []
+        for inp, ref, cands in zip(inputs, references, candidates_list):
+            valid = [c for c in cands if is_valid_candidate(c)]
+            if len(valid) >= 2:
+                items.append((inp, ref, valid))
+
+        for b_start in tqdm(range(0, len(items), MEGA_BATCH), desc="Model feedback"):
+            batch_items = items[b_start : b_start + MEGA_BATCH]
+
+            all_prompts = []
+            all_refs = []
+            all_candidates = []
+            cand_counts = []
+            for inp, ref, valid in batch_items:
+                for c in valid:
+                    all_prompts.append(inp)
+                    all_refs.append(ref)
+                    all_candidates.append(c)
+                cand_counts.append(len(valid))
 
             if self.use_self_reward:
-                scores = self._score_logprob(inp, valid_candidates)
+                all_scores = self._score_logprob_mega(all_prompts, all_candidates)
             else:
-                scores = [self._score_judge(inp, ref, c) for c in valid_candidates]
+                all_scores = [
+                    self._score_judge(p, r, c)
+                    for p, r, c in zip(all_prompts, all_refs, all_candidates)
+                ]
 
-            ranked = sorted(
-                zip(valid_candidates, scores), key=lambda x: x[1], reverse=True
-            )
+            # 分发分数回各输入
+            offset = 0
+            for (inp, ref, valid), n in zip(batch_items, cand_counts):
+                scores = all_scores[offset : offset + n]
+                offset += n
 
-            chosen, chosen_score = ranked[0]
-            rejected, rejected_score = ranked[-1]
+                ranked = sorted(zip(valid, scores), key=lambda x: x[1], reverse=True)
+                chosen, chosen_score = ranked[0]
+                rejected, rejected_score = ranked[-1]
 
-            if chosen_score > rejected_score:
-                preference_pairs.append({
-                    "input": inp,
-                    "chosen": chosen,
-                    "rejected": rejected,
-                    "reference": ref,
-                    "score_diff": chosen_score - rejected_score,
-                    "chosen_score": chosen_score,
-                    "rejected_score": rejected_score,
-                    "feedback_type": "model",
-                })
+                if chosen_score > rejected_score:
+                    preference_pairs.append({
+                        "input": inp,
+                        "chosen": chosen,
+                        "rejected": rejected,
+                        "reference": ref,
+                        "score_diff": chosen_score - rejected_score,
+                        "chosen_score": chosen_score,
+                        "rejected_score": rejected_score,
+                        "feedback_type": "model",
+                    })
 
         return preference_pairs
