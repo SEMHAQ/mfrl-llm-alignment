@@ -31,6 +31,8 @@ def get_prompt(input_text: str, dataset_name: str = "lcsts") -> str:
     fmt = META_PROMPTS.get(dataset_name, META_PROMPTS["lcsts"])
     return fmt.format(input=input_text)
 
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
 from transformers import AutoTokenizer, AutoModelForCausalLM
 from src.feedback.rule_feedback import RuleFeedback
 from src.feedback.model_feedback import ModelFeedback
