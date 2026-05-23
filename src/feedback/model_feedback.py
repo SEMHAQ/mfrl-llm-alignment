@@ -174,7 +174,7 @@ class ModelFeedback:
     ) -> List[Dict]:
         """从多候选中生成基于模型评分的偏好对。"""
         preference_pairs = []
-        MEGA_BATCH = 32  # 一次forward处理32个输入的所有候选
+        MEGA_BATCH = 8  # 一次forward处理8个输入的所有候选
 
         # 预处理：过滤无效候选
         items = []
