@@ -27,9 +27,9 @@ dpo:
   loss_type: "sigmoid"
   learning_rate: 5.0e-6
   num_epochs: 3
-  batch_size: 8
-  gradient_accumulation: 2
-  max_length: 256
+  batch_size: 4
+  gradient_accumulation: 4
+  max_length: 192
   max_prompt_length: 128
 
 # 课程学习配置
