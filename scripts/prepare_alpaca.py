@@ -8,9 +8,9 @@ from datasets import load_dataset
 print("Downloading Alpaca-Chinese (streaming, first 2000 samples)...")
 dataset = load_dataset(
     "silk-road/alpaca-data-gpt4-chinese",
-    split="train[:2000]",
+    split="train",
     streaming=True,
-)
+).take(2000)
 
 raw_data = []
 for item in dataset:
