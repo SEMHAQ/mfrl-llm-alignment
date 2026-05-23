@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>MFRL论文图片</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
+
+  body { font-family: 'Noto Sans SC', 'SimSun', sans-serif; background: #f5f5f5; padding: 20px; }
+
+  .figure-container {
+    background: white;
+    border: 1px solid #ddd;
+    margin-bottom: 30px;
+    padding: 30px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    page-break-inside: avoid;
+  }
+
+  .figure-title {
+    text-align: center;
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 20px;
+    color: #333;
+  }
+
+  /* ============ 图1: MFRL框架图 ============ */
+  .framework { text-align: center; padding: 10px 0; }
+
+  .flow-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-bottom: 8px;
+  }
+
+  .module {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 14px 22px;
+    border-radius: 6px;
+    border: 1.5px solid #4f81bd;
+    background: #dce6f2;
+    min-width: 100px;
+    position: relative;
+  }
+  .module .name { font-size: 18px; font-weight: 600; color: #1a3c6e; }
+  .module .label { font-size: 12px; color: #4f81bd; margin-top: 4px; letter-spacing: 1px; }
+
+  .module-sm {
+    padding: 10px 16px;
+    min-width: 80px;
+    background: #eef3fa;
+    border-color: #9bb7d6;
+  }
+  .module-sm .name { font-size: 14px; }
+
+  .arrow { font-size: 24px; color: #4f81bd; font-weight: 300; padding: 0 4px; }
+  .arrow-label { font-size: 11px; color: #888; text-align: center; margin-top: -4px; }
+
+  .sub-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 6px;
+  }
+  .sub-module {
+    padding: 8px 14px;
+    border-radius: 4px;
+    border: 1px dashed #9bb7d6;
+    background: #eef3fa;
+    font-size: 12px;
+    color: #2a5494;
+  }
+
+  .bracket { font-size: 36px; color: #999; padding: 0 6px; }
+
+  .data-label {
+    display: inline-block;
+    padding: 6px 20px;
+    border-radius: 4px;
+    background: #fef2f2;
+    border: 1px solid #fbc4c4;
+    font-size: 13px;
+    color: #a03a3a;
+    margin: 0 4px;
+  }
+
+  .data-label-blue {
+    background: #e8f4fd;
+    border-color: #9bb7d6;
+    color: #2a5494;
+  }
+
+  .output-box {
+    display: inline-block;
+    padding: 12px 28px;
+    border-radius: 6px;
+    background: #4f81bd;
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0 4px;
+  }
+
+  /* ============ 图2: 柱状图 ============ */
+  .chart { padding: 20px 0; }
+  .bar-chart {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    height: 300px;
+    gap: 20px;
+    padding: 0 40px;
+    border-bottom: 2px solid #333;
+    position: relative;
+  }
+
+  .bar-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    max-width: 120px;
+  }
+
+  .bar-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+  }
+
+  .bar {
+    width: 60px;
+    border-radius: 4px 4px 0 0;
+    min-height: 4px;
+    transition: height 0.3s;
+    position: relative;
+  }
+
+  .bar .val {
+    position: absolute;
+    top: -22px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 13px;
+    font-weight: 600;
+    color: #333;
+    white-space: nowrap;
+  }
+
+  .bar-0 { background: #b0c4de; height: 150px; }
+  .bar-1 { background: #4f81bd; height: 140px; }
+  .bar-2 { background: #9bbb59; height: 147px; }
+  .bar-3 { background: #f4a940; height: 151px; }
+  .bar-4 { background: #4bac6c; height: 156px; }
+  .bar-5 { background: #c0504d; height: 158px; }
+
+  .bar-label {
+    font-size: 12px;
+    color: #555;
+    text-align: center;
+    margin-top: 8px;
+    font-weight: 500;
+  }
+
+  .y-axis {
+    position: absolute;
+    left: 20px;
+    top: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    font-size: 11px;
+    color: #888;
+  }
+
+  .chart-title {
+    text-align: center;
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 20px;
+  }
+
+  /* ============ 图3: Alpaca结果 ============ */
+  .chart-row {
+    display: flex;
+    gap: 40px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+</style>
+</head>
+<body>
+
+<!-- ==================== 图1: MFRL框架图 ==================== -->
+<div class="figure-container">
+  <div class="figure-title">图1  MFRL整体框架</div>
+  <div class="framework">
+
+    <!-- 输入 -->
+    <div class="flow-row">
+      <div class="data-label">训练样本 (x, y*)</div>
+    </div>
+
+    <div class="flow-row" style="margin: 6px 0;">
+      <span class="arrow">↓</span>
+    </div>
+
+    <!-- 候选生成 -->
+    <div class="flow-row">
+      <div class="module">
+        <span class="name">候选生成</span>
+        <span class="label">多温度采样 + 拒绝滤波</span>
+      </div>
+    </div>
+
+    <div class="flow-row" style="margin: 6px 0;">
+      <span class="arrow">↓</span>
+      <div style="font-size:11px;color:#999;margin-top:2px;">候选输出 {y₁, y₂, y₃, y₄}</div>
+    </div>
+
+    <!-- MFC -->
+    <div class="flow-row">
+      <div class="module" style="background:#dce6f2;border-color:#4f81bd;">
+        <span class="name">MFC</span>
+        <span class="label">多源反馈收集</span>
+      </div>
+    </div>
+
+    <div class="sub-row">
+      <div class="sub-module">📐 ROUGE-1/2/L</div>
+      <div class="sub-module" style="background:#fff5e6;border-color:#f4a940;">🤖 Log-Probability</div>
+    </div>
+
+    <div class="flow-row" style="margin: 6px 0;">
+      <span class="arrow">↓</span>
+      <div style="font-size:11px;color:#999;">规则分数 + 自奖励分数</div>
+    </div>
+
+    <!-- AFF -->
+    <div class="flow-row">
+      <div class="module" style="background:#dce6f2;border-color:#4f81bd;">
+        <span class="name">AFF</span>
+        <span class="label">自适应反馈融合</span>
+      </div>
+    </div>
+
+    <div class="sub-row">
+      <div class="sub-module">⚖ 注意力权重</div>
+      <div class="sub-module">🔄 分数归一化</div>
+    </div>
+
+    <div class="flow-row" style="margin: 6px 0;">
+      <span class="arrow">↓</span>
+      <div style="font-size:11px;color:#999;">融合偏好对 (x, y⁺, y⁻)</div>
+    </div>
+
+    <!-- POF -->
+    <div class="flow-row">
+      <div class="module" style="background:#dce6f2;border-color:#4f81bd;">
+        <span class="name">POF</span>
+        <span class="label">偏好优化微调</span>
+      </div>
+    </div>
+
+    <div class="sub-row">
+      <div class="sub-module">DPO Loss</div>
+      <div class="sub-module">LoRA (rank=8)</div>
+    </div>
+
+    <div class="flow-row" style="margin: 8px 0;">
+      <span class="arrow">↓</span>
+    </div>
+
+    <!-- 输出 -->
+    <div class="flow-row">
+      <div class="output-box">优化后模型</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ==================== 图2: LCSTS实验结果柱状图 ==================== -->
+<div class="figure-container">
+  <div class="figure-title">图2  LCSTS数据集ROUGE-L对比</div>
+
+  <div class="chart">
+    <div class="chart-title">ROUGE-L</div>
+    <div class="bar-chart" style="height:280px;">
+
+      <div class="y-axis" style="left:10px;">
+        <span>0.20</span>
+        <span>0.15</span>
+        <span>0.10</span>
+        <span>0.05</span>
+        <span>0</span>
+      </div>
+
+      <div class="bar-group">
+        <div class="bar-wrapper">
+          <div class="bar bar-0" style="height:226px;">
+            <span class="val">0.162</span>
+          </div>
+        </div>
+        <div class="bar-label">Base</div>
+      </div>
+
+      <div class="bar-group">
+        <div class="bar-wrapper">
+          <div class="bar bar-1" style="height:211px;">
+            <span class="val">0.151</span>
+          </div>
+        </div>
+        <div class="bar-label">SFT</div>
+      </div>
+
+      <div class="bar-group">
+        <div class="bar-wrapper">
+          <div class="bar bar-2" style="height:220px;">
+            <span class="val">0.158</span>
+          </div>
+        </div>
+        <div class="bar-label">DPO</div>
+      </div>
+
+      <div class="bar-group">
+        <div class="bar-wrapper">
+          <div class="bar bar-3" style="height:227px;">
+            <span class="val">0.163</span>
+          </div>
+        </div>
+        <div class="bar-label">KTO</div>
+      </div>
+
+      <div class="bar-group">
+        <div class="bar-wrapper">
+          <div class="bar bar-4" style="height:236px;">
+            <span class="val">0.169</span>
+          </div>
+        </div>
+        <div class="bar-label">MFRL<br>(w/o MF)</div>
+      </div>
+
+      <div class="bar-group">
+        <div class="bar-wrapper">
+          <div class="bar" style="height:240px;background:#c0504d;">
+            <span class="val" style="font-weight:700;color:#c0504d;">0.171</span>
+          </div>
+        </div>
+        <div class="bar-label" style="font-weight:700;color:#c0504d;">MFRL</div>
+      </div>
+
+    </div>
+  </div>
+
+  <div style="text-align:center;font-size:11px;color:#999;margin-top:10px;">
+    注：纵轴为ROUGE-L F1分数，柱顶数字为具体数值
+  </div>
+</div>
+
+<!-- ==================== 图3: 消融实验 ==================== -->
+<div class="figure-container">
+  <div class="figure-title">图3  LCSTS消融实验结果</div>
+
+  <div class="chart">
+    <div class="bar-chart" style="height:240px;">
+
+      <div class="y-axis" style="left:10px;">
+        <span>0.175</span>
+        <span>0.170</span>
+        <span>0.165</span>
+        <span>0.160</span>
+      </div>
+
+      <div class="bar-group">
+        <div class="bar-wrapper">
+          <div class="bar bar-4" style="height:220px;background:#4bac6c;">
+            <span class="val">0.170</span>
+          </div>
+        </div>
+        <div class="bar-label">等权融合<br>(w/o AFF)</div>
+      </div>
+
+      <div class="bar-group">
+        <div class="bar-wrapper">
+          <div class="bar bar-4" style="height:218px;background:#9bbb59;">
+            <span class="val">0.169</span>
+          </div>
+        </div>
+        <div class="bar-label">仅规则反馈<br>(w/o MF)</div>
+      </div>
+
+      <div class="bar-group">
+        <div class="bar-wrapper">
+          <div class="bar" style="height:224px;background:#c0504d;">
+            <span class="val" style="font-weight:700;color:#c0504d;">0.171</span>
+          </div>
+        </div>
+        <div class="bar-label" style="font-weight:700;color:#c0504d;">完整MFRL</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ==================== 图4: Alpaca-Chinese结果 ==================== -->
+<div class="figure-container">
+  <div class="figure-title">图4  Alpaca-Chinese数据集ROUGE-L对比</div>
+
+  <div class="chart">
+    <div class="bar-chart" style="height:240px;">
+
+      <div class="y-axis" style="left:10px;">
+        <span>0.16</span>
+        <span>0.12</span>
+        <span>0.08</span>
+        <span>0.04</span>
+        <span>0</span>
+      </div>
+
+      <div class="bar-group">
+        <div class="bar-wrapper">
+          <div class="bar bar-1" style="height:170px;">
+            <span class="val">0.122</span>
+          </div>
+        </div>
+        <div class="bar-label">SFT</div>
+      </div>
+
+      <div class="bar-group">
+        <div class="bar-wrapper">
+          <div class="bar bar-2" style="height:215px;">
+            <span class="val">0.154</span>
+          </div>
+        </div>
+        <div class="bar-label">DPO</div>
+      </div>
+
+      <div class="bar-group">
+        <div class="bar-wrapper">
+          <div class="bar" style="height:210px;background:#c0504d;">
+            <span class="val" style="font-weight:700;color:#c0504d;">0.151</span>
+          </div>
+        </div>
+        <div class="bar-label" style="font-weight:700;color:#c0504d;">MFRL</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
