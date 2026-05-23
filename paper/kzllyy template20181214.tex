@@ -155,8 +155,9 @@ s_{\rm fused}\!=\!w_{\rm RF}s_{\rm RF}\!+\!w_{\rm MF}s_{\rm MF}
 \subsection{偏好优化微调 (POF)}
 
 \begin{equation}
-\mathcal{L}_{\rm DPO}\!=\!-\mathbb{E}\!\left[\!\log\sigma\!\left(\beta\log\frac{\pi_\theta(y^+|x)}{\pi_{\rm ref}(y^+|x)}-\beta\log\frac{\pi_\theta(y^-|x)}{\pi_{\rm ref}(y^-|x)}\right)\!\right]
+\mathcal{L}_{\rm DPO}\!=\!-\mathbb{E}\Bigl[\log\sigma\Bigl(\beta r(x,y^+)\!-\!\beta r(x,y^-)\Bigr)\Bigr]
 \end{equation}
+其中$r(x,y)\!=\!\log\frac{\pi_\theta(y|x)}{\pi_{\rm ref}(y|x)}$为隐式奖励函数。
 
 LoRA$^{[15]}$: rank=8, alpha=16。超参: lr=5e-6, batch=4, grad\_accum=4, 3 epochs, $\beta$=0.1。
 
@@ -167,7 +168,7 @@ LoRA$^{[15]}$: rank=8, alpha=16。超参: lr=5e-6, batch=4, grad\_accum=4, 3 epochs
 基座模型Qwen2.5-1.5B-Instruct$^{[18]}$。数据集: LCSTS$^{[19]}$ (2000样本), Alpaca-Chinese (1000样本)。基线: Base, SFT, DPO$^{[6]}$, KTO$^{[7]}$, MFRL w/o MF。评估: ROUGE-1/2/L$^{[17]}$。单卡RTX 3090 (24GB), 约2-3h。
 
 \begin{center}
-\includegraphics[scale=0.75,trim=0 0 0 0]{figures/fig2_loss_curve.eps}\\
+\includegraphics[width=\columnwidth]{figures/fig2_loss_curve.eps}\\
 \label{Fig2}
 {\fontsize{9.3pt}{11.6pt}\selectfont 图~2~~MFRL训练损失曲线\\
 Fig.~2~~Training loss curve of MFRL}
@@ -195,7 +196,7 @@ MFRL w/o MF & 自动 & 0.169 & 0.013 & 0.169 \\
 MFRL所有方法最优, 偏好数据自动生成无需人工标注。
 
 \begin{center}
-\includegraphics[scale=0.7,trim=0 0 0 0]{figures/fig3_lcsts_bars.eps}\\
+\includegraphics[width=\columnwidth]{figures/fig3_lcsts_bars.eps}\\
 \label{Fig3}
 {\fontsize{9.3pt}{11.6pt}\selectfont 图~3~~LCSTS各方法ROUGE-L对比\\
 Fig.~3~~ROUGE-L comparison on LCSTS}
@@ -219,7 +220,7 @@ DPO & 0.163 & 0.084 & 0.154 \\
 指令跟随上MFRL与DPO相当, 均优于SFT(+0.029)。
 
 \begin{center}
-\includegraphics[scale=0.7,trim=0 0 0 0]{figures/fig4_alpaca_bars.eps}\\
+\includegraphics[width=\columnwidth]{figures/fig4_alpaca_bars.eps}\\
 \label{Fig4}
 {\fontsize{9.3pt}{11.6pt}\selectfont 图~4~~Alpaca-Chinese各方法ROUGE-L对比\\
 Fig.~4~~ROUGE-L comparison on Alpaca-Chinese}
@@ -243,7 +244,7 @@ w/o 自适应融合 & 0.170 \\
 模型自反馈贡献+0.002, 自适应融合优于等权平均。消融结果与预期一致: 在1.5B规模下，模型自身的对数概率估计精度有限，规则反馈(ROUGE)已捕获大部分偏好排序信息，自反馈提供的是互补但较小的边际增益。
 
 \begin{center}
-\includegraphics[scale=0.7,trim=0 0 0 0]{figures/fig5_ablation.eps}\\
+\includegraphics[width=\columnwidth]{figures/fig5_ablation.eps}\\
 \label{Fig5}
 {\fontsize{9.3pt}{11.6pt}\selectfont 图~5~~消融实验结果\\
 Fig.~5~~Ablation study results}
