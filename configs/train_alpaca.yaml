@@ -1,0 +1,63 @@
+# MFRL训练配置 - Alpaca-Chinese指令跟随数据集
+# 适配单卡3090 (24GB)环境
+
+model:
+  name: "models/Qwen2.5-1.5B-Instruct"
+  dtype: "float16"
+  trust_remote_code: true
+
+lora:
+  r: 8
+  alpha: 16
+  dropout: 0.05
+  target_modules:
+    - "q_proj"
+    - "k_proj"
+    - "v_proj"
+    - "o_proj"
+    - "gate_proj"
+    - "up_proj"
+    - "down_proj"
+
+dpo:
+  beta: 0.1
+  loss_type: "sigmoid"
+  learning_rate: 5.0e-6
+  num_epochs: 3
+  batch_size: 4
+  gradient_accumulation: 4
+  max_length: 512
+  max_prompt_length: 256
+
+curriculum:
+  enabled: false  # 经过实验验证无效，论文中不提
+
+feedback:
+  rule:
+    enabled: true
+    metrics: ["rouge1", "rouge2", "rougeL"]
+    weights:
+      rouge1: 0.3
+      rouge2: 0.3
+      rougeL: 0.4
+  model:
+    enabled: true
+    model_name: "self"
+  num_candidates: 4
+  min_score_diff: 0.0
+
+generation:
+  temperature: 1.2
+  top_p: 0.95
+  max_new_tokens: 128
+  multi_temperature: true
+
+data:
+  dataset: "alpaca_chinese"
+  max_train_samples: 1000  # 少一些加速实验
+  max_test_samples: 100
+
+output:
+  dir: "outputs/alpaca_v1"
+  logging_steps: 10
+  save_strategy: "epoch"

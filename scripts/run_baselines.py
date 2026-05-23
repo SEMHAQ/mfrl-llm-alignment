@@ -21,6 +21,15 @@ from trl import DPOTrainer, DPOConfig, KTOTrainer, KTOConfig, SFTTrainer, SFTCon
 from datasets import Dataset
 from src.eval.evaluator import Evaluator
 
+META_PROMPTS = {
+    "lcsts": "请为以下文本生成简洁准确的摘要：\n{input}\n摘要：",
+    "alpaca_chinese": "{input}\n请回答以上指令。",
+}
+
+def get_prompt(input_text: str, dataset_name: str = "lcsts") -> str:
+    fmt = META_PROMPTS.get(dataset_name, META_PROMPTS["lcsts"])
+    return fmt.format(input=input_text)
+
 
 def load_config(config_path: str) -> dict:
     with open(config_path, "r", encoding="utf-8") as f:
@@ -195,7 +204,7 @@ def main():
     # 构造测试集（对比人工摘要）
     test_data = []
     for item in test_raw:
-        prompt = f"请为以下文本生成简洁准确的摘要：\n{item['input']}\n摘要："
+        prompt = get_prompt(item["input"], dataset_name)
         test_data.append({"prompt": prompt, "reference": item["reference"]})
 
     # 运行baselines

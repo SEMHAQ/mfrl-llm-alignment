@@ -22,7 +22,14 @@ import yaml
 import torch
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).parent.parent))
+META_PROMPTS = {
+    "lcsts": "请为以下文本生成简洁准确的摘要：\n{input}\n摘要：",
+    "alpaca_chinese": "{input}\n请回答以上指令。",
+}
+
+def get_prompt(input_text: str, dataset_name: str = "lcsts") -> str:
+    fmt = META_PROMPTS.get(dataset_name, META_PROMPTS["lcsts"])
+    return fmt.format(input=input_text)
 
 from transformers import AutoTokenizer, AutoModelForCausalLM
 from src.feedback.rule_feedback import RuleFeedback
@@ -297,9 +304,10 @@ def main():
             raise ValueError("No feedback enabled")
 
         # 格式化为DPO格式（保留reference用于评估）
+        dataset_name = config["data"]["dataset"]
         dpo_data = []
         for pair in final_pairs:
-            prompt = f"请为以下文本生成简洁准确的摘要：\n{pair['input']}\n摘要："
+            prompt = get_prompt(pair["input"], dataset_name)
             dpo_data.append({
                 "prompt": prompt,
                 "chosen": pair["chosen"],
@@ -327,9 +335,10 @@ def main():
 
     # Step 4: 评估（使用测试集，对比人工摘要）
     print("\nEvaluating...")
+    dataset_name = config["data"]["dataset"]
     test_data = []
     for item in test_raw:
-        prompt = f"请为以下文本生成简洁准确的摘要：\n{item['input']}\n摘要："
+        prompt = get_prompt(item["input"], dataset_name)
         test_data.append({
             "prompt": prompt,
             "reference": item["reference"],
