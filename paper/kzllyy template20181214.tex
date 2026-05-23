@@ -98,22 +98,7 @@ Self-Reward$^{[8]}$和RLAIF$^{[9]}$用模型/AI生成反馈。LoRA$^{[12]}$降显存使消费级
 
 给定输入$x$和参考$y^*$，$\pi_\theta$生成候选$\{y_1,\dots,y_K\}$。三个模块: (1) MFC获取多源反馈；(2) AFF融合为统一分数；(3) POF进行DPO训练。
 
-\begin{center}
-\fbox{\parbox{0.85\textwidth}{\centering
-{\bf 输入}: 训练样本 $(x, y^*)$ \\[2pt]
-$\downarrow$ 多温度采样 + 拒绝滤波 \\[2pt]
-{\bf MFC}: ROUGE得分 + Log-Probability自评分 \\[2pt]
-$\downarrow$ \\[2pt]
-{\bf AFF}: 注意力融合 $\rightarrow$ 偏好对 $(x, y^+, y^-)$ \\[2pt]
-$\downarrow$ \\[2pt]
-{\bf POF}: DPO + LoRA (rank=8) \\[2pt]
-$\downarrow$ \\[2pt]
-{\bf 输出}: 优化后模型 $\pi_\theta$
-}}\\
-\label{Fig1}
-{\fontsize{9.3pt}{11.6pt}\selectfont 图~1~~MFRL整体框架\\
-Fig.~1~~The MFRL framework}
-\end{center}
+% 图1 (MFRL框架图) 暂缺，后续补充
 
 \subsection{多源反馈收集 (MFC)}
 
