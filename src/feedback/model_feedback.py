@@ -9,6 +9,7 @@
 import torch
 import numpy as np
 from typing import List, Dict, Optional
+from tqdm import tqdm
 from transformers import AutoTokenizer, AutoModelForCausalLM
 from .rule_feedback import is_valid_candidate
 
@@ -73,47 +74,55 @@ class ModelFeedback:
 
     @torch.no_grad()
     def score(self, input_text: str, reference: str, candidate: str) -> float:
-        """对单个候选输出评分。
-
-        Args:
-            input_text: 输入文本
-            reference: 参考答案
-            candidate: 待评估候选
-
-        Returns:
-            归一化得分 [0, 1]
-        """
+        """对单个候选输出评分。"""
         if self.use_self_reward:
-            return self._score_logprob(input_text, candidate)
+            return self._score_logprob(input_text, [candidate])[0]
         else:
             return self._score_judge(input_text, reference, candidate)
 
-    def _score_logprob(self, prompt_text: str, candidate: str) -> float:
-        """Self-reward: 用模型的log-probability作为质量信号。"""
-        full_text = prompt_text + candidate
+    def _score_logprob(self, prompt_text: str, candidates: List[str]) -> List[float]:
+        """Self-reward: 批量计算多个候选的log-probability分数。
+
+        同一prompt的多个candidate在一次forward pass中完成。
+        """
         messages = [{"role": "user", "content": prompt_text}]
         prompt_formatted = self.tokenizer.apply_chat_template(
             messages, tokenize=False, add_generation_prompt=True
         )
-        prompt_ids = self.tokenizer(prompt_formatted, return_tensors="pt").to(self.device)
+
+        # 构建 batch: prompt_formatted + each candidate
+        full_texts = [prompt_text + c for c in candidates]
+        # Tokenize prompt alone to get prompt length
+        prompt_ids = self.tokenizer(prompt_formatted, return_tensors="pt")
         prompt_len = prompt_ids["input_ids"].shape[1]
 
-        full_ids = self.tokenizer(full_text, return_tensors="pt").to(self.device)
-        input_ids = full_ids["input_ids"]
+        # Tokenize full texts with padding
+        enc = self.tokenizer(full_texts, return_tensors="pt", padding=True)
+        input_ids = enc["input_ids"].to(self.device)
+        attention_mask = enc["attention_mask"].to(self.device)
 
-        outputs = self.model(input_ids=input_ids)
-        logits = outputs.logits
+        outputs = self.model(input_ids=input_ids, attention_mask=attention_mask)
+        logits = outputs.logits  # [B, seq, vocab]
 
-        # 计算candidate部分的平均log-probability
-        candidate_logits = logits[0, prompt_len - 1:-1, :]
-        candidate_ids = input_ids[0, prompt_len:]
-        log_probs = torch.log_softmax(candidate_logits, dim=-1)
-        token_log_probs = log_probs.gather(1, candidate_ids.unsqueeze(1)).squeeze(1)
-        avg_log_prob = token_log_probs.mean().item()
+        scores = []
+        for i in range(len(candidates)):
+            # Find actual length (excluding padding)
+            actual_len = attention_mask[i].sum().item()
+            cand_len = actual_len - prompt_len
+            if cand_len <= 0:
+                scores.append(0.0)
+                continue
 
-        # 归一化到 [0, 1]（log-prob通常在-10到0之间）
-        score = max(0.0, min(1.0, (avg_log_prob + 10.0) / 10.0))
-        return score
+            cand_logits = logits[i, prompt_len - 1:actual_len - 1, :]
+            cand_ids = input_ids[i, prompt_len:actual_len]
+            log_probs = torch.log_softmax(cand_logits, dim=-1)
+            token_log_probs = log_probs.gather(1, cand_ids.unsqueeze(1)).squeeze(1)
+            avg_log_prob = token_log_probs.mean().item()
+
+            score = max(0.0, min(1.0, (avg_log_prob + 10.0) / 10.0))
+            scores.append(score)
+
+        return scores
 
     def _score_judge(self, input_text: str, reference: str, candidate: str) -> float:
         """外部评判模型：用prompt引导评分。"""
@@ -161,31 +170,27 @@ class ModelFeedback:
         references: List[str],
         candidates_list: List[List[str]],
     ) -> List[Dict]:
-        """从多候选中生成基于模型评分的偏好对。
-
-        Args:
-            inputs: 输入文本列表
-            references: 参考文本列表
-            candidates_list: 每个输入对应的多个候选输出
-
-        Returns:
-            偏好对列表
-        """
+        """从多候选中生成基于模型评分的偏好对。"""
         preference_pairs = []
 
-        for inp, ref, candidates in zip(inputs, references, candidates_list):
-            # 过滤无效候选
+        for inp, ref, candidates in tqdm(
+            zip(inputs, references, candidates_list),
+            total=len(inputs),
+            desc="Model feedback",
+        ):
             valid_candidates = [c for c in candidates if is_valid_candidate(c)]
             if len(valid_candidates) < 2:
                 continue
 
-            # 对每个候选评分
-            scores = [self.score(inp, ref, c) for c in valid_candidates]
+            if self.use_self_reward:
+                scores = self._score_logprob(inp, valid_candidates)
+            else:
+                scores = [self._score_judge(inp, ref, c) for c in valid_candidates]
+
             ranked = sorted(
                 zip(valid_candidates, scores), key=lambda x: x[1], reverse=True
             )
 
-            # 取最高分和最低分构成偏好对
             chosen, chosen_score = ranked[0]
             rejected, rejected_score = ranked[-1]
 
