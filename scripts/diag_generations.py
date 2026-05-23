@@ -6,7 +6,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from transformers import AutoTokenizer, AutoModelForCausalLM
 from peft import PeftModel
 
-with open("configs/train.yaml") as f:
+with open("configs/train.yaml", encoding="utf-8") as f:
     config = yaml.safe_load(f)
 
 model_name = config["model"]["name"]
@@ -18,7 +18,7 @@ base = AutoModelForCausalLM.from_pretrained(
 ).to("cuda")
 model = PeftModel.from_pretrained(base, "outputs/mfrl_v3/final")
 
-with open("data/lcsts_train.json") as f:
+with open("data/lcsts_train.json", encoding="utf-8") as f:
     data = json.load(f)
 
 for i in range(5):
