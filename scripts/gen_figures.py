@@ -52,13 +52,16 @@ if os.path.exists(loss_path):
     smooth = np.convolve(losses, np.ones(window)/window, mode='valid')
     smooth_steps = steps[window//2 : window//2 + len(smooth)]
 
-    fig, ax = plt.subplots(figsize=(3.2, 2.0))
-    ax.plot(steps, losses, 'o', markersize=3, color='#bdc3c7', alpha=0.7, markeredgewidth=0)
-    ax.plot(smooth_steps, smooth, '-', color=C1, linewidth=1.2)
+    fig, ax = plt.subplots(figsize=(3.2, 1.7))
+    ax.plot(steps, losses, 'o', markersize=2.5, color='#bdc3c7',
+            alpha=0.7, markeredgewidth=0, label='Per-step')
+    ax.plot(smooth_steps, smooth, '-', color=C1, linewidth=1.2, label='Smoothed')
     ax.set_xlabel("Training Step")
     ax.set_ylabel("DPO Loss")
     ax.set_xlim(left=0)
     ax.set_ylim(bottom=0)
+    ax.legend(frameon=True, fancybox=False, edgecolor='#ddd',
+              fontsize=6.5, loc='upper right', handlelength=1.5, borderpad=0.4)
     ax.grid(True, linestyle='--', alpha=0.25, linewidth=0.4)
     epoch_bounds = [0]
     for i in range(1, len(epochs)):
@@ -100,12 +103,12 @@ methods2 = ['SFT', 'DPO', 'MFRL']
 rl2 = [0.122, 0.154, 0.151]
 colors2 = [C1, C2, C3]
 
-fig, ax = plt.subplots(figsize=(2.5, 2.0))
+fig, ax = plt.subplots(figsize=(2.4, 1.6))
 x = np.arange(len(methods2))
 bars = ax.bar(x, rl2, width=0.45, color=colors2, edgecolor='white', linewidth=0.3)
 for bar, val in zip(bars, rl2):
-    ax.text(bar.get_x()+bar.get_width()/2, bar.get_height()+0.005,
-            f'{val:.3f}', ha='center', fontsize=9, fontweight='bold', color='#2c3e50')
+    ax.text(bar.get_x()+bar.get_width()/2, bar.get_height()+0.006,
+            f'{val:.3f}', ha='center', fontsize=8.5, fontweight='bold', color='#2c3e50')
 ax.set_xticks(x)
 ax.set_xticklabels(methods2, fontsize=9)
 ax.set_ylabel("ROUGE-L")
@@ -120,22 +123,20 @@ plt.close()
 print("Saved fig4_alpaca_bars.eps")
 
 # ====== Fig.5: Ablation ======
-# Use English labels to avoid dvipdfmx Chinese font issues
 alabels = ['Full MFRL', 'w/o Model\nFeedback', 'w/o Adaptive\nFusion']
 avals = [0.171, 0.169, 0.170]
 acolors = [C3, C4, C2]
 
-fig, ax = plt.subplots(figsize=(2.5, 2.0))
+fig, ax = plt.subplots(figsize=(2.4, 1.6))
 x = np.arange(len(alabels))
 bars = ax.bar(x, avals, width=0.4, color=acolors, edgecolor='white', linewidth=0.3)
 for bar, val in zip(bars, avals):
-    offset = (max(avals) - min(avals)) * 0.12
-    ax.text(bar.get_x()+bar.get_width()/2, bar.get_height()+offset,
-            f'{val:.3f}', ha='center', fontsize=9, fontweight='bold', color='#2c3e50')
+    ax.text(bar.get_x()+bar.get_width()/2, bar.get_height()+0.002,
+            f'{val:.3f}', ha='center', fontsize=8.5, fontweight='bold', color='#2c3e50')
 ax.set_xticks(x)
 ax.set_xticklabels(alabels, fontsize=7)
 ax.set_ylabel("ROUGE-L")
-ax.set_ylim(0.155, max(avals)*1.04)
+ax.set_ylim(0.155, 0.178)
 ax.grid(True, axis='y', linestyle='--', alpha=0.25, linewidth=0.4)
 ax.set_axisbelow(True)
 for spine in ['top', 'right']:
