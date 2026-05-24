@@ -3,151 +3,137 @@
 <head>
 <meta charset="UTF-8">
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+  * { margin:0; padding:0; box-sizing:border-box; }
   body {
     background: #fff;
-    font-family: 'Times New Roman', 'SimSun', 'STSong', serif;
+    font-family: 'Times New Roman','SimSun','STSong',serif;
     display: flex;
     justify-content: center;
-    padding: 36px 20px;
+    padding: 30px 20px;
   }
-  .diagram { width: 500px; }
+  .diagram { width: 480px; }
 
-  /* === Grouping dashed box === */
+  /* === Group boxes === */
   .group {
     position: relative;
-    border: 0.8px dashed #888888;
-    padding: 16px 22px 12px 22px;
+    border: 1.5px dashed;
+    border-radius: 8px;
+    padding: 20px 18px 14px 18px;
     margin-bottom: 0;
     text-align: center;
   }
+  .group-blue  { border-color: #4A90E2; }
+  .group-amber { border-color: #F5A623; }
+  .group-green { border-color: #50C878; }
+
   .group-label {
     position: absolute;
     top: -10px;
-    right: 12px;
+    left: 12px;
     background: #fff;
-    padding: 1px 8px;
-    font-size: 10.5px;
+    padding: 2px 10px;
+    font-size: 11px;
     font-weight: 700;
     color: #000;
     white-space: nowrap;
   }
 
-  /* === IO: dashed rounded rect === */
-  .io-dashed {
+  /* === IO boxes: gray dashed, no fill === */
+  .io-box {
     display: inline-block;
     border: 1.2px dashed #888888;
-    border-radius: 3px;
+    border-radius: 5px;
     background: #fff;
     padding: 8px 20px;
-    font-size: 13px;
+    font-size: 12px;
     color: #000;
     font-weight: 500;
   }
+  /* === output box: solid dark === */
+  .out-box {
+    display: inline-block;
+    border: 1.5px solid #4A6FA5;
+    border-radius: 5px;
+    background: #4A6FA5;
+    color: #fff;
+    padding: 8px 24px;
+    font-size: 12.5px;
+    font-weight: 600;
+  }
 
-  /* === Core module: solid rounded rect, low-sat fill, matching border === */
+  /* === Core module === */
   .mod {
     display: inline-block;
     border-radius: 5px;
     border-style: solid;
     border-width: 1.5px;
-    padding: 12px 28px;
+    padding: 12px 24px;
+    text-align: center;
   }
-  .mod .hd {
-    font-size: 17px;
-    font-weight: 700;
-    letter-spacing: 2px;
-    margin-bottom: 2px;
-  }
-  .mod .sub {
-    font-size: 10.5px;
-    margin-bottom: 8px;
-  }
-  .mod.mfc { background: #E6F2FF; border-color: #4A90E2; }
-  .mod.mfc .hd { color: #000; }
-  .mod.mfc .sub { color: #000; }
-  .mod.aff { background: #FFF2E6; border-color: #F5A623; }
-  .mod.aff .hd { color: #000; }
-  .mod.aff .sub { color: #000; }
-  .mod.pof { background: #E6FFE6; border-color: #50C878; }
-  .mod.pof .hd { color: #000; }
-  .mod.pof .sub { color: #000; }
+  .mod .hd { font-size:16px; font-weight:700; letter-spacing:3px; margin-bottom:2px; }
+  .mod .sub { font-size:10px; margin-bottom:8px; }
+  .mod.mfc  { background:#E6F2FF; border-color:#4A90E2; }
+  .mod.aff  { background:#FFF2E6; border-color:#F5A623; }
+  .mod.pof  { background:#E6FFE6; border-color:#50C878; }
+  .mod .hd,.mod .sub { color:#000; }
 
-  /* === Sub-items: white bg, thin gray border, left text === */
-  .mod .children {
-    display: flex;
-    gap: 6px;
-    justify-content: center;
-  }
+  /* === Sub-items === */
+  .mod .children { display:flex; gap:6px; justify-content:center; }
   .child {
-    border: 0.8px solid #888888;
+    border: 1px solid #888888;
     background: #fff;
-    padding: 6px 14px;
-    font-size: 10.5px;
+    padding: 6px 12px;
+    font-size: 10px;
     color: #000;
     text-align: left;
     border-radius: 2px;
-    line-height: 1.5;
+    line-height: 1.45;
   }
 
   /* === Middle step: gray dashed, no fill === */
-  .step-dashed {
+  .step-box {
     display: inline-block;
     border: 1px dashed #888888;
-    border-radius: 3px;
+    border-radius: 5px;
     background: transparent;
-    padding: 6px 18px;
-    font-size: 12px;
+    padding: 6px 16px;
+    font-size: 11.5px;
     color: #000;
   }
+  .step-box .ch { color:#2d6a4f; font-weight:700; }
+  .step-box .rj { color:#b33; font-weight:700; }
 
-  /* === Output: solid dark === */
-  .out-solid {
-    display: inline-block;
-    border: 1.5px solid #4A6FA5;
-    border-radius: 3px;
-    background: #4A6FA5;
-    color: #fff;
-    padding: 9px 26px;
-    font-size: 13px;
-    font-weight: 600;
-  }
-
-  /* === Arrow === */
+  /* === Arrows: strictly vertical, black solid === */
   .arr-row { text-align:center; height:22px; line-height:0; }
   .arr-row svg { display:block; margin:0 auto; }
 
-  .pref-box .ch { color:#2d6a4f; font-weight:700; }
-  .pref-box .rj { color:#b33; font-weight:700; }
+  /* Spacing inside groups */
+  .gap4 { height:4px; }
+  .gap6 { height:6px; }
 </style>
 </head>
 <body>
 
 <div class="diagram">
 
-  <!-- Group 1: Sampling -->
-  <div class="group">
-    <div class="group-label">Multi-temperature Sampling</div>
-    <div class="io-dashed" style="margin-bottom:6px;">训练样本 (x, y*)</div>
+  <!-- ===== Group 1: 多源反馈收集 (input + candidates + MFC) ===== -->
+  <div class="group group-blue">
+    <div class="group-label">多源反馈收集 (Multi-form Feedback Collector)</div>
+
+    <div class="io-box">训练样本 (x, y*)</div>
+    <div class="gap4"></div>
     <div class="arr-row">
       <svg width="16" height="22"><line x1="8" y1="0" x2="8" y2="14" stroke="#333" stroke-width="1.5"/><polygon points="2,12 8,21 14,12" fill="#333"/></svg>
     </div>
-    <div class="step-dashed">候选集 {y<sub>1</sub>, y<sub>2</sub>, y<sub>3</sub>, y<sub>4</sub>}</div>
-  </div>
+    <div class="step-box">候选集 {y<sub>1</sub>, y<sub>2</sub>, y<sub>3</sub>, y<sub>4</sub>}</div>
+    <div class="gap6"></div>
 
-  <div class="arr-row">
-    <svg width="16" height="22"><line x1="8" y1="0" x2="8" y2="14" stroke="#333" stroke-width="1.5"/><polygon points="2,12 8,21 14,12" fill="#333"/></svg>
-  </div>
-
-  <!-- Group 2: MFC + Rejection Filter -->
-  <div class="group">
-    <div class="group-label">Rejection Filter</div>
     <div class="mod mfc">
       <div class="hd">MFC</div>
       <div class="sub">Multi-form Feedback Collector</div>
       <div class="children">
-        <div class="child">ROUGE-1/2/L<br>Rule-based Feedback</div>
-        <div class="child">Log-Probability<br>Self-Reward Signal</div>
+        <div class="child">ROUGE-1 / ROUGE-2 / ROUGE-L<br>Rule-based Feedback</div>
+        <div class="child">Token-level Log-Probability<br>Self-Reward Signal</div>
       </div>
     </div>
   </div>
@@ -156,27 +142,25 @@
     <svg width="16" height="22"><line x1="8" y1="0" x2="8" y2="14" stroke="#333" stroke-width="1.5"/><polygon points="2,12 8,21 14,12" fill="#333"/></svg>
   </div>
 
-  <!-- Group 3: AFF -->
-  <div class="group">
-    <div class="group-label">s<sub>rule</sub> + s<sub>self</sub> &rarr; s<sub>fused</sub></div>
+  <!-- ===== Group 2: 自适应反馈融合 (AFF + preference pairs) ===== -->
+  <div class="group group-amber">
+    <div class="group-label">自适应反馈融合 (Adaptive Feedback Fusion)</div>
+
     <div class="mod aff">
       <div class="hd">AFF</div>
       <div class="sub">Adaptive Feedback Fusion</div>
       <div class="children">
-        <div class="child">Learnable Attention<br>w = softmax(W&middot;[s<sub>rule</sub>,s<sub>self</sub>]+b)</div>
-        <div class="child">Unified Score<br>s<sub>fused</sub> = w<sub>rule</sub>s<sub>rule</sub> + w<sub>self</sub>s<sub>self</sub></div>
+        <div class="child">Learnable Attention Weights<br>w = softmax(W&middot;[s<sub>rule</sub>, s<sub>self</sub>] + b)</div>
+        <div class="child">Unified Preference Score<br>s<sub>fused</sub> = w<sub>rule</sub>s<sub>rule</sub> + w<sub>self</sub>s<sub>self</sub></div>
       </div>
     </div>
-  </div>
 
-  <div class="arr-row">
-    <svg width="16" height="22"><line x1="8" y1="0" x2="8" y2="14" stroke="#333" stroke-width="1.5"/><polygon points="2,12 8,21 14,12" fill="#333"/></svg>
-  </div>
+    <div class="gap6"></div>
+    <div class="arr-row">
+      <svg width="16" height="22"><line x1="8" y1="0" x2="8" y2="14" stroke="#333" stroke-width="1.5"/><polygon points="2,12 8,21 14,12" fill="#333"/></svg>
+    </div>
 
-  <!-- Group 4: Preference Pairs -->
-  <div class="group">
-    <div class="group-label">Preference Pair Construction</div>
-    <div class="step-dashed pref-box">
+    <div class="step-box">
       Preference Pairs &nbsp; (x, <span class="ch">y<sup>+</sup></span>, <span class="rj">y<sup>&minus;</sup></span>)
     </div>
   </div>
@@ -185,21 +169,25 @@
     <svg width="16" height="22"><line x1="8" y1="0" x2="8" y2="14" stroke="#333" stroke-width="1.5"/><polygon points="2,12 8,21 14,12" fill="#333"/></svg>
   </div>
 
-  <!-- Group 5: POF + Output -->
-  <div class="group">
-    <div class="group-label">DPO Training (&beta; = 0.1)</div>
-    <div class="mod pof" style="margin-bottom:8px;">
+  <!-- ===== Group 3: 偏好优化微调 (POF + output) ===== -->
+  <div class="group group-green">
+    <div class="group-label">偏好优化微调 (Preference Optimization Fine-tuning)</div>
+
+    <div class="mod pof">
       <div class="hd">POF</div>
       <div class="sub">Preference Optimization Fine-tuning</div>
       <div class="children">
-        <div class="child">DPO Loss Optimization<br>L<sub>DPO</sub> on Preference Pairs</div>
-        <div class="child">LoRA Fine-tuning<br>(rank = 8, &alpha; = 16)</div>
+        <div class="child">DPO Loss Minimization<br>L<sub>DPO</sub> on Preference Pairs</div>
+        <div class="child">LoRA Fine-tuning<br>(rank = 8, &alpha; = 16, &beta; = 0.1)</div>
       </div>
     </div>
+
+    <div class="gap6"></div>
     <div class="arr-row">
       <svg width="16" height="22"><line x1="8" y1="0" x2="8" y2="14" stroke="#333" stroke-width="1.5"/><polygon points="2,12 8,21 14,12" fill="#333"/></svg>
     </div>
-    <div class="out-solid">Optimized Model &nbsp; &#960;<sub>&#952;</sub></div>
+
+    <div class="out-box">Optimized Policy Model &nbsp; &#960;<sub>&#952;</sub></div>
   </div>
 
 </div>
