@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #fff;
+    font-family: 'Inter', 'Noto Sans SC', 'Microsoft YaHei', sans-serif;
+    display: flex;
+    justify-content: center;
+    padding: 40px 20px;
+  }
+
+  .diagram {
+    width: 620px;
+    position: relative;
+  }
+
+  /* Pipeline sections */
+  .stage {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0;
+  }
+
+  .stage-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* Arrow between stages */
+  .connector {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 36px;
+    position: relative;
+  }
+  .connector .line {
+    width: 2px;
+    height: 100%;
+    background: linear-gradient(to bottom, #7eb8da, #4f81bd);
+    position: relative;
+  }
+  .connector .arrow-head {
+    width: 0;
+    height: 0;
+    border-left: 7px solid transparent;
+    border-right: 7px solid transparent;
+    border-top: 9px solid #4f81bd;
+    position: absolute;
+    bottom: -1px;
+  }
+  .connector .side-label {
+    position: absolute;
+    right: -180px;
+    font-size: 11px;
+    color: #777;
+    white-space: nowrap;
+    font-style: italic;
+  }
+
+  /* Module box */
+  .module {
+    border-radius: 10px;
+    padding: 16px 24px;
+    text-align: center;
+    position: relative;
+    min-width: 280px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .module.mfc {
+    background: linear-gradient(135deg, #e8f0fe, #d4e4f7);
+    border: 1.5px solid #4f81bd;
+  }
+  .module.aff {
+    background: linear-gradient(135deg, #fef7e0, #fceabb);
+    border: 1.5px solid #e6a817;
+  }
+  .module.pof {
+    background: linear-gradient(135deg, #e6f3ec, #c8e6d0);
+    border: 1.5px solid #3d8b5e;
+  }
+  .module .abbr {
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    line-height: 1.1;
+  }
+  .mfc .abbr { color: #2a5298; }
+  .aff .abbr { color: #b8860b; }
+  .pof .abbr { color: #2d6a4f; }
+
+  .module .full-name {
+    font-size: 13px;
+    font-weight: 500;
+    margin-top: 2px;
+  }
+  .mfc .full-name { color: #4f81bd; }
+  .aff .full-name { color: #c99718; }
+  .pof .full-name { color: #40916c; }
+
+  /* Sub-module pair */
+  .sub-row {
+    display: flex;
+    gap: 12px;
+    margin-top: 10px;
+    justify-content: center;
+  }
+  .sub-box {
+    border-radius: 6px;
+    padding: 8px 16px;
+    font-size: 11px;
+    font-weight: 500;
+    text-align: center;
+    min-width: 110px;
+  }
+  .sub-rule {
+    background: #f0f4ff;
+    border: 1px solid #b8cff5;
+    color: #3a5f9a;
+  }
+  .sub-model {
+    background: #fef9f0;
+    border: 1px solid #f0d78c;
+    color: #8a6d20;
+  }
+  .sub-dpo {
+    background: #f0faf4;
+    border: 1px solid #a3d9b1;
+    color: #2d6a4f;
+  }
+  .sub-lora {
+    background: #f0faf4;
+    border: 1px solid #a3d9b1;
+    color: #2d6a4f;
+  }
+
+  /* IO box */
+  .io-box {
+    border-radius: 8px;
+    padding: 12px 28px;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 600;
+    min-width: 220px;
+  }
+  .io-input {
+    background: #f8f9fa;
+    border: 1.5px solid #adb5bd;
+    color: #495057;
+  }
+  .io-candidate {
+    background: #f0f4f8;
+    border: 1.5px dashed #b0bec5;
+    color: #546e7a;
+    font-size: 12px;
+  }
+  .io-output {
+    background: linear-gradient(135deg, #4f81bd, #3a6ba5);
+    border: 1.5px solid #2a5298;
+    color: #fff;
+    font-size: 14px;
+    box-shadow: 0 3px 12px rgba(79,129,189,0.3);
+  }
+  .io-pair {
+    background: #fff;
+    border: 1px solid #dee2e6;
+    color: #495057;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 8px 20px;
+    border-radius: 6px;
+  }
+
+  /* Side annotation */
+  .side-note {
+    position: absolute;
+    right: -170px;
+    width: 150px;
+    font-size: 10px;
+    color: #999;
+    line-height: 1.4;
+    font-style: italic;
+  }
+
+  /* Section bracket */
+  .section-label {
+    font-size: 10px;
+    color: #adb5bd;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
+    text-align: center;
+    margin: 4px 0;
+  }
+
+  /* Icon circles */
+  .icon-dot {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    margin-right: 4px;
+    vertical-align: middle;
+    position: relative;
+    top: -1px;
+  }
+  .dot-rule { background: #4f81bd; }
+  .dot-model { background: #e6a817; }
+</style>
+</head>
+<body>
+
+<div class="diagram">
+
+  <!-- Input -->
+  <div class="stage">
+    <div class="stage-main">
+      <div class="io-box io-input">输入数据: (x, y*)</div>
+    </div>
+  </div>
+
+  <!-- Arrow + side note -->
+  <div class="connector">
+    <div class="line"><div class="arrow-head"></div></div>
+    <div class="side-label">多温度采样</div>
+  </div>
+
+  <!-- Candidates -->
+  <div class="stage">
+    <div class="stage-main">
+      <div class="io-box io-candidate">候选集: {y&#8321;, y&#8322;, y&#8323;, y&#8324;}</div>
+    </div>
+  </div>
+
+  <!-- Arrow -->
+  <div class="connector">
+    <div class="line"><div class="arrow-head"></div></div>
+    <div class="side-label">拒绝滤波</div>
+  </div>
+
+  <!-- MFC Module -->
+  <div class="stage">
+    <div class="stage-main">
+      <div class="module mfc">
+        <div class="abbr">MFC</div>
+        <div class="full-name">多源反馈收集模块</div>
+        <div class="sub-row">
+          <div class="sub-box sub-rule">
+            <span class="icon-dot dot-rule"></span>R1/R2/RL 规则反馈
+          </div>
+          <div class="sub-box sub-model">
+            <span class="icon-dot dot-model"></span>LogP 模型自反馈
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Arrow -->
+  <div class="connector">
+    <div class="line"><div class="arrow-head"></div></div>
+    <div class="side-label">s<sub>RF</sub> + s<sub>MF</sub></div>
+  </div>
+
+  <!-- AFF Module -->
+  <div class="stage">
+    <div class="stage-main">
+      <div class="module aff">
+        <div class="abbr">AFF</div>
+        <div class="full-name">自适应反馈融合模块</div>
+        <div class="sub-row">
+          <div class="sub-box sub-model" style="background:#fff8ed;border:1px solid #e6c860;">
+            Attention 权重学习
+          </div>
+          <div class="sub-box sub-model" style="background:#fff8ed;border:1px solid #e6c860;">
+            分数归一化
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Arrow -->
+  <div class="connector">
+    <div class="line"><div class="arrow-head"></div></div>
+    <div class="side-label">偏好对</div>
+  </div>
+
+  <!-- Preference pair -->
+  <div class="stage">
+    <div class="stage-main">
+      <div class="io-box io-pair">
+        偏好对: (x, <span style="color:#2d6a4f;font-weight:700;">y&#8314;</span>, <span style="color:#c0392b;font-weight:700;">y&#8315;</span>)
+      </div>
+    </div>
+  </div>
+
+  <!-- Arrow -->
+  <div class="connector">
+    <div class="line"><div class="arrow-head"></div></div>
+    <div class="side-label">DPO 训练</div>
+  </div>
+
+  <!-- POF Module -->
+  <div class="stage">
+    <div class="stage-main">
+      <div class="module pof">
+        <div class="abbr">POF</div>
+        <div class="full-name">偏好优化微调模块</div>
+        <div class="sub-row">
+          <div class="sub-box sub-dpo">
+            DPO 损失函数
+          </div>
+          <div class="sub-box sub-lora">
+            LoRA (rank=8)
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Arrow -->
+  <div class="connector">
+    <div class="line"><div class="arrow-head"></div></div>
+  </div>
+
+  <!-- Output -->
+  <div class="stage">
+    <div class="stage-main">
+      <div class="io-box io-output">
+        输出: 优化后策略模型 &#960;<sub>&#952;</sub>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>
