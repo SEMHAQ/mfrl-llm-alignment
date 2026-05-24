@@ -3,191 +3,229 @@
 <head>
 <meta charset="UTF-8">
 <style>
-  * { margin:0; padding:0; box-sizing:border-box; }
-  body {
-    background: #fff;
-    font-family: 'Times New Roman','SimSun','STSong',serif;
-    display: flex;
-    justify-content: center;
-    padding: 30px 20px;
-  }
-  .diagram { width: 480px; }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#fff;font-family:'Times New Roman','SimSun',serif;display:flex;justify-content:center;padding:24px 16px}
+  .diagram{width:760px;position:relative}
 
-  /* === Group boxes === */
-  .group {
-    position: relative;
-    border: 1.5px dashed;
-    border-radius: 8px;
-    padding: 20px 18px 14px 18px;
-    margin-bottom: 0;
-    text-align: center;
-  }
-  .group-blue  { border-color: #4A90E2; }
-  .group-amber { border-color: #F5A623; }
-  .group-green { border-color: #50C878; }
+  .main-row{display:flex;gap:14px;justify-content:center;align-items:stretch}
 
-  .group-label {
-    position: absolute;
-    top: -10px;
-    left: 12px;
-    background: #fff;
-    padding: 2px 10px;
-    font-size: 11px;
-    font-weight: 700;
-    color: #000;
-    white-space: nowrap;
-  }
+  .col{display:flex;flex-direction:column;align-items:center;gap:4px}
+  .col-left{width:230px}
+  .col-mid{width:240px;justify-content:center}
+  .col-right{width:230px}
 
-  /* === IO boxes: gray dashed, no fill === */
-  .io-box {
-    display: inline-block;
-    border: 1.2px dashed #888888;
-    border-radius: 5px;
-    background: #fff;
-    padding: 8px 20px;
-    font-size: 12px;
-    color: #000;
-    font-weight: 500;
-  }
-  /* === output box: solid dark === */
-  .out-box {
-    display: inline-block;
-    border: 1.5px solid #4A6FA5;
-    border-radius: 5px;
-    background: #4A6FA5;
-    color: #fff;
-    padding: 8px 24px;
-    font-size: 12.5px;
-    font-weight: 600;
-  }
+  /* Group box */
+  .group{position:relative;border:1.5px dashed;border-radius:8px;padding:20px 12px 12px 12px;width:100%;text-align:center}
+  .group-blue{border-color:#4A90E2;background:rgba(74,144,226,0.04)}
+  .group-amber{border-color:#F5A623;background:rgba(245,166,35,0.04)}
+  .group-green{border-color:#50C878;background:rgba(80,200,120,0.04)}
+  .group-label{position:absolute;top:-10px;left:10px;background:#fff;padding:2px 8px;font-size:10px;font-weight:700;color:#000;white-space:nowrap}
 
-  /* === Core module === */
-  .mod {
-    display: inline-block;
-    border-radius: 5px;
-    border-style: solid;
-    border-width: 1.5px;
-    padding: 12px 24px;
-    text-align: center;
-  }
-  .mod .hd { font-size:16px; font-weight:700; letter-spacing:3px; margin-bottom:2px; }
-  .mod .sub { font-size:10px; margin-bottom:8px; }
-  .mod.mfc  { background:#E6F2FF; border-color:#4A90E2; }
-  .mod.aff  { background:#FFF2E6; border-color:#F5A623; }
-  .mod.pof  { background:#E6FFE6; border-color:#50C878; }
-  .mod .hd,.mod .sub { color:#000; }
+  /* Module */
+  .mod{display:inline-block;border-radius:5px;border:1.5px solid;padding:10px 16px;text-align:center;position:relative;box-shadow:inset 0 1px 2px rgba(0,0,0,0.04)}
+  .mod .hd{font-size:15px;font-weight:700;letter-spacing:3px;color:#000}
+  .mod .sub{font-size:9px;color:#000;font-style:italic;margin-bottom:6px}
+  .mod.mfc{background:#E6F2FF;border-color:#4A90E2}
+  .mod.aff{background:#FFF2E6;border-color:#F5A623}
+  .mod.pof{background:#E6FFE6;border-color:#50C878}
 
-  /* === Sub-items === */
-  .mod .children { display:flex; gap:6px; justify-content:center; }
-  .child {
-    border: 1px solid #888888;
-    background: #fff;
-    padding: 6px 12px;
-    font-size: 10px;
-    color: #000;
-    text-align: left;
-    border-radius: 2px;
-    line-height: 1.45;
-  }
+  /* Sub-items */
+  .mod .children{display:flex;flex-direction:column;gap:4px}
+  .child{border:1px solid #888;background:#fff;padding:5px 10px;font-size:8.5px;color:#000;text-align:left;border-radius:3px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+  .child .desc{flex:1;line-height:1.35}
+  .child .formula{font-size:7.5px;color:#555;white-space:nowrap;font-style:italic}
 
-  /* === Middle step: gray dashed, no fill === */
-  .step-box {
-    display: inline-block;
-    border: 1px dashed #888888;
-    border-radius: 5px;
-    background: transparent;
-    padding: 6px 16px;
-    font-size: 11.5px;
-    color: #000;
-  }
-  .step-box .ch { color:#2d6a4f; font-weight:700; }
-  .step-box .rj { color:#b33; font-weight:700; }
+  /* IO boxes */
+  .io-box{display:inline-block;border:1.2px dashed #888;border-radius:5px;background:#fff;padding:6px 14px;font-size:11px;color:#000;font-weight:500}
+  .out-box{display:inline-block;border:1.5px solid #4A6FA5;border-radius:5px;background:#4A6FA5;color:#fff;padding:8px 18px;font-size:11.5px;font-weight:600}
+  .step-box{display:inline-block;border:1px dashed #888;border-radius:5px;background:transparent;padding:5px 12px;font-size:10.5px;color:#000}
+  .step-box .ch{color:#2d6a4f;font-weight:700}
+  .step-box .rj{color:#b33;font-weight:700}
+  .count{font-size:8px;color:#888;vertical-align:super}
 
-  /* === Arrows: strictly vertical, black solid === */
-  .arr-row { text-align:center; height:22px; line-height:0; }
-  .arr-row svg { display:block; margin:0 auto; }
+  /* Arrows */
+  .arr-down{text-align:center;height:18px;line-height:0}
+  .arr-down svg{display:block;margin:0 auto}
+  .arr-right{text-align:center;margin:0 -4px}
+  .arr-right svg{display:block}
 
-  /* Spacing inside groups */
-  .gap4 { height:4px; }
-  .gap6 { height:6px; }
+  /* Arrows between columns */
+  .inter-col{display:flex;align-items:center;justify-content:center;gap:0}
+  .h-arrow{display:flex;align-items:center}
+  .h-arrow .line{width:30px;height:2px;background:#333}
+  .h-arrow .head{width:0;height:0;border-top:7px solid transparent;border-bottom:7px solid transparent;border-left:10px solid #333}
+  .h-arrow.feedback .line{width:20px;height:1px;background:#888}
+  .h-arrow.feedback .head{border-left-color:transparent;border-right:8px solid #888;border-left-width:0;border-right-width:8px}
+  .arrow-label{font-size:8px;color:#666;text-align:center;padding:0 2px}
+  .arrow-label.dim{color:#aaa;font-style:italic}
+
+  /* SVG icons */
+  .icon-wrap{position:absolute;top:-16px;left:50%;transform:translateX(-50%)}
+  .icon-wrap svg{display:block}
+
+  /* Feedback path */
+  .feedback-path{position:absolute;right:-80px;top:50%;transform:translateY(-50%)}
 </style>
 </head>
 <body>
 
 <div class="diagram">
 
-  <!-- ===== Group 1: 多源反馈收集 (input + candidates + MFC) ===== -->
-  <div class="group group-blue">
-    <div class="group-label">多源反馈收集 (Multi-form Feedback Collector)</div>
+  <!-- ===== 3-column layout ===== -->
+  <div class="main-row">
 
-    <div class="io-box">训练样本 (x, y*)</div>
-    <div class="gap4"></div>
-    <div class="arr-row">
-      <svg width="16" height="22"><line x1="8" y1="0" x2="8" y2="14" stroke="#333" stroke-width="1.5"/><polygon points="2,12 8,21 14,12" fill="#333"/></svg>
-    </div>
-    <div class="step-box">候选集 {y<sub>1</sub>, y<sub>2</sub>, y<sub>3</sub>, y<sub>4</sub>}</div>
-    <div class="gap6"></div>
+    <!-- === LEFT: 多源反馈收集 === -->
+    <div class="col col-left">
+      <div class="group group-blue" style="flex:1">
+        <div class="group-label">多源反馈收集 (MFC)</div>
 
-    <div class="mod mfc">
-      <div class="hd">MFC</div>
-      <div class="sub">Multi-form Feedback Collector</div>
-      <div class="children">
-        <div class="child">ROUGE-1 / ROUGE-2 / ROUGE-L<br>Rule-based Feedback</div>
-        <div class="child">Token-level Log-Probability<br>Self-Reward Signal</div>
-      </div>
-    </div>
-  </div>
+        <!-- Input with doc icon -->
+        <div style="position:relative;display:inline-block">
+          <svg style="position:absolute;top:-14px;left:50%;margin-left:-10px" width="20" height="14"><rect x="1" y="1" width="16" height="12" fill="#fff" stroke="#888" stroke-width="1" rx="1"/><line x1="5" y1="6" x2="13" y2="6" stroke="#888" stroke-width="0.8"/><line x1="5" y1="9" x2="13" y2="9" stroke="#888" stroke-width="0.8"/><polygon points="15,1 15,3 18,0 13,0" fill="#888"/></svg>
+          <div class="io-box">(x, y*)</div>
+        </div>
+        <div class="arr-down">
+          <svg width="12" height="18"><line x1="6" y1="0" x2="6" y2="12" stroke="#333" stroke-width="2"/><polygon points="1,10 6,17 11,10" fill="#333"/></svg>
+        </div>
+        <div style="font-size:8px;color:#888;margin-top:-2px">多温度采样</div>
 
-  <div class="arr-row">
-    <svg width="16" height="22"><line x1="8" y1="0" x2="8" y2="14" stroke="#333" stroke-width="1.5"/><polygon points="2,12 8,21 14,12" fill="#333"/></svg>
-  </div>
+        <!-- Candidates -->
+        <div style="position:relative;display:inline-block">
+          <svg style="position:absolute;top:-12px;left:50%;margin-left:-12px" width="24" height="12">
+            <rect x="0" y="1" width="20" height="10" fill="#fff" stroke="#888" stroke-width="0.8"/><line x1="3" y1="5" x2="17" y2="5" stroke="#ccc" stroke-width="0.6"/><line x1="3" y1="7" x2="17" y2="7" stroke="#ccc" stroke-width="0.6"/>
+            <rect x="2" y="3" width="20" height="10" fill="#fff" stroke="#888" stroke-width="0.8"/><line x1="5" y1="6" x2="19" y2="6" stroke="#ccc" stroke-width="0.6"/><line x1="5" y1="8" x2="19" y2="8" stroke="#ccc" stroke-width="0.6"/>
+            <rect x="4" y="5" width="20" height="10" fill="#fff" stroke="#888" stroke-width="0.8"/><line x1="7" y1="8" x2="21" y2="8" stroke="#ccc" stroke-width="0.6"/><line x1="7" y1="10" x2="21" y2="10" stroke="#ccc" stroke-width="0.6"/>
+          </svg>
+          <div class="step-box">{y<sub>1</sub>, ..., y<sub>4</sub>}<span class="count">&times;4</span></div>
+        </div>
+        <div class="arr-down">
+          <svg width="12" height="18"><line x1="6" y1="0" x2="6" y2="12" stroke="#333" stroke-width="2"/><polygon points="1,10 6,17 11,10" fill="#333"/></svg>
+        </div>
+        <div style="font-size:8px;color:#888;margin-top:-2px">拒绝滤波</div>
 
-  <!-- ===== Group 2: 自适应反馈融合 (AFF + preference pairs) ===== -->
-  <div class="group group-amber">
-    <div class="group-label">自适应反馈融合 (Adaptive Feedback Fusion)</div>
-
-    <div class="mod aff">
-      <div class="hd">AFF</div>
-      <div class="sub">Adaptive Feedback Fusion</div>
-      <div class="children">
-        <div class="child">Learnable Attention Weights<br>w = softmax(W&middot;[s<sub>rule</sub>, s<sub>self</sub>] + b)</div>
-        <div class="child">Unified Preference Score<br>s<sub>fused</sub> = w<sub>rule</sub>s<sub>rule</sub> + w<sub>self</sub>s<sub>self</sub></div>
-      </div>
-    </div>
-
-    <div class="gap6"></div>
-    <div class="arr-row">
-      <svg width="16" height="22"><line x1="8" y1="0" x2="8" y2="14" stroke="#333" stroke-width="1.5"/><polygon points="2,12 8,21 14,12" fill="#333"/></svg>
-    </div>
-
-    <div class="step-box">
-      Preference Pairs &nbsp; (x, <span class="ch">y<sup>+</sup></span>, <span class="rj">y<sup>&minus;</sup></span>)
-    </div>
-  </div>
-
-  <div class="arr-row">
-    <svg width="16" height="22"><line x1="8" y1="0" x2="8" y2="14" stroke="#333" stroke-width="1.5"/><polygon points="2,12 8,21 14,12" fill="#333"/></svg>
-  </div>
-
-  <!-- ===== Group 3: 偏好优化微调 (POF + output) ===== -->
-  <div class="group group-green">
-    <div class="group-label">偏好优化微调 (Preference Optimization Fine-tuning)</div>
-
-    <div class="mod pof">
-      <div class="hd">POF</div>
-      <div class="sub">Preference Optimization Fine-tuning</div>
-      <div class="children">
-        <div class="child">DPO Loss Minimization<br>L<sub>DPO</sub> on Preference Pairs</div>
-        <div class="child">LoRA Fine-tuning<br>(rank = 8, &alpha; = 16, &beta; = 0.1)</div>
+        <!-- MFC -->
+        <div style="position:relative;display:inline-block;width:100%">
+          <!-- Funnel icon -->
+          <svg style="position:absolute;top:-16px;left:50%;margin-left:-10px" width="20" height="16"><polygon points="2,2 18,2 13,14 7,14" fill="none" stroke="#4A90E2" stroke-width="1.2"/><line x1="13" y1="14" x2="10" y2="16" stroke="#4A90E2" stroke-width="1.2"/><line x1="7" y1="14" x2="10" y2="16" stroke="#4A90E2" stroke-width="1.2"/></svg>
+          <div class="mod mfc" style="width:100%">
+            <div class="hd">MFC</div>
+            <div class="sub">Multi-form Feedback Collector</div>
+            <div class="children">
+              <div class="child"><span class="desc">ROUGE-1/2/L Rule Feedback</span><span class="formula">s<sub>rule</sub> = ROUGE(y<sub>i</sub>, y*)</span></div>
+              <div class="child"><span class="desc">Log-Probability Self-Reward</span><span class="formula">s<sub>self</sub> = log P(y<sub>i</sub> | x)</span></div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div class="gap6"></div>
-    <div class="arr-row">
-      <svg width="16" height="22"><line x1="8" y1="0" x2="8" y2="14" stroke="#333" stroke-width="1.5"/><polygon points="2,12 8,21 14,12" fill="#333"/></svg>
+    <!-- === Inter-column arrow: MFC -> AFF === -->
+    <div style="display:flex;align-items:center;flex-direction:column;justify-content:center;gap:2px;width:50px">
+      <div class="h-arrow" style="flex-direction:row">
+        <div class="line"></div><div class="head"></div>
+      </div>
+      <div class="arrow-label">s<sub>rule</sub>, s<sub>self</sub></div>
     </div>
 
-    <div class="out-box">Optimized Policy Model &nbsp; &#960;<sub>&#952;</sub></div>
+    <!-- === CENTER: 自适应反馈融合 === -->
+    <div class="col col-mid">
+      <div class="group group-amber" style="flex:1;display:flex;flex-direction:column;align-items:center">
+        <div class="group-label">自适应反馈融合 (AFF)</div>
+
+        <!-- Merge icon -->
+        <svg style="margin-bottom:2px" width="36" height="24">
+          <line x1="2" y1="6" x2="12" y2="14" stroke="#F5A623" stroke-width="1.2"/><polygon points="12,10 16,14 12,18" fill="none" stroke="#F5A623" stroke-width="1.2"/>
+          <line x1="34" y1="6" x2="24" y2="14" stroke="#F5A623" stroke-width="1.2"/><polygon points="24,10 20,14 24,18" fill="none" stroke="#F5A623" stroke-width="1.2"/>
+          <line x1="14" y1="14" x2="22" y2="14" stroke="#F5A623" stroke-width="1.5"/>
+          <polygon points="16,12 18,17 20,12" fill="#F5A623"/>
+        </svg>
+
+        <div class="mod aff" style="width:100%">
+          <div class="hd">AFF</div>
+          <div class="sub">Adaptive Feedback Fusion</div>
+          <div class="children">
+            <div class="child"><span class="desc">Attention Weight Learning</span><span class="formula">w = softmax(W[s<sub>rule</sub>;s<sub>self</sub>] + b)</span></div>
+            <div class="child"><span class="desc">Unified Preference Score</span><span class="formula">s<sub>fused</sub> = w<sub>rule</sub>s<sub>rule</sub> + w<sub>self</sub>s<sub>self</sub></span></div>
+          </div>
+        </div>
+
+        <div class="arr-down" style="margin-top:6px">
+          <svg width="12" height="18"><line x1="6" y1="0" x2="6" y2="12" stroke="#333" stroke-width="2"/><polygon points="1,10 6,17 11,10" fill="#333"/></svg>
+        </div>
+        <div class="arrow-label">argmax/argmin pair construction</div>
+
+        <!-- Scale icon for preference pair -->
+        <svg style="margin-bottom:2px" width="22" height="14"><line x1="1" y1="4" x2="21" y2="4" stroke="#888" stroke-width="1"/><line x1="11" y1="4" x2="11" y2="12" stroke="#888" stroke-width="0.8"/><polygon points="6,8 8,2 10,8" fill="none" stroke="#F5A623" stroke-width="0.8"/><polygon points="12,8 14,10 16,8" fill="none" stroke="#F5A623" stroke-width="0.8"/></svg>
+
+        <div class="step-box">
+          (<span class="ch">y<sup>+</sup></span>, <span class="rj">y<sup>&minus;</sup></span>)
+        </div>
+      </div>
+    </div>
+
+    <!-- === Inter-column arrow: AFF -> POF === -->
+    <div style="display:flex;align-items:center;flex-direction:column;justify-content:center;gap:2px;width:50px">
+      <div class="h-arrow" style="flex-direction:row">
+        <div class="line"></div><div class="head"></div>
+      </div>
+      <div class="arrow-label">偏好对</div>
+    </div>
+
+    <!-- === RIGHT: 偏好优化微调 === -->
+    <div class="col col-right">
+      <div class="group group-green" style="flex:1">
+        <div class="group-label">偏好优化微调 (POF)</div>
+
+        <!-- Gear icon -->
+        <svg style="margin-bottom:2px" width="22" height="22">
+          <circle cx="11" cy="11" r="6" fill="none" stroke="#50C878" stroke-width="1.5"/>
+          <circle cx="11" cy="11" r="2" fill="none" stroke="#50C878" stroke-width="1"/>
+          <line x1="11" y1="3" x2="11" y2="5" stroke="#50C878" stroke-width="1.2"/>
+          <line x1="11" y1="17" x2="11" y2="19" stroke="#50C878" stroke-width="1.2"/>
+          <line x1="3" y1="11" x2="5" y2="11" stroke="#50C878" stroke-width="1.2"/>
+          <line x1="17" y1="11" x2="19" y2="11" stroke="#50C878" stroke-width="1.2"/>
+          <line x1="5.5" y1="5.5" x2="7" y2="7" stroke="#50C878" stroke-width="1.2"/>
+          <line x1="15" y1="15" x2="16.5" y2="16.5" stroke="#50C878" stroke-width="1.2"/>
+        </svg>
+
+        <div class="mod pof" style="width:100%">
+          <div class="hd">POF</div>
+          <div class="sub">Preference Optimization Fine-tuning</div>
+          <div class="children">
+            <div class="child"><span class="desc">DPO Loss Optimization</span><span class="formula">L<sub>DPO</sub>, &beta; = 0.1</span></div>
+            <div class="child"><span class="desc">LoRA Fine-tuning</span><span class="formula">rank=8, &alpha;=16</span></div>
+          </div>
+        </div>
+
+        <div class="arr-down" style="margin-top:6px">
+          <svg width="12" height="18"><line x1="6" y1="0" x2="6" y2="12" stroke="#333" stroke-width="2"/><polygon points="1,10 6,17 11,10" fill="#333"/></svg>
+        </div>
+
+        <!-- NN icon -->
+        <svg width="28" height="18">
+          <circle cx="4" cy="9" r="2.5" fill="none" stroke="#4A6FA5" stroke-width="1"/>
+          <circle cx="14" cy="5" r="2.5" fill="none" stroke="#4A6FA5" stroke-width="1"/>
+          <circle cx="14" cy="13" r="2.5" fill="none" stroke="#4A6FA5" stroke-width="1"/>
+          <circle cx="24" cy="9" r="2.5" fill="none" stroke="#4A6FA5" stroke-width="1"/>
+          <line x1="6.5" y1="7.5" x2="11.5" y2="5.5" stroke="#4A6FA5" stroke-width="0.6"/>
+          <line x1="6.5" y1="10.5" x2="11.5" y2="12.5" stroke="#4A6FA5" stroke-width="0.6"/>
+          <line x1="16.5" y1="5.5" x2="21.5" y2="7.5" stroke="#4A6FA5" stroke-width="0.6"/>
+          <line x1="16.5" y1="12.5" x2="21.5" y2="10.5" stroke="#4A6FA5" stroke-width="0.6"/>
+        </svg>
+
+        <div class="out-box">Optimized Model &pi;<sub>&theta;</sub></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ===== Feedback loop (bottom: output -> back to input) ===== -->
+  <div style="display:flex;align-items:center;justify-content:center;margin-top:6px;gap:4px">
+    <div style="font-size:9px;color:#aaa;font-style:italic">迭代训练回路 (Iterative Training Loop)</div>
+    <svg width="120" height="20">
+      <line x1="0" y1="10" x2="100" y2="10" stroke="#aaa" stroke-width="1" stroke-dasharray="4,3"/>
+      <polygon points="94,6 106,10 94,14" fill="none" stroke="#aaa" stroke-width="1"/>
+    </svg>
   </div>
 
 </div>
