@@ -70,7 +70,7 @@ body{background:#fff;font-family:'Segoe UI','Microsoft YaHei',sans-serif;display
 .ha .ahr{border-left:12px solid #333}
 .ha .ahl{border-right:12px solid #3B82F6}
 .ha .ahg{border-right:12px solid #10B981}
-.hlb{position:absolute;font-size:7.5px;background:rgba(255,255,255,0.9);padding:2px 5px;border:0.5px solid #ddd;border-radius:2px;white-space:nowrap;top:-10px;left:14px}
+.hlb{position:absolute;font-size:10px;background:rgba(255,255,255,0.9);padding:1px 3px;border:0.5px solid #ddd;border-radius:2px;white-space:nowrap;top:-10px;left:14px}
 
 /* Bottom loop */
 .bl{position:relative;border:1.5px dashed rgba(139,92,246,0.5);border-radius:8px;background:rgba(139,92,246,0.03);padding:14px 16px 10px 16px;text-align:center;margin-top:10px}
@@ -90,7 +90,7 @@ body{background:#fff;font-family:'Segoe UI','Microsoft YaHei',sans-serif;display
 <div class="leg"><b>图例</b><br>
 <span class="ln ln1"></span> 主流程数据<br>
 <span class="ln ln2"></span> 自监督信号<br>
-<span class="ln ln3"></span> 梯度反馈<br>
+<span class="ln ln3"></span> 模型反馈<br>
 <span class="ln ln4"></span> 动态阈值</div>
 
 <!-- ===== TOP ===== -->
@@ -105,7 +105,7 @@ body{background:#fff;font-family:'Segoe UI','Microsoft YaHei',sans-serif;display
 <div class="arw"><svg width="12" height="14"><line x1="6" y1="0" x2="6" y2="9" stroke="#333" stroke-width="2.5"/><polygon points="0,7 6,14 12,7" fill="#333"/></svg></div>
 <div class="el" style="color:#999;font-style:italic">拒绝滤波</div>
 
-<div class="m m-m"><div class="hd">MFC</div><div class="sub">Multi-form Feedback Collector</div>
+<div class="m m-m"><div class="sub">Multi-form Feedback Collector</div><div class="hd">MFC</div>
 <div style="font-weight:700;font-size:9px;color:#3B82F6;margin-bottom:3px">规则反馈分支</div>
 <div class="ar"><div class="at" style="flex:1">ROUGE-1<div class="fm">unigram F<sub>1</sub></div></div><div class="at" style="flex:1">ROUGE-2<div class="fm">bigram F<sub>1</sub></div></div><div class="at" style="flex:1">ROUGE-L<div class="fm">LCS F<sub>1</sub></div></div></div>
 <div class="hd"></div>
@@ -124,7 +124,7 @@ body{background:#fff;font-family:'Segoe UI','Microsoft YaHei',sans-serif;display
 
 <!-- CENTER: AFF -->
 <div class="col col-c"><div class="g g-o"><div class="gl">自适应反馈融合 (AFF)</div>
-<div class="m m-o"><div class="hd">AFF</div><div class="sub">Adaptive Feedback Fusion</div>
+<div class="m m-o"><div class="sub">Adaptive Feedback Fusion</div><div class="hd">AFF</div>
 <div class="sr"><div class="sb" style="flex:1"><span style="font-weight:700">注意力权重</span><div class="fm">w=softmax(W[s<sub>rule</sub>;s<sub>self</sub>]+b)</div>
 <svg width="32" height="24" style="margin-top:2px">
 <rect x="2" y="2" width="7" height="5" fill="#F59E0B" opacity=".12"/><rect x="9" y="2" width="7" height="5" fill="#F59E0B" opacity=".25"/><rect x="16" y="2" width="7" height="5" fill="#F59E0B" opacity=".40"/><rect x="23" y="2" width="7" height="5" fill="#F59E0B" opacity=".55"/>
@@ -148,7 +148,7 @@ body{background:#fff;font-family:'Segoe UI','Microsoft YaHei',sans-serif;display
 
 <!-- RIGHT: POF -->
 <div class="col col-r"><div class="g g-g"><div class="gl">偏好优化微调 (POF)</div>
-<div class="m m-g"><div class="hd">POF</div><div class="sub">Preference Optimization Fine-tuning</div>
+<div class="m m-g"><div class="sub">Preference Optimization Fine-tuning</div><div class="hd">POF</div>
 <div class="sb" style="margin-bottom:4px"><span style="font-weight:700">DPO 损失</span><div class="fm">L<sub>DPO</sub>=-E[log &sigma;(&beta;r(y<sup>+</sup>)-&beta;r(y<sup>&minus;</sup>))]</div>
 <svg width="44" height="16" style="margin-top:2px"><line x1="4" y1="1" x2="44" y2="1" stroke="#bbb" stroke-width="0.4"/><line x1="4" y1="1" x2="4" y2="14" stroke="#bbb" stroke-width="0.4"/>
 <path d="M4,10 Q20,10 26,3 Q30,6 42,2" fill="none" stroke="#059669" stroke-width="1.2"/>
@@ -169,13 +169,17 @@ body{background:#fff;font-family:'Segoe UI','Microsoft YaHei',sans-serif;display
 </div>
 
 <!-- Cross-module arrows -->
-<div class="xa">
-  <div style="position:absolute;left:310px;top:-20px;width:260px;border-top:2px dashed #3B82F6;transform:rotate(-8deg)"></div>
-  <div style="position:absolute;left:420px;top:-22px;font-size:7px;color:#3B82F6;font-style:italic;background:#fff;padding:0 3px">自监督信号</div>
+<div class="xa" style="position:relative;margin-bottom:4px">
+  <div style="position:absolute;left:270px;top:-10px;width:300px;border-top:2px dashed #3B82F6;transform:rotate(-5deg)"></div>
+  <div style="position:absolute;left:410px;top:-16px;font-size:10px;color:#3B82F6;font-style:italic;background:rgba(255,255,255,0.9);padding:1px 3px;border-radius:2px">自监督信号</div>
 </div>
-<div class="xa">
-  <div style="position:absolute;right:310px;top:-14px;width:260px;border-top:2px dashed #10B981;transform:rotate(6deg)"></div>
-  <div style="position:absolute;right:420px;top:-16px;font-size:7px;color:#10B981;font-style:italic;background:#fff;padding:0 3px">模型反馈</div>
+<div class="xa" style="position:relative;margin-bottom:2px">
+  <div style="position:absolute;right:270px;top:-4px;width:300px;border-top:2px dashed #10B981;transform:rotate(5deg)"></div>
+  <div style="position:absolute;right:410px;top:-10px;font-size:10px;color:#10B981;font-style:italic;background:rgba(255,255,255,0.9);padding:1px 3px;border-radius:2px">模型反馈</div>
+</div>
+<!-- White circle at intersection -->
+<div style="text-align:center;position:relative;height:0">
+  <div style="display:inline-block;width:8px;height:8px;background:#fff;border:1px solid #ddd;border-radius:50%;position:relative;top:-12px;z-index:1"></div>
 </div>
 
 <!-- BOTTOM: Iterative Loop -->
@@ -187,7 +191,8 @@ body{background:#fff;font-family:'Segoe UI','Microsoft YaHei',sans-serif;display
 <div class="bs"><b>&#9776; 超参数调整</b><div style="font-size:7px;color:#888">&beta; / rank / lr</div></div>
 </div>
 <div style="display:flex;align-items:center;justify-content:center;margin-top:8px;gap:8px">
-<div style="font-size:8px;color:#8B5CF6;font-style:italic">&larr; 动态阈值更新 &larr;</div>
-<div style="width:240px;border-top:2px dashed #8B5CF6"></div></div></div>
+<div style="width:120px;border-top:2px dashed #8B5CF6"></div>
+<div style="font-size:10px;color:#8B5CF6;font-style:italic;background:rgba(255,255,255,0.9);padding:1px 3px;border-radius:2px">动态阈值更新 &rarr; 拒绝滤波</div>
+<div style="width:120px;border-top:2px dashed #8B5CF6"></div></div></div>
 
 </div></body></html>
