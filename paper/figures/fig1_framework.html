@@ -10,11 +10,30 @@
     display: flex;
     justify-content: center;
     padding: 36px 20px;
-    -webkit-font-smoothing: antialiased;
   }
-  .diagram { width: 520px; }
+  .diagram { width: 500px; }
 
-  /* === 1. Input / Output: dashed rounded rect, small radius === */
+  /* === Grouping dashed box === */
+  .group {
+    position: relative;
+    border: 0.8px dashed #aaa;
+    padding: 18px 22px 14px 22px;
+    margin-bottom: 6px;
+    text-align: center;
+  }
+  .group-label {
+    position: absolute;
+    top: -10px;
+    right: 12px;
+    background: #fff;
+    padding: 1px 8px;
+    font-size: 10.5px;
+    font-weight: 700;
+    color: #444;
+    white-space: nowrap;
+  }
+
+  /* === IO: dashed rounded rect === */
   .io-dashed {
     display: inline-block;
     border: 1.2px dashed #888;
@@ -24,17 +43,15 @@
     font-size: 13px;
     color: #333;
     font-weight: 500;
-    text-align: center;
   }
 
-  /* === 2. Core modules: solid rounded rect, low-saturation fill, matching darker border === */
+  /* === Core module: solid rounded rect, low-sat fill, matching border === */
   .mod {
     display: inline-block;
     border-radius: 5px;
     border-style: solid;
     border-width: 1.5px;
     padding: 12px 28px;
-    text-align: center;
   }
   .mod .hd {
     font-size: 17px;
@@ -46,32 +63,17 @@
     font-size: 10.5px;
     margin-bottom: 8px;
   }
-
-  /* MFC: blue */
-  .mod.mfc {
-    background: #eaf0f8;
-    border-color: #7a9fc9;
-  }
+  .mod.mfc { background: #eaf0f8; border-color: #7a9fc9; }
   .mod.mfc .hd { color: #2a5298; }
   .mod.mfc .sub { color: #4a72a8; }
-
-  /* AFF: amber */
-  .mod.aff {
-    background: #fdf8ed;
-    border-color: #d4b04a;
-  }
+  .mod.aff { background: #fdf8ed; border-color: #d4b04a; }
   .mod.aff .hd { color: #8b6914; }
   .mod.aff .sub { color: #9a7b2a; }
-
-  /* POF: green */
-  .mod.pof {
-    background: #edf6f1;
-    border-color: #6fae82;
-  }
+  .mod.pof { background: #edf6f1; border-color: #6fae82; }
   .mod.pof .hd { color: #2d6a4f; }
   .mod.pof .sub { color: #3d7a5c; }
 
-  /* === 3. Sub-items: white bg, thin gray border, left-aligned text === */
+  /* === Sub-items: white bg, thin gray border, left text === */
   .mod .children {
     display: flex;
     gap: 6px;
@@ -88,7 +90,7 @@
     line-height: 1.5;
   }
 
-  /* === 4. Middle step: gray dashed rect, no fill === */
+  /* === Middle step: gray dashed, no fill === */
   .step-dashed {
     display: inline-block;
     border: 1px dashed #999;
@@ -97,10 +99,9 @@
     padding: 6px 18px;
     font-size: 12px;
     color: #555;
-    text-align: center;
   }
 
-  /* === 5. Output: solid dark box === */
+  /* === Output: solid dark === */
   .out-solid {
     display: inline-block;
     border: 1.5px solid #333;
@@ -110,121 +111,96 @@
     padding: 9px 26px;
     font-size: 13px;
     font-weight: 600;
-    text-align: center;
   }
 
-  .row { text-align: center; margin: 0; }
+  /* === Arrow === */
+  .arr-row { text-align:center; height:24px; line-height:0; }
+  .arr-row svg { display:block; margin:0 auto; }
 
-  /* Arrow */
-  .arr-row {
-    text-align: center;
-    height: 26px;
-    position: relative;
-    line-height: 0;
-  }
-  .arr-row svg { display: block; margin: 0 auto; }
-
-  .side-tag {
-    position: absolute;
-    right: -130px;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 9.5px;
-    color: #999;
-    font-style: italic;
-    white-space: nowrap;
-    text-align: left;
-    line-height: 1.3;
-  }
-
-  .pref-box .ch { color: #2d6a4f; font-weight: 700; }
-  .pref-box .rj { color: #b33; font-weight: 700; }
+  .pref-box .ch { color:#2d6a4f; font-weight:700; }
+  .pref-box .rj { color:#b33; font-weight:700; }
 </style>
 </head>
 <body>
 
 <div class="diagram">
 
-  <!-- Input -->
-  <div class="row"><div class="io-dashed">训练样本 (x, y*)</div></div>
-
-  <div class="arr-row" style="position:relative;">
-    <svg width="14" height="26"><line x1="7" y1="1" x2="7" y2="18" stroke="#777" stroke-width="1"/><polygon points="1,16 7,24 13,16" fill="#777"/></svg>
-    <span class="side-tag">Multi-temperature<br>sampling</span>
+  <!-- Group 1: Sampling -->
+  <div class="group">
+    <div class="group-label">Multi-temperature Sampling</div>
+    <div class="io-dashed" style="margin-bottom:6px;">训练样本 (x, y*)</div>
+    <div class="arr-row">
+      <svg width="14" height="24"><line x1="7" y1="1" x2="7" y2="17" stroke="#777" stroke-width="1"/><polygon points="1,15 7,23 13,15" fill="#777"/></svg>
+    </div>
+    <div class="step-dashed">候选集 {y<sub>1</sub>, y<sub>2</sub>, y<sub>3</sub>, y<sub>4</sub>}</div>
   </div>
 
-  <!-- Candidates -->
-  <div class="row"><div class="step-dashed">候选集 {y<sub>1</sub>, y<sub>2</sub>, y<sub>3</sub>, y<sub>4</sub>}</div></div>
-
-  <div class="arr-row" style="position:relative;">
-    <svg width="14" height="26"><line x1="7" y1="1" x2="7" y2="18" stroke="#777" stroke-width="1"/><polygon points="1,16 7,24 13,16" fill="#777"/></svg>
-    <span class="side-tag">Rejection<br>filter</span>
+  <div class="arr-row">
+    <svg width="14" height="24"><line x1="7" y1="1" x2="7" y2="17" stroke="#777" stroke-width="1"/><polygon points="1,15 7,23 13,15" fill="#777"/></svg>
   </div>
 
-  <!-- MFC -->
-  <div class="row">
+  <!-- Group 2: MFC + Rejection Filter -->
+  <div class="group">
+    <div class="group-label">Rejection Filter</div>
     <div class="mod mfc">
       <div class="hd">MFC</div>
       <div class="sub">Multi-form Feedback Collector</div>
       <div class="children">
-        <div class="child">ROUGE-1 / ROUGE-2 / ROUGE-L<br>Rule-based Feedback</div>
-        <div class="child">Token-level Log-Probability<br>Self-Reward Signal</div>
-      </div>
-    </div>
-  </div>
-
-  <div class="arr-row" style="position:relative;">
-    <svg width="14" height="26"><line x1="7" y1="1" x2="7" y2="18" stroke="#777" stroke-width="1"/><polygon points="1,16 7,24 13,16" fill="#777"/></svg>
-    <span class="side-tag">s<sub>rule</sub><br>s<sub>self</sub></span>
-  </div>
-
-  <!-- AFF -->
-  <div class="row">
-    <div class="mod aff">
-      <div class="hd">AFF</div>
-      <div class="sub">Adaptive Feedback Fusion</div>
-      <div class="children">
-        <div class="child">Learnable Attention Weights<br>w = softmax(W &middot; [s<sub>rule</sub>, s<sub>self</sub>] + b)</div>
-        <div class="child">Unified Preference Score<br>s<sub>fused</sub> = w<sub>rule</sub>&middot;s<sub>rule</sub> + w<sub>self</sub>&middot;s<sub>self</sub></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="arr-row" style="position:relative;">
-    <svg width="14" height="26"><line x1="7" y1="1" x2="7" y2="18" stroke="#777" stroke-width="1"/><polygon points="1,16 7,24 13,16" fill="#777"/></svg>
-    <span class="side-tag"> argmax / argmin<br>pair construction</span>
-  </div>
-
-  <!-- Preference pair -->
-  <div class="row">
-    <div class="step-dashed pref-box">
-      Preference Pair &nbsp; (x, <span class="ch">y<sup>+</sup></span>, <span class="rj">y<sup>&minus;</sup></span>)
-    </div>
-  </div>
-
-  <div class="arr-row" style="position:relative;">
-    <svg width="14" height="26"><line x1="7" y1="1" x2="7" y2="18" stroke="#777" stroke-width="1"/><polygon points="1,16 7,24 13,16" fill="#777"/></svg>
-    <span class="side-tag">DPO training<br>&beta; = 0.1</span>
-  </div>
-
-  <!-- POF -->
-  <div class="row">
-    <div class="mod pof">
-      <div class="hd">POF</div>
-      <div class="sub">Preference Optimization Fine-tuning</div>
-      <div class="children">
-        <div class="child">DPO Loss Minimization<br>L<sub>DPO</sub> on preference pairs</div>
-        <div class="child">LoRA Parameter-efficient<br>Fine-tuning (rank = 8)</div>
+        <div class="child">ROUGE-1/2/L<br>Rule-based Feedback</div>
+        <div class="child">Log-Probability<br>Self-Reward Signal</div>
       </div>
     </div>
   </div>
 
   <div class="arr-row">
-    <svg width="14" height="26"><line x1="7" y1="1" x2="7" y2="18" stroke="#777" stroke-width="1"/><polygon points="1,16 7,24 13,16" fill="#777"/></svg>
+    <svg width="14" height="24"><line x1="7" y1="1" x2="7" y2="17" stroke="#777" stroke-width="1"/><polygon points="1,15 7,23 13,15" fill="#777"/></svg>
   </div>
 
-  <!-- Output -->
-  <div class="row"><div class="out-solid">Optimized Policy Model &nbsp; &#960;<sub>&#952;</sub></div></div>
+  <!-- Group 3: AFF -->
+  <div class="group">
+    <div class="group-label">s<sub>rule</sub> + s<sub>self</sub> &rarr; s<sub>fused</sub></div>
+    <div class="mod aff">
+      <div class="hd">AFF</div>
+      <div class="sub">Adaptive Feedback Fusion</div>
+      <div class="children">
+        <div class="child">Learnable Attention<br>w = softmax(W&middot;[s<sub>rule</sub>,s<sub>self</sub>]+b)</div>
+        <div class="child">Unified Score<br>s<sub>fused</sub> = w<sub>rule</sub>s<sub>rule</sub> + w<sub>self</sub>s<sub>self</sub></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="arr-row">
+    <svg width="14" height="24"><line x1="7" y1="1" x2="7" y2="17" stroke="#777" stroke-width="1"/><polygon points="1,15 7,23 13,15" fill="#777"/></svg>
+  </div>
+
+  <!-- Group 4: Preference Pairs -->
+  <div class="group">
+    <div class="group-label">Preference Pair Construction</div>
+    <div class="step-dashed pref-box">
+      Preference Pairs &nbsp; (x, <span class="ch">y<sup>+</sup></span>, <span class="rj">y<sup>&minus;</sup></span>)
+    </div>
+  </div>
+
+  <div class="arr-row">
+    <svg width="14" height="24"><line x1="7" y1="1" x2="7" y2="17" stroke="#777" stroke-width="1"/><polygon points="1,15 7,23 13,15" fill="#777"/></svg>
+  </div>
+
+  <!-- Group 5: POF + Output -->
+  <div class="group">
+    <div class="group-label">DPO Training (&beta; = 0.1)</div>
+    <div class="mod pof" style="margin-bottom:8px;">
+      <div class="hd">POF</div>
+      <div class="sub">Preference Optimization Fine-tuning</div>
+      <div class="children">
+        <div class="child">DPO Loss Optimization<br>L<sub>DPO</sub> on Preference Pairs</div>
+        <div class="child">LoRA Fine-tuning<br>(rank = 8, &alpha; = 16)</div>
+      </div>
+    </div>
+    <div class="arr-row">
+      <svg width="14" height="24"><line x1="7" y1="1" x2="7" y2="17" stroke="#777" stroke-width="1"/><polygon points="1,15 7,23 13,15" fill="#777"/></svg>
+    </div>
+    <div class="out-solid">Optimized Model &nbsp; &#960;<sub>&#952;</sub></div>
+  </div>
 
 </div>
 
