@@ -102,31 +102,7 @@ LoRA$^{[15]}$Í¨¹ıµÍÖÈ·Ö½â¾ØÕó½üËÆÈ«²ÎÊı¸üĞÂ£¬ÏÔÖø½µµÍÁËÎ¢µ÷²ÎÊıÁ¿ºÍÏÔ´æĞèÇó£¬ÒÑ³
 
 \subsection{×ÜÌå¼Ü¹¹ÓëÑµÁ·Á÷³Ì}
 
-¸ø¶¨ÊäÈë$x$ºÍ²Î¿¼$y^*$£¬²ßÂÔÄ£ĞÍ$\pi_\theta$Éú³ÉºòÑ¡¼¯ºÏ$\{y_1,\dots,y_K\}$¡£MFRL°üº¬Èı¸öºËĞÄÄ£¿é: (1) MFC»ñÈ¡¶àÔ´·´À¡ĞÅºÅ£»(2) AFF½«Òì¹¹ĞÅºÅÈÚºÏÎªÍ³Ò»Æ«ºÃ·ÖÊı£»(3) POF»ùÓÚÈÚºÏÆ«ºÃ¶Ô½øĞĞDPOÎ¢µ÷¡£ÍêÕûÑµÁ·Á÷³ÌÈçËã·¨1ËùÊ¾¡£
-
-{\fontsize{9.3pt}{11.6pt}\selectfont
-\noindent{\bf Ëã·¨1}\;{\bf MFRLÑµÁ·Á÷³Ì}\\
-\noindent{\bf ÊäÈë:}\;»ù×ùÄ£ĞÍ$\pi_{\rm ref}$, ÑµÁ·¼¯$\mathcal{D}=\{(x_i, y_i^*)\}_{i=1}^{N}$, ºòÑ¡Êı$K$, ÎÂ¶È¼¯ºÏ$\mathcal{T}$\\
-\noindent{\bf Êä³ö:}\;ÓÅ»¯ºóÄ£ĞÍ$\pi_\theta$\\
-\noindent{\bf 1:}\;³õÊ¼»¯$\pi_\theta\leftarrow\pi_{\rm ref}$£¬ÅäÖÃLoRAÊÊÅäÆ÷\\
-\noindent{\bf 2:}\;{\bf for}\;Ã¿¸öÑµÁ·Ñù±¾$(x, y^*)\in\mathcal{D}$ {\bf do}\\
-\noindent{\bf 3:}\quad $\mathcal{Y}\leftarrow\varnothing$\\
-\noindent{\bf 4:}\quad {\bf for}\;$T\in\mathcal{T}$ {\bf do}\\
-\noindent{\bf 5:}\quad\quad ÒÔÎÂ¶È$T$´Ó$\pi_\theta$²ÉÑù$K/|\mathcal{T}|$¸öºòÑ¡Êä³ö\\
-\noindent{\bf 6:}\quad\quad $\mathcal{Y}\leftarrow\mathcal{Y}\cup\{y_{T,1},\dots,y_{T,K/|\mathcal{T}|}\}$\\
-\noindent{\bf 7:}\quad {\bf end for}\\
-\noindent{\bf 8:}\quad ¾Ü¾øÂË²¨: ÒÆ³ıº¬¾Ü¾øÄ£Ê½µÄºòÑ¡\\
-\noindent{\bf 9:}\quad MFC: ¼ÆËã$s_{\rm RF}$(Ê½(1))ºÍ$s_{\rm MF}$(Ê½(2))\\
-\noindent{\bf 10:}\quad AFF: ¼ÆËãÈÚºÏ·ÖÊı$s_{\rm fused}$(Ê½(3)-(4))\\
-\noindent{\bf 11:}\quad Ñ¡È¡$y^+\!=\!\arg\max s_{\rm fused}$, $y^-\!=\!\arg\min s_{\rm fused}$\\
-\noindent{\bf 12:}\quad ¹¹½¨Æ«ºÃ¶Ô$\mathcal{P}\leftarrow\mathcal{P}\cup\{(x, y^+, y^-)\}$\\
-\noindent{\bf 13:}\;{\bf end for}\\
-\noindent{\bf 14:}\;{\bf for}\;epoch = 1,2,3 {\bf do}\\
-\noindent{\bf 15:}\quad ÔÚ$\mathcal{P}$ÉÏ×îĞ¡»¯$\mathcal{L}_{\rm DPO}$(Ê½(5))¸üĞÂ$\pi_\theta$\\
-\noindent{\bf 16:}\;{\bf end for}\\
-\noindent{\bf 17:}\;{\bf return}\;$\pi_\theta$
-}
-\vspace{4pt}
+¸ø¶¨ÊäÈë$x$ºÍ²Î¿¼$y^*$£¬²ßÂÔÄ£ĞÍ$\pi_\theta$Éú³ÉºòÑ¡¼¯ºÏ$\{y_1,\dots,y_K\}$¡£MFRL°üº¬Èı¸öºËĞÄÄ£¿é: (1) MFC»ñÈ¡¶àÔ´·´À¡ĞÅºÅ£»(2) AFF½«Òì¹¹ĞÅºÅÈÚºÏÎªÍ³Ò»Æ«ºÃ·ÖÊı£»(3) POF»ùÓÚÈÚºÏÆ«ºÃ¶Ô½øĞĞDPOÎ¢µ÷¡£¾ßÌå¶øÑÔ£¬ÏÈ¶ÔÃ¿¸öÊäÈë¶àÎÂ¶È²ÉÑù$K=4$¸öºòÑ¡£¬¾­¾Ü¾øÂË²¨ºó¼ÆËã¹æÔò·ÖÊı$s_{\rm RF}$ºÍ×Ô½±Àø·ÖÊı$s_{\rm MF}$£»È»ºóÍ¨¹ı×¢ÒâÁ¦»úÖÆÈÚºÏµÃ$s_{\rm fused}$£¬Ñ¡È¡×î¸ßºÍ×îµÍ·Ö¹¹³ÉÆ«ºÃ¶Ô$(x, y^+, y^-)$£»×îºóÔÚÆ«ºÃ¶ÔÉÏ×îĞ¡»¯$\mathcal{L}_{\rm DPO}$(Ê½(5))¸üĞÂ²ßÂÔÄ£ĞÍ¡£
 
 \end{multicols}
 \begin{center}
@@ -279,7 +255,7 @@ DPOÎÂ¶È $\beta$ & 0.05 & 0.170 \\
                & 0.20 & 0.168 \\
                & 0.50 & {\bf 0.174} \\
 \bottomrule
-\end{tabular}}}\end{center}
+\end{tabular}}\end{center}
 
 ÓÉ±í4¿ÉµÃ³öÒÔÏÂ½áÂÛ¡£
 
