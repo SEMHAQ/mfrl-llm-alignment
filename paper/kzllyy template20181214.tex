@@ -1,9 +1,7 @@
 \input kzllyyhead
-\usepackage{multirow}
 \begin{document}
 \makeatother
 \begin{CJK*}{GBK}{song}
-\renewcommand{\CJKglue}{\hskip 0pt plus 0.08\baselineskip}
 \title{\LARGE\textbf{多形式反馈融合的大语言模型直接偏好优化}\\
 \footnotetext{\scriptsize \hskip -6pt
 \hspace*{-0.1em}收稿日期: xxxx$-$xx$-$xx; 录用日期: xxxx$-$xx$-$xx.\\
@@ -269,16 +267,14 @@ Table~4~~Hyperparameter sensitivity on LCSTS}\\
 {\fontsize{9.3pt}{11.6pt}\selectfont
 \begin{tabular}{@{ }lcc@{ }}\toprule
 超参数 & 取值 & ROUGE-L \\\midrule
-\multirow{3}{*}{LoRA秩 $r$}
-  & 4  & 0.168 \\
-  & 8  & {\bf 0.171} \\
-  & 16 & {\bf 0.176} \\
+LoRA秩 $r$ & 4  & 0.168 \\
+          & 8  & {\bf 0.171} \\
+          & 16 & {\bf 0.176} \\
 \midrule
-\multirow{4}{*}{DPO温度 $\beta$}
-  & 0.05 & 0.170 \\
-  & 0.10 & 0.171 \\
-  & 0.20 & 0.168 \\
-  & 0.50 & {\bf 0.174} \\
+DPO温度 $\beta$ & 0.05 & 0.170 \\
+               & 0.10 & 0.171 \\
+               & 0.20 & 0.168 \\
+               & 0.50 & {\bf 0.174} \\
 \bottomrule
 \end{tabular}}}\end{center}
 
