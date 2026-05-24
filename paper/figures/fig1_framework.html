@@ -62,10 +62,10 @@ body{background:#fff;font-family:'Times New Roman','SimSun',serif;display:flex;j
 .alt-bot{bottom:-16px;left:50%;transform:translateX(-50%)}
 
 /* Bottom loop */
-.bl{position:relative;border:1.5px dashed rgba(139,92,246,0.5);border-radius:8px;background:rgba(139,92,246,0.03);padding:14px 16px 10px 16px;text-align:center;margin-top:10px}
+.bl{position:relative;border:1.5px dashed rgba(139,92,246,0.5);border-radius:8px;background:rgba(139,92,246,0.03);padding:14px 10px 10px 10px;text-align:center;margin-top:10px}
 .bl .ll{padding:0 0 8px 0;font-size:10px;font-weight:700;color:#000;text-align:center}
 .bl .br{display:flex;align-items:center;justify-content:center;gap:14px}
-.bl .bs{border:1.5px solid #ccc;background:#fff;border-radius:4px;padding:6px 14px;font-size:10px;color:#111827;box-shadow:inset 0 1px 2px rgba(0,0,0,0.06);text-align:center;line-height:1.3}
+.bl .bs{border:1.5px solid #ccc;background:#fff;border-radius:4px;padding:6px 18px;font-size:10px;color:#111827;box-shadow:inset 0 1px 2px rgba(0,0,0,0.06);text-align:center;line-height:1.3;flex:1}
 .bl .bs .nd{font-size:9px;color:#6b7280}
 .bl .ba{width:0;height:0;border-top:5px solid transparent;border-bottom:5px solid transparent;border-left:8px solid #8B5CF6}
 
@@ -90,7 +90,7 @@ body{background:#fff;font-family:'Times New Roman','SimSun',serif;display:flex;j
 
 <div class="m m-m"><div class="sub">Multi-form Feedback Collector</div><div class="hd">MFC</div>
 <div class="sl">规则反馈分支</div>
-<div class="ar"><div class="at" style="flex:1;white-space:nowrap">ROUGE-1 <span style="font-size:10px;color:#374151;font-style:italic">unigram F<sub>1</sub></span></div><div class="at" style="flex:1;white-space:nowrap">ROUGE-2 <span style="font-size:10px;color:#374151;font-style:italic">bigram F<sub>1</sub></span></div><div class="at" style="flex:1;white-space:nowrap">ROUGE-L <span style="font-size:10px;color:#374151;font-style:italic">LCS F<sub>1</sub></span></div></div>
+<div style="text-align:center;margin-bottom:3px"><div class="at" style="display:inline-block;white-space:nowrap;padding:3px 14px">ROUGE-1 <span style="font-size:10px;color:#374151;font-style:italic">unigram F<sub>1</sub></span></div></div><div class="ar"><div class="at" style="flex:1;white-space:nowrap">ROUGE-2 <span style="font-size:10px;color:#374151;font-style:italic">bigram F<sub>1</sub></span></div><div class="at" style="flex:1;white-space:nowrap">ROUGE-L <span style="font-size:10px;color:#374151;font-style:italic">LCS F<sub>1</sub></span></div></div>
 <div class="dv"></div>
 <div class="sl">自奖励分支</div>
 <div class="ar"><div class="at" style="flex:1">Token LogP<div class="fm">log P(y<sub>t</sub>|x)</div></div><div class="at" style="flex:1">Seq LogP<div class="fm">avg &Sigma;log P</div></div></div>
@@ -114,7 +114,7 @@ body{background:#fff;font-family:'Times New Roman','SimSun',serif;display:flex;j
 <rect x="2" y="12" width="7" height="5" fill="#F59E0B" opacity=".35"/><rect x="9" y="12" width="7" height="5" fill="#F59E0B" opacity=".55"/><rect x="16" y="12" width="7" height="5" fill="#F59E0B" opacity=".72"/><rect x="23" y="12" width="7" height="5" fill="#F59E0B" opacity=".90"/>
 <rect x="2" y="17" width="7" height="5" fill="#F59E0B" opacity=".50"/><rect x="9" y="17" width="7" height="5" fill="#F59E0B" opacity=".68"/><rect x="16" y="17" width="7" height="5" fill="#F59E0B" opacity=".82"/><rect x="23" y="17" width="7" height="5" fill="#F59E0B" opacity=".98"/>
 </svg></div>
-<div class="sb" style="width:90%;margin:0 auto 8px auto"><span class="sl" style="margin-top:0">分数融合</span><svg width="18" height="12" style="float:right;margin-left:4px"><line x1="1" y1="2" x2="9" y2="8" stroke="#d97706" stroke-width="1"/><polygon points="6,6 10,8 6,10" fill="none" stroke="#d97706" stroke-width="0.8"/><line x1="17" y1="2" x2="9" y2="8" stroke="#d97706" stroke-width="1"/><polygon points="12,6 8,8 12,10" fill="none" stroke="#d97706" stroke-width="0.8"/></svg><div class="fm">s<sub>fused</sub>=w<sub>rule</sub>s<sub>rule</sub>+w<sub>self</sub>s<sub>self</sub></div>
+<div class="sb" style="width:90%;margin:0 auto 8px auto"><span class="sl" style="margin-top:0">分数融合</span><div class="fm">s<sub>fused</sub>=w<sub>rule</sub>s<sub>rule</sub>+w<sub>self</sub>s<sub>self</sub></div>
 <svg width="28" height="14" style="margin-top:2px"><line x1="4" y1="2" x2="10" y2="10" stroke="#d97706" stroke-width="1.2"/><line x1="24" y1="2" x2="18" y2="10" stroke="#d97706" stroke-width="1.2"/><circle cx="14" cy="10" r="2.5" fill="#d97706"/></svg></div>
 <div class="dv"></div>
 <div class="sr"><div class="sb" style="flex:1;border:2px solid #10b981;box-shadow:0 2px 4px rgba(0,0,0,0.08)"><span style="font-weight:700;color:#10b981">y<sup>+</sup></span><div class="fm">argmax s<sub>fused</sub></div></div>
@@ -131,9 +131,7 @@ body{background:#fff;font-family:'Times New Roman','SimSun',serif;display:flex;j
 <div class="col col-r"><div class="g g-g"><div class="gl">偏好优化微调 (POF)</div>
 <div class="m m-g"><div class="sub" style="white-space:nowrap;font-size:9px">Preference Optimization Fine-tuning</div><div class="hd">POF</div>
 <div class="sb" style="margin-bottom:4px"><span class="sl" style="margin-top:0">DPO 损失</span><div class="fm">L<sub>DPO</sub>=-E[log &sigma;(&beta;r(y<sup>+</sup>)-&beta;r(y<sup>&minus;</sup>))]</div>
-<svg width="60" height="18" style="margin-top:2px"><line x1="2" y1="1" x2="58" y2="1" stroke="#bbb" stroke-width="0.3"/><line x1="2" y1="1" x2="2" y2="16" stroke="#bbb" stroke-width="0.3"/>
-<path d="M4,13 L18,7 L34,5 L52,3" fill="none" stroke="#059669" stroke-width="1"/>
-<text x="55" y="15" font-size="5" fill="#888">iter</text><text x="4" y="16" font-size="5" fill="#888">loss</text></svg>
+<svg width="30" height="15" style="margin-top:2px"><path d="M2,13 Q15,12 18,6 Q22,3 28,2" fill="none" stroke="#059669" stroke-width="1.2"/></svg>
 <div style="font-size:10px;color:#6b7280;font-style:italic;margin-top:1px">(&beta;=0.1)</div></div>
 <div class="sb"><span class="sl" style="margin-top:0">LoRA 参数更新</span><svg width="18" height="14" style="float:right;margin-left:4px"><circle cx="3" cy="7" r="1.5" fill="none" stroke="#059669" stroke-width="0.8"/><circle cx="9" cy="3" r="1.5" fill="none" stroke="#059669" stroke-width="0.8"/><circle cx="9" cy="11" r="1.5" fill="none" stroke="#059669" stroke-width="0.8"/><circle cx="15" cy="7" r="1.5" fill="none" stroke="#059669" stroke-width="0.8"/><line x1="4.5" y1="6.5" x2="7.5" y2="3.5" stroke="#059669" stroke-width="0.5"/><line x1="4.5" y1="7.5" x2="7.5" y2="10.5" stroke="#059669" stroke-width="0.5"/><line x1="10.5" y1="3.5" x2="13.5" y2="6.5" stroke="#059669" stroke-width="0.5"/><line x1="10.5" y1="10.5" x2="13.5" y2="7.5" stroke="#059669" stroke-width="0.5"/></svg><div class="fm">(rank=<b>8</b>, &alpha;=<b>16</b>)</div>
 <div style="display:flex;gap:3px;justify-content:center;align-items:center;margin-top:3px">
@@ -148,7 +146,7 @@ body{background:#fff;font-family:'Times New Roman','SimSun',serif;display:flex;j
 </div>
 
 <!-- BOTTOM: Iterative Loop -->
-<div class="bl" style="margin-top:20px"><div class="ll">迭代训练闭环 (Iterative Training Loop)</div>
+<div class="bl" style="margin-top:20px"><div class="ll"><svg width="16" height="16" style="vertical-align:middle;margin-right:4px"><path d="M8,2 Q12,2 12,6 Q12,10 8,10 Q4,10 4,6 Q4,4 7,4" fill="none" stroke="#8B5CF6" stroke-width="1.2"/><polygon points="6,2 8,2 4,6" fill="none" stroke="#8B5CF6" stroke-width="1"/></svg>迭代训练闭环 (Iterative Training Loop)<span style="float:right;font-size:9px;color:#8B5CF6;font-weight:400;font-style:italic">持续迭代优化</span></div>
 <div class="br">
 <div class="bs"><b>模型评估</b><div class="nd">ROUGE / LogP 评分</div></div><div class="ba"></div>
 <div class="bs"><b>数据重采样</b><div class="nd">T &isin; {0.5,0.8,1.2,1.8}</div></div><div class="ba"></div>
