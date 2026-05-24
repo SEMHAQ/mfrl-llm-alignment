@@ -3,25 +3,16 @@
 body{background:#fff;font-family:'Times New Roman','SimSun',serif;display:flex;justify-content:center;padding:16px 8px}
 .diag{width:860px;position:relative}
 
-/* Legend */
-.leg{position:absolute;top:6px;right:6px;background:rgba(255,255,255,0.95);border:1px solid #ddd;padding:6px 10px;border-radius:4px;font-size:9px;line-height:1.7;z-index:10}
-.leg b{font-size:10px}
-.leg .ln{display:inline-block;width:20px;height:0;vertical-align:middle;margin-right:3px}
-.leg .ln1{border-top:2.5px solid #333}
-.leg .ln2{border-top:2px dashed #3B82F6}
-.leg .ln3{border-top:2px dashed #10B981}
-.leg .ln4{border-top:2px dashed #8B5CF6}
-
-.top{display:flex;gap:14px;margin-bottom:8px}
-.col{display:flex;flex-direction:column;align-items:center;gap:0}
-.col-l{width:270px}.col-c{width:270px}.col-r{width:270px}
+.top{display:flex;gap:14px;margin-bottom:8px;align-items:stretch}
+.col{display:flex;flex-direction:column;align-items:center;gap:0;width:270px;flex:1}
+.col-l{}.col-c{}.col-r{} /* placeholder — keep width from .col */
 
 /* Group - no white bg on label */
 .g{position:relative;border:1px dashed;border-radius:8px;padding:18px 12px 12px 12px;text-align:center;width:100%}
 .g-b{border-color:rgba(59,130,246,0.4);background:rgba(59,130,246,0.04)}
 .g-o{border-color:rgba(217,119,6,0.4);background:rgba(217,119,6,0.04)}
 .g-g{border-color:rgba(5,150,105,0.4);background:rgba(5,150,105,0.04)}
-.gl{position:absolute;top:-10px;left:10px;padding:1px 8px;font-size:10px;font-weight:700;color:#000} /* no bg */
+.gl{padding:0 0 8px 0;font-size:10px;font-weight:700;color:#000;text-align:center}
 
 /* Core mod */
 .m{display:inline-block;border-radius:6px;border:2.5px solid;padding:12px 14px;text-align:center;width:100%;box-shadow:inset 0 2px 4px rgba(0,0,0,0.06)}
@@ -72,7 +63,7 @@ body{background:#fff;font-family:'Times New Roman','SimSun',serif;display:flex;j
 
 /* Bottom loop */
 .bl{position:relative;border:1.5px dashed rgba(139,92,246,0.5);border-radius:8px;background:rgba(139,92,246,0.03);padding:14px 16px 10px 16px;text-align:center;margin-top:10px}
-.bl .ll{position:absolute;top:-10px;left:10px;padding:1px 8px;font-size:10px;font-weight:700;color:#000} /* no bg */
+.bl .ll{padding:0 0 8px 0;font-size:10px;font-weight:700;color:#000;text-align:center}
 .bl .br{display:flex;align-items:center;justify-content:center;gap:14px}
 .bl .bs{border:1.5px solid #ccc;background:#fff;border-radius:4px;padding:6px 14px;font-size:10px;color:#111827;box-shadow:inset 0 1px 2px rgba(0,0,0,0.06);text-align:center;line-height:1.3}
 .bl .bs .nd{font-size:9px;color:#6b7280}
@@ -81,18 +72,9 @@ body{background:#fff;font-family:'Times New Roman','SimSun',serif;display:flex;j
 /* Sub-section label */
 .sl{font-size:11px;font-weight:700;color:#111827;margin:4px 0 3px 0}
 
-/* Cross arrows */
-.xa{position:relative;height:0}
 </style></head><body>
 
 <div class="diag">
-
-<!-- Legend -->
-<div class="leg"><b>图例</b><br>
-<span class="ln ln1"></span> 主流程数据<br>
-<span class="ln ln2"></span> 自监督信号<br>
-<span class="ln ln3"></span> 模型反馈<br>
-<span class="ln ln4"></span> 动态阈值</div>
 
 <!-- ===== TOP ===== -->
 <div class="top">
@@ -165,21 +147,6 @@ body{background:#fff;font-family:'Times New Roman','SimSun',serif;display:flex;j
 <div class="out">Optimized &pi;<sub>&theta;</sub></div></div></div>
 </div>
 
-<!-- Cross-module: blue self-supervision arrow (MFC self-reward -> POF output) -->
-<div style="position:relative;height:0;margin:0">
-  <div style="position:absolute;left:410px;top:-130px;width:2px;height:50px;border-left:2px dashed #3B82F6"></div>
-  <div style="position:absolute;left:410px;top:-80px;width:80px;border-top:2px dashed #3B82F6"></div>
-  <div style="position:absolute;left:485px;top:-86px;font-size:10px;color:#3B82F6;font-style:italic;background:rgba(255,255,255,0.9);padding:2px 4px;border-radius:2px">自监督信号</div>
-</div>
-
-<!-- Cross-module: green model feedback arrow (POF output -> AFF attention) -->
-<div style="position:relative;height:0;margin:0">
-  <div style="position:absolute;right:320px;top:-8px;width:2px;height:30px;border-left:2px dashed #10B981"></div>
-  <div style="position:absolute;right:200px;top:22px;width:120px;border-top:2px dashed #10B981"></div>
-  <div style="position:absolute;right:200px;top:22px;width:2px;height:80px;border-left:2px dashed #10B981"></div>
-  <div style="position:absolute;right:250px;top:16px;font-size:10px;color:#10B981;font-style:italic;background:rgba(255,255,255,0.9);padding:2px 4px;border-radius:2px">模型反馈</div>
-</div>
-
 <!-- BOTTOM: Iterative Loop -->
 <div class="bl" style="margin-top:20px"><div class="ll">迭代训练闭环 (Iterative Training Loop)</div>
 <div class="br">
@@ -188,16 +155,13 @@ body{background:#fff;font-family:'Times New Roman','SimSun',serif;display:flex;j
 <div class="bs"><b>偏好重构</b><div class="nd">MFC &rarr; AFF &rarr; POF</div></div><div class="ba"></div>
 <div class="bs"><b>超参数调整</b><div class="nd">&beta; / rank / lr</div></div>
 </div>
-<!-- Loop-back arrow: 超参数调整 -> 模型评估 -->
-<div style="display:flex;align-items:center;justify-content:center;margin-top:6px;gap:6px">
+<!-- Loop-back dashed arrow -->
+<div style="display:flex;align-items:center;justify-content:center;margin-top:8px">
 <div style="width:0;height:0;border-top:5px solid transparent;border-bottom:5px solid transparent;border-right:8px solid #8B5CF6"></div>
-<div style="font-size:10px;color:#8B5CF6;font-style:italic;background:rgba(255,255,255,0.95);padding:2px 4px;border-radius:2px">迭代训练</div>
-<div style="width:500px;border-top:2px dashed #8B5CF6"></div>
-<div style="width:0;height:0;border-top:5px solid transparent;border-bottom:5px solid transparent;border-left:8px solid #8B5CF6"></div>
+<div style="width:560px;border-top:2px dashed #8B5CF6;position:relative">
+  <span style="position:absolute;top:-18px;left:50%;transform:translateX(-50%);font-size:10px;color:#8B5CF6;font-style:italic;background:rgba(255,255,255,0.95);padding:2px 4px;border-radius:2px">迭代训练</span>
 </div>
-<div style="display:flex;align-items:center;justify-content:center;margin-top:8px;gap:8px">
-<div style="width:120px;border-top:2px dashed #8B5CF6"></div>
-<div style="font-size:10px;color:#8B5CF6;font-style:italic;background:rgba(255,255,255,0.95);padding:2px 4px;border-radius:2px">动态阈值更新 &rarr; 拒绝滤波</div>
-<div style="width:120px;border-top:2px dashed #8B5CF6"></div></div></div>
+<div style="width:0;height:0;border-top:5px solid transparent;border-bottom:5px solid transparent;border-left:8px solid #8B5CF6"></div>
+</div></div>
 
 </div></body></html>
