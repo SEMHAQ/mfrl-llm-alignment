@@ -45,6 +45,9 @@ class MFRLConfig:
     max_length: int = 512
     max_prompt_length: int = 256
 
+    # 随机种子
+    seed: int = 42
+
     # 课程学习
     curriculum_enabled: bool = True
     curriculum_warmup_epochs: float = 0.5
@@ -125,6 +128,7 @@ class MFRLTrainer:
             bf16=(self.config.model_dtype == "bfloat16"),
             fp16=(self.config.model_dtype == "float16"),
             gradient_checkpointing=True,
+            data_seed=self.config.seed,
             report_to="none",
             remove_unused_columns=False,
         )

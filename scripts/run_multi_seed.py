@@ -139,6 +139,7 @@ def train_sft(config: dict, dpo_data: list, test_data: list, out_dir: str, seed:
         max_length=config["dpo"]["max_length"],
         max_prompt_length=config["dpo"]["max_prompt_length"],
         logging_steps=10, save_strategy="epoch",
+        data_seed=seed,
         report_to="none",
     )
     trainer = DPOTrainer(model=model, ref_model=None, args=dpo_cfg,
@@ -176,6 +177,7 @@ def train_dpo(config: dict, dpo_data: list, test_data: list, out_dir: str, seed:
         max_length=config["dpo"]["max_length"],
         max_prompt_length=config["dpo"]["max_prompt_length"],
         logging_steps=10, save_strategy="epoch",
+        data_seed=seed,
         report_to="none",
     )
     trainer = DPOTrainer(model=model, ref_model=None, args=dpo_cfg,
@@ -215,7 +217,7 @@ def train_kto(config: dict, dpo_data: list, test_data: list, out_dir: str, seed:
         gradient_accumulation_steps=config["dpo"]["gradient_accumulation"],
         max_length=config["dpo"]["max_length"],
         max_prompt_length=config["dpo"]["max_prompt_length"],
-        logging_steps=10, report_to="none",
+        logging_steps=10, data_seed=seed, report_to="none",
     )
     trainer = KTOTrainer(model=model, ref_model=None, args=kto_cfg,
                          processing_class=tokenizer,
@@ -250,7 +252,7 @@ def train_mfrl(config: dict, dpo_data: list, test_data: list, out_dir: str, seed
         refs = [d.get("reference", "") for d in dpo_data[:len(dpo_data)]]
         # 从共享缓存读取候选
         cand_path = os.path.join("data", "shared_candidates.json")
-        with open(cand_path, "r") as f:
+        with open(cand_path, "r", encoding="utf-8") as f:
             candidates = json.load(f)
         pairs = rule_feedback.generate_preference_pairs(inputs, refs, candidates)
         dpo_data = pairs  # rule-only
@@ -275,7 +277,7 @@ def train_mfrl(config: dict, dpo_data: list, test_data: list, out_dir: str, seed
         gradient_accumulation_steps=config["dpo"]["gradient_accumulation"],
         max_length=config["dpo"]["max_length"],
         max_prompt_length=config["dpo"]["max_prompt_length"],
-        output_dir=out_dir,
+        seed=seed, output_dir=out_dir,
     )
 
     trainer = MFRLTrainer(mfrl_config)
