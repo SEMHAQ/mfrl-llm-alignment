@@ -81,10 +81,10 @@ body{background:#fff;font-family:'Times New Roman','SimSun',serif;display:flex;j
 
 <!-- LEFT: MFC -->
 <div class="col col-l"><div class="g g-b"><div class="gl">多源反馈收集 (MFC)</div>
-<div class="io">(x, y*)</div>
+<div class="io"><svg width="12" height="10" style="vertical-align:middle;margin-right:3px"><rect x="1" y="1" width="10" height="8" fill="none" stroke="#888" stroke-width="1"/><line x1="3" y1="3" x2="9" y2="3" stroke="#aaa" stroke-width="0.6"/><line x1="3" y1="5" x2="9" y2="5" stroke="#aaa" stroke-width="0.6"/></svg>(x, y*)</div>
 <div class="arw"><svg width="12" height="14"><line x1="6" y1="0" x2="6" y2="9" stroke="#333" stroke-width="2.5"/><polygon points="0,7 6,14 12,7" fill="#333"/></svg></div>
 <div class="el">多温度采样</div>
-<div class="st">{y<sub>1</sub>, &hellip;, y<sub>4</sub>} <span style="font-size:10px;color:#6b7280">&times;4</span></div>
+<div class="st"><svg width="14" height="10" style="vertical-align:middle;margin-right:3px"><rect x="1" y="2" width="12" height="7" fill="none" stroke="#888" stroke-width="0.8"/><rect x="3" y="0" width="12" height="7" fill="none" stroke="#888" stroke-width="0.8"/></svg>{y<sub>1</sub>, &hellip;, y<sub>4</sub>} <span style="font-size:10px;color:#6b7280">&times;4</span></div>
 <div class="arw"><svg width="12" height="14"><line x1="6" y1="0" x2="6" y2="9" stroke="#333" stroke-width="2.5"/><polygon points="0,7 6,14 12,7" fill="#333"/></svg></div>
 <div class="el">拒绝滤波</div>
 
@@ -107,14 +107,14 @@ body{background:#fff;font-family:'Times New Roman','SimSun',serif;display:flex;j
 <!-- CENTER: AFF -->
 <div class="col col-c"><div class="g g-o"><div class="gl">自适应反馈融合 (AFF)</div>
 <div class="m m-o"><div class="sub">Adaptive Feedback Fusion</div><div class="hd">AFF</div>
-<div class="sb" style="width:90%;margin:0 auto 8px auto"><span class="sl" style="margin-top:0">注意力权重</span><div class="fm">w=softmax(W[s<sub>rule</sub>;s<sub>self</sub>]+b)</div>
+<div class="sb" style="width:90%;margin:0 auto 8px auto"><span class="sl" style="margin-top:0">注意力权重</span><svg width="16" height="12" style="float:right;margin-left:4px"><circle cx="4" cy="6" r="1.2" fill="#d97706"/><circle cx="12" cy="2" r="1.2" fill="#d97706"/><circle cx="12" cy="10" r="1.2" fill="#d97706"/><line x1="5" y1="5.5" x2="11" y2="2.5" stroke="#d97706" stroke-width="0.6"/><line x1="5" y1="6.5" x2="11" y2="9.5" stroke="#d97706" stroke-width="0.6"/></svg><div class="fm">w=softmax(W[s<sub>rule</sub>;s<sub>self</sub>]+b)</div>
 <svg width="32" height="24" style="margin-top:2px">
 <rect x="2" y="2" width="7" height="5" fill="#F59E0B" opacity=".12"/><rect x="9" y="2" width="7" height="5" fill="#F59E0B" opacity=".25"/><rect x="16" y="2" width="7" height="5" fill="#F59E0B" opacity=".40"/><rect x="23" y="2" width="7" height="5" fill="#F59E0B" opacity=".55"/>
 <rect x="2" y="7" width="7" height="5" fill="#F59E0B" opacity=".22"/><rect x="9" y="7" width="7" height="5" fill="#F59E0B" opacity=".48"/><rect x="16" y="7" width="7" height="5" fill="#F59E0B" opacity=".62"/><rect x="23" y="7" width="7" height="5" fill="#F59E0B" opacity=".78"/>
 <rect x="2" y="12" width="7" height="5" fill="#F59E0B" opacity=".35"/><rect x="9" y="12" width="7" height="5" fill="#F59E0B" opacity=".55"/><rect x="16" y="12" width="7" height="5" fill="#F59E0B" opacity=".72"/><rect x="23" y="12" width="7" height="5" fill="#F59E0B" opacity=".90"/>
 <rect x="2" y="17" width="7" height="5" fill="#F59E0B" opacity=".50"/><rect x="9" y="17" width="7" height="5" fill="#F59E0B" opacity=".68"/><rect x="16" y="17" width="7" height="5" fill="#F59E0B" opacity=".82"/><rect x="23" y="17" width="7" height="5" fill="#F59E0B" opacity=".98"/>
 </svg></div>
-<div class="sb" style="width:90%;margin:0 auto 8px auto"><span class="sl" style="margin-top:0">分数融合</span><div class="fm">s<sub>fused</sub>=w<sub>rule</sub>s<sub>rule</sub>+w<sub>self</sub>s<sub>self</sub></div>
+<div class="sb" style="width:90%;margin:0 auto 8px auto"><span class="sl" style="margin-top:0">分数融合</span><svg width="18" height="12" style="float:right;margin-left:4px"><line x1="1" y1="2" x2="9" y2="8" stroke="#d97706" stroke-width="1"/><polygon points="6,6 10,8 6,10" fill="none" stroke="#d97706" stroke-width="0.8"/><line x1="17" y1="2" x2="9" y2="8" stroke="#d97706" stroke-width="1"/><polygon points="12,6 8,8 12,10" fill="none" stroke="#d97706" stroke-width="0.8"/></svg><div class="fm">s<sub>fused</sub>=w<sub>rule</sub>s<sub>rule</sub>+w<sub>self</sub>s<sub>self</sub></div>
 <svg width="28" height="14" style="margin-top:2px"><line x1="4" y1="2" x2="10" y2="10" stroke="#d97706" stroke-width="1.2"/><line x1="24" y1="2" x2="18" y2="10" stroke="#d97706" stroke-width="1.2"/><circle cx="14" cy="10" r="2.5" fill="#d97706"/></svg></div>
 <div class="dv"></div>
 <div class="sr"><div class="sb" style="flex:1;border:2px solid #10b981;box-shadow:0 2px 4px rgba(0,0,0,0.08)"><span style="font-weight:700;color:#10b981">y<sup>+</sup></span><div class="fm">argmax s<sub>fused</sub></div></div>
@@ -135,7 +135,7 @@ body{background:#fff;font-family:'Times New Roman','SimSun',serif;display:flex;j
 <path d="M4,13 L18,7 L34,5 L52,3" fill="none" stroke="#059669" stroke-width="1"/>
 <text x="55" y="15" font-size="5" fill="#888">iter</text><text x="4" y="16" font-size="5" fill="#888">loss</text></svg>
 <div style="font-size:10px;color:#6b7280;font-style:italic;margin-top:1px">(&beta;=0.1)</div></div>
-<div class="sb"><span class="sl" style="margin-top:0">LoRA 参数更新</span><div class="fm">(rank=<b>8</b>, &alpha;=<b>16</b>)</div>
+<div class="sb"><span class="sl" style="margin-top:0">LoRA 参数更新</span><svg width="18" height="14" style="float:right;margin-left:4px"><circle cx="3" cy="7" r="1.5" fill="none" stroke="#059669" stroke-width="0.8"/><circle cx="9" cy="3" r="1.5" fill="none" stroke="#059669" stroke-width="0.8"/><circle cx="9" cy="11" r="1.5" fill="none" stroke="#059669" stroke-width="0.8"/><circle cx="15" cy="7" r="1.5" fill="none" stroke="#059669" stroke-width="0.8"/><line x1="4.5" y1="6.5" x2="7.5" y2="3.5" stroke="#059669" stroke-width="0.5"/><line x1="4.5" y1="7.5" x2="7.5" y2="10.5" stroke="#059669" stroke-width="0.5"/><line x1="10.5" y1="3.5" x2="13.5" y2="6.5" stroke="#059669" stroke-width="0.5"/><line x1="10.5" y1="10.5" x2="13.5" y2="7.5" stroke="#059669" stroke-width="0.5"/></svg><div class="fm">(rank=<b>8</b>, &alpha;=<b>16</b>)</div>
 <div style="display:flex;gap:3px;justify-content:center;align-items:center;margin-top:3px">
 <div style="border:0.8px solid #059669;padding:2px 4px;font-size:7px;background:#fff">Q</div>
 <div style="border:0.8px solid #059669;padding:2px 4px;font-size:7px;background:#fff">K</div>
@@ -144,7 +144,7 @@ body{background:#fff;font-family:'Times New Roman','SimSun',serif;display:flex;j
 <div style="border:0.5px dashed #059669;padding:2px 5px;font-size:6px;color:#059669">LoRA</div></div></div></div>
 
 <div class="arw" style="margin-top:6px"><svg width="12" height="14"><line x1="6" y1="0" x2="6" y2="9" stroke="#333" stroke-width="2.5"/><polygon points="0,7 6,14 12,7" fill="#333"/></svg></div>
-<div class="out">Optimized &pi;<sub>&theta;</sub></div></div></div>
+<div class="out"><svg width="16" height="12" style="vertical-align:middle;margin-right:4px"><rect x="1" y="1" width="4" height="10" fill="none" stroke="#fff" stroke-width="0.8" opacity="0.6"/><rect x="6" y="1" width="4" height="10" fill="none" stroke="#fff" stroke-width="0.8" opacity="0.8"/><rect x="11" y="1" width="4" height="10" fill="none" stroke="#fff" stroke-width="0.8"/></svg>Optimized &pi;<sub>&theta;</sub></div></div></div>
 </div>
 
 <!-- BOTTOM: Iterative Loop -->
