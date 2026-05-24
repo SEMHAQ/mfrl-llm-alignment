@@ -6,29 +6,119 @@
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
     background: #fff;
-    font-family: 'Times New Roman', 'SimSun', 'STSong', 'Noto Serif CJK SC', serif;
+    font-family: 'Times New Roman', 'SimSun', 'STSong', serif;
     display: flex;
     justify-content: center;
-    padding: 30px 20px;
+    padding: 36px 20px;
     -webkit-font-smoothing: antialiased;
   }
-  .diagram { width: 580px; }
+  .diagram { width: 520px; }
 
-  .io {
-    text-align: center;
-    padding: 8px 24px;
-    font-size: 13px;
-    font-weight: bold;
-    color: #222;
-    border: 1.5px solid #666;
-    background: #fff;
+  /* === 1. Input / Output: dashed rounded rect, small radius === */
+  .io-dashed {
     display: inline-block;
+    border: 1.2px dashed #888;
+    border-radius: 3px;
+    background: #fff;
+    padding: 8px 20px;
+    font-size: 13px;
+    color: #333;
+    font-weight: 500;
+    text-align: center;
   }
-  .io-row { text-align: center; margin: 0; }
 
+  /* === 2. Core modules: solid rounded rect, low-saturation fill, matching darker border === */
+  .mod {
+    display: inline-block;
+    border-radius: 5px;
+    border-style: solid;
+    border-width: 1.5px;
+    padding: 12px 28px;
+    text-align: center;
+  }
+  .mod .hd {
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    margin-bottom: 2px;
+  }
+  .mod .sub {
+    font-size: 10.5px;
+    margin-bottom: 8px;
+  }
+
+  /* MFC: blue */
+  .mod.mfc {
+    background: #eaf0f8;
+    border-color: #7a9fc9;
+  }
+  .mod.mfc .hd { color: #2a5298; }
+  .mod.mfc .sub { color: #4a72a8; }
+
+  /* AFF: amber */
+  .mod.aff {
+    background: #fdf8ed;
+    border-color: #d4b04a;
+  }
+  .mod.aff .hd { color: #8b6914; }
+  .mod.aff .sub { color: #9a7b2a; }
+
+  /* POF: green */
+  .mod.pof {
+    background: #edf6f1;
+    border-color: #6fae82;
+  }
+  .mod.pof .hd { color: #2d6a4f; }
+  .mod.pof .sub { color: #3d7a5c; }
+
+  /* === 3. Sub-items: white bg, thin gray border, left-aligned text === */
+  .mod .children {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+  }
+  .child {
+    border: 0.8px solid #ccc;
+    background: #fff;
+    padding: 6px 14px;
+    font-size: 10.5px;
+    color: #444;
+    text-align: left;
+    border-radius: 2px;
+    line-height: 1.5;
+  }
+
+  /* === 4. Middle step: gray dashed rect, no fill === */
+  .step-dashed {
+    display: inline-block;
+    border: 1px dashed #999;
+    border-radius: 3px;
+    background: transparent;
+    padding: 6px 18px;
+    font-size: 12px;
+    color: #555;
+    text-align: center;
+  }
+
+  /* === 5. Output: solid dark box === */
+  .out-solid {
+    display: inline-block;
+    border: 1.5px solid #333;
+    border-radius: 3px;
+    background: #2c2c2c;
+    color: #fff;
+    padding: 9px 26px;
+    font-size: 13px;
+    font-weight: 600;
+    text-align: center;
+  }
+
+  .row { text-align: center; margin: 0; }
+
+  /* Arrow */
   .arr-row {
     text-align: center;
-    height: 22px;
+    height: 26px;
     position: relative;
     line-height: 0;
   }
@@ -36,83 +126,19 @@
 
   .side-tag {
     position: absolute;
-    right: -140px;
+    right: -130px;
     top: 50%;
     transform: translateY(-50%);
-    font-size: 10px;
-    color: #888;
+    font-size: 9.5px;
+    color: #999;
     font-style: italic;
     white-space: nowrap;
+    text-align: left;
+    line-height: 1.3;
   }
 
-  .module-wrap { text-align: center; margin: 0; }
-
-  .mod {
-    display: inline-block;
-    border: 1.5px solid #333;
-    background: #fff;
-    padding: 0;
-    text-align: center;
-    vertical-align: top;
-  }
-  .mod .hd {
-    font-size: 18px;
-    font-weight: bold;
-    letter-spacing: 2px;
-    padding: 10px 40px 2px 40px;
-    color: #111;
-  }
-  .mod .subtitle {
-    font-size: 11px;
-    color: #555;
-    padding: 0 40px 6px 40px;
-    border-bottom: 1px solid #ddd;
-    margin-bottom: 6px;
-  }
-  .mod .children {
-    display: flex;
-    gap: 0;
-    justify-content: center;
-    padding: 6px 8px 10px 8px;
-  }
-  .child {
-    border: 1px solid #999;
-    background: #fafafa;
-    padding: 6px 16px;
-    font-size: 10.5px;
-    color: #333;
-  }
-  .child + .child { margin-left: 6px; }
-
-  /* Color differentiation via left border accent — subtle, academic */
-  .mod.mfc { border-color: #4a7fb5; }
-  .mod.mfc .hd { color: #2a5298; }
-  .mod.aff { border-color: #c99718; }
-  .mod.aff .hd { color: #8b6914; }
-  .mod.pof { border-color: #3d8b5e; }
-  .mod.pof .hd { color: #2d6a4f; }
-
-  .pref-box {
-    display: inline-block;
-    border: 1px solid #999;
-    background: #fcfcfc;
-    padding: 6px 18px;
-    font-size: 12px;
-    color: #444;
-  }
-
-  .pref-box .ch { color: #2d6a4f; font-weight: bold; }
-  .pref-box .rj { color: #a33; font-weight: bold; }
-
-  .out-box {
-    display: inline-block;
-    border: 1.5px solid #222;
-    background: #222;
-    color: #fff;
-    padding: 9px 28px;
-    font-size: 13px;
-    font-weight: bold;
-  }
+  .pref-box .ch { color: #2d6a4f; font-weight: 700; }
+  .pref-box .rj { color: #b33; font-weight: 700; }
 </style>
 </head>
 <body>
@@ -120,89 +146,85 @@
 <div class="diagram">
 
   <!-- Input -->
-  <div class="io-row"><div class="io">Input: (x, y*)</div></div>
+  <div class="row"><div class="io-dashed">训练样本 (x, y*)</div></div>
 
-  <!-- Arrow -->
   <div class="arr-row" style="position:relative;">
-    <svg width="14" height="22"><line x1="7" y1="2" x2="7" y2="16" stroke="#555" stroke-width="1.2"/><polygon points="1,14 7,21 13,14" fill="#555"/></svg>
+    <svg width="14" height="26"><line x1="7" y1="1" x2="7" y2="18" stroke="#777" stroke-width="1"/><polygon points="1,16 7,24 13,16" fill="#777"/></svg>
     <span class="side-tag">Multi-temperature<br>sampling</span>
   </div>
 
   <!-- Candidates -->
-  <div class="io-row"><div class="io" style="font-weight:normal;font-size:12px;border-style:dashed;">Candidates: {y&#8321;, y&#8322;, y&#8323;, y&#8324;}</div></div>
+  <div class="row"><div class="step-dashed">候选集 {y<sub>1</sub>, y<sub>2</sub>, y<sub>3</sub>, y<sub>4</sub>}</div></div>
 
-  <!-- Arrow -->
   <div class="arr-row" style="position:relative;">
-    <svg width="14" height="22"><line x1="7" y1="2" x2="7" y2="16" stroke="#555" stroke-width="1.2"/><polygon points="1,14 7,21 13,14" fill="#555"/></svg>
+    <svg width="14" height="26"><line x1="7" y1="1" x2="7" y2="18" stroke="#777" stroke-width="1"/><polygon points="1,16 7,24 13,16" fill="#777"/></svg>
     <span class="side-tag">Rejection<br>filter</span>
   </div>
 
   <!-- MFC -->
-  <div class="module-wrap">
+  <div class="row">
     <div class="mod mfc">
       <div class="hd">MFC</div>
-      <div class="subtitle">Multi-form Feedback Collector</div>
+      <div class="sub">Multi-form Feedback Collector</div>
       <div class="children">
-        <div class="child">ROUGE-1/2/L<br>Rule Feedback</div>
-        <div class="child">Log-Probability<br>Self-Reward</div>
+        <div class="child">ROUGE-1 / ROUGE-2 / ROUGE-L<br>Rule-based Feedback</div>
+        <div class="child">Token-level Log-Probability<br>Self-Reward Signal</div>
       </div>
     </div>
   </div>
 
-  <!-- Arrow -->
   <div class="arr-row" style="position:relative;">
-    <svg width="14" height="22"><line x1="7" y1="2" x2="7" y2="16" stroke="#555" stroke-width="1.2"/><polygon points="1,14 7,21 13,14" fill="#555"/></svg>
-    <span class="side-tag">s<sub>RF</sub> + s<sub>MF</sub></span>
+    <svg width="14" height="26"><line x1="7" y1="1" x2="7" y2="18" stroke="#777" stroke-width="1"/><polygon points="1,16 7,24 13,16" fill="#777"/></svg>
+    <span class="side-tag">s<sub>rule</sub><br>s<sub>self</sub></span>
   </div>
 
   <!-- AFF -->
-  <div class="module-wrap">
+  <div class="row">
     <div class="mod aff">
       <div class="hd">AFF</div>
-      <div class="subtitle">Adaptive Feedback Fusion</div>
+      <div class="sub">Adaptive Feedback Fusion</div>
       <div class="children">
-        <div class="child">Attention<br>Weight Learning</div>
-        <div class="child">Score<br>Normalization</div>
+        <div class="child">Learnable Attention Weights<br>w = softmax(W &middot; [s<sub>rule</sub>, s<sub>self</sub>] + b)</div>
+        <div class="child">Unified Preference Score<br>s<sub>fused</sub> = w<sub>rule</sub>&middot;s<sub>rule</sub> + w<sub>self</sub>&middot;s<sub>self</sub></div>
       </div>
     </div>
   </div>
 
-  <!-- Arrow -->
   <div class="arr-row" style="position:relative;">
-    <svg width="14" height="22"><line x1="7" y1="2" x2="7" y2="16" stroke="#555" stroke-width="1.2"/><polygon points="1,14 7,21 13,14" fill="#555"/></svg>
-    <span class="side-tag">Preference<br>pairs</span>
+    <svg width="14" height="26"><line x1="7" y1="1" x2="7" y2="18" stroke="#777" stroke-width="1"/><polygon points="1,16 7,24 13,16" fill="#777"/></svg>
+    <span class="side-tag"> argmax / argmin<br>pair construction</span>
   </div>
 
   <!-- Preference pair -->
-  <div class="io-row">
-    <div class="pref-box">Preference Pairs: (x, <span class="ch">y<sup>+</sup></span>, <span class="rj">y<sup>&minus;</sup></span>)</div>
+  <div class="row">
+    <div class="step-dashed pref-box">
+      Preference Pair &nbsp; (x, <span class="ch">y<sup>+</sup></span>, <span class="rj">y<sup>&minus;</sup></span>)
+    </div>
   </div>
 
-  <!-- Arrow -->
   <div class="arr-row" style="position:relative;">
-    <svg width="14" height="22"><line x1="7" y1="2" x2="7" y2="16" stroke="#555" stroke-width="1.2"/><polygon points="1,14 7,21 13,14" fill="#555"/></svg>
+    <svg width="14" height="26"><line x1="7" y1="1" x2="7" y2="18" stroke="#777" stroke-width="1"/><polygon points="1,16 7,24 13,16" fill="#777"/></svg>
     <span class="side-tag">DPO training<br>&beta; = 0.1</span>
   </div>
 
   <!-- POF -->
-  <div class="module-wrap">
+  <div class="row">
     <div class="mod pof">
       <div class="hd">POF</div>
-      <div class="subtitle">Preference Optimization Fine-tuning</div>
+      <div class="sub">Preference Optimization Fine-tuning</div>
       <div class="children">
-        <div class="child">DPO Loss<br>Optimization</div>
-        <div class="child">LoRA Fine-tuning<br>(rank = 8)</div>
+        <div class="child">DPO Loss Minimization<br>L<sub>DPO</sub> on preference pairs</div>
+        <div class="child">LoRA Parameter-efficient<br>Fine-tuning (rank = 8)</div>
       </div>
     </div>
   </div>
 
-  <!-- Arrow -->
   <div class="arr-row">
-    <svg width="14" height="22"><line x1="7" y1="2" x2="7" y2="16" stroke="#555" stroke-width="1.2"/><polygon points="1,14 7,21 13,14" fill="#555"/></svg>
+    <svg width="14" height="26"><line x1="7" y1="1" x2="7" y2="18" stroke="#777" stroke-width="1"/><polygon points="1,16 7,24 13,16" fill="#777"/></svg>
   </div>
 
   <!-- Output -->
-  <div class="io-row"><div class="out-box">Output: Optimized Policy Model &#960;<sub>&#952;</sub></div></div>
+  <div class="row"><div class="out-solid">Optimized Policy Model &nbsp; &#960;<sub>&#952;</sub></div></div>
 
 </div>
 
