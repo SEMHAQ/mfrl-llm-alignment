@@ -72,18 +72,18 @@ if os.path.exists(loss_path):
     print(f"Saved fig2_loss_curve.eps ({len(steps)} pts)")
 
 # ====== Fig.3: LCSTS ======
-methods = ['Base', 'SFT', 'DPO', 'KTO', 'MFRL\n(w/o MF)', 'MFRL']
+methods = ['Base', 'SFT', 'DPO', 'KTO', 'MFRL(-MF)', 'MFRL']
 rl = [0.162, 0.151, 0.158, 0.163, 0.169, 0.171]
 colors = [C0, C1, C2, C4, C6, C3]
 
-fig, ax = plt.subplots(figsize=(3.2, 2.2))
+fig, ax = plt.subplots(figsize=(3.2, 2.0))
 x = np.arange(len(methods))
 bars = ax.bar(x, rl, width=0.55, color=colors, edgecolor='white', linewidth=0.3)
 for bar, val in zip(bars, rl):
-    ax.text(bar.get_x()+bar.get_width()/2, bar.get_height()+0.004,
-            f'{val:.3f}', ha='center', fontsize=7, fontweight='bold', color='#2c3e50')
+    ax.text(bar.get_x()+bar.get_width()/2, bar.get_height()+0.005,
+            f'{val:.3f}', ha='center', fontsize=6.5, fontweight='bold', color='#2c3e50')
 ax.set_xticks(x)
-ax.set_xticklabels(methods, fontsize=6, rotation=15)
+ax.set_xticklabels(methods, fontsize=7)
 ax.set_ylabel("ROUGE-L")
 ax.set_ylim(0, 0.21)
 ax.grid(True, axis='y', linestyle='--', alpha=0.25, linewidth=0.4)
@@ -120,7 +120,8 @@ plt.close()
 print("Saved fig4_alpaca_bars.eps")
 
 # ====== Fig.5: Ablation ======
-alabels = ['完整MFRL', '无模型反馈', '无自适应融合']
+# Use English labels to avoid dvipdfmx Chinese font issues
+alabels = ['Full MFRL', 'w/o Model\nFeedback', 'w/o Adaptive\nFusion']
 avals = [0.171, 0.169, 0.170]
 acolors = [C3, C4, C2]
 
@@ -128,12 +129,13 @@ fig, ax = plt.subplots(figsize=(2.5, 2.0))
 x = np.arange(len(alabels))
 bars = ax.bar(x, avals, width=0.4, color=acolors, edgecolor='white', linewidth=0.3)
 for bar, val in zip(bars, avals):
-    ax.text(bar.get_x()+bar.get_width()/2, bar.get_height()+0.001,
+    offset = (max(avals) - min(avals)) * 0.12
+    ax.text(bar.get_x()+bar.get_width()/2, bar.get_height()+offset,
             f'{val:.3f}', ha='center', fontsize=9, fontweight='bold', color='#2c3e50')
 ax.set_xticks(x)
-ax.set_xticklabels(alabels, fontsize=7.5)
+ax.set_xticklabels(alabels, fontsize=7)
 ax.set_ylabel("ROUGE-L")
-ax.set_ylim(0.155, 0.178)
+ax.set_ylim(0.155, max(avals)*1.04)
 ax.grid(True, axis='y', linestyle='--', alpha=0.25, linewidth=0.4)
 ax.set_axisbelow(True)
 for spine in ['top', 'right']:
