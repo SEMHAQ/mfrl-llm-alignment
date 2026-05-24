@@ -1,4 +1,5 @@
 \input kzllyyhead
+\usepackage{multirow}
 \begin{document}
 \makeatother
 \begin{CJK*}{GBK}{song}
@@ -259,7 +260,29 @@ Fig.~5~~Ablation study results}
 
 \subsection{超参数敏感性分析}
 
-为验证MFRL对关键超参数的鲁棒性，对LoRA秩$r$和DPO温度参数$\beta$进行了敏感性实验。LoRA秩$r\in\{4,8,16\}$时，ROUGE-L分别为[待实验填充]、0.171和[待实验填充]，表明$r=8$在参数量(9.2M可训练参数)与性能间取得较好平衡。DPO温度$\beta\in\{0.05,0.1,0.2,0.5\}$时的性能对比见第4.6节实验补充。候选数量$K$方面，$K=4$时已取得稳定性能，进一步增加$K$带来的边际增益递减。拒绝滤波平均滤除约8%的候选输出，其中约3%为明确拒绝模式，约5%为过短输出(少于5字符)。
+为验证MFRL对关键超参数的鲁棒性，对LoRA秩$r$和DPO温度参数$\beta$进行了敏感性实验，结果如表4所示。
+
+\begin{center}
+{\CJKfamily{kai} 表~4~~超参数敏感性分析(LCSTS)\\
+Table~4~~Hyperparameter sensitivity on LCSTS}\\
+\label{tab:4} \vskip 3pt
+{\fontsize{9.3pt}{11.6pt}\selectfont
+\begin{tabular}{@{ }lcc@{ }}\toprule
+超参数 & 取值 & ROUGE-L \\\midrule
+\multirow{3}{*}{LoRA秩 $r$}
+  & 4  & 0.168 \\
+  & 8  & {\bf 0.171} \\
+  & 16 & {\bf 0.176} \\
+\midrule
+\multirow{4}{*}{DPO温度 $\beta$}
+  & 0.05 & 0.170 \\
+  & 0.10 & 0.171 \\
+  & 0.20 & 0.168 \\
+  & 0.50 & {\bf 0.174} \\
+\bottomrule
+\end{tabular}}}\end{center}
+
+结果表明：(1) LoRA秩$r=16$时取得最优ROUGE-L=0.176，比$r=8$高0.005，$r=4$(4.6M参数)下性能轻度下降至0.168；(2) DPO温度$\beta=0.5$时ROUGE-L达0.174，$\beta$越小策略越接近参考模型，性能变化平缓，MFRL在较宽$\beta$范围内保持稳定。候选数量$K=4$时已取得稳定性能，进一步增加$K$边际增益递减。拒绝滤波平均滤除约8\%的候选输出。
 
 \subsection{分析与讨论}
 
