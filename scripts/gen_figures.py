@@ -20,30 +20,35 @@ plt.rcParams.update({
 C = ['#4f81bd', '#9bbb59', '#c0504d', '#f4a940', '#8064a2', '#4bacc6']
 
 # ====== Fig.2: Loss Curve ======
-loss_path = os.path.join(OUT, "loss_curve.json")
+loss_path = os.path.join(OUT, "raw_loss.json")
 if os.path.exists(loss_path):
     with open(loss_path) as f:
         data = json.load(f)
 
-    # Filter: only training steps (skip eval/save entries)
-    train_data = [d for d in data if d.get("loss", 0) > 0.05]
+    # Filter training entries (with loss field)
+    train_data = [d for d in data if 'loss' in d and 'step' in d]
     steps = [d["step"] for d in train_data]
     losses = [d["loss"] for d in train_data]
     epochs = [d["epoch"] for d in train_data]
 
-    # Smooth with moving average
-    window = 10
-    smooth = np.convolve(losses, np.ones(window)/window, mode='valid')
-    smooth_steps = steps[window//2 : window//2 + len(smooth)]
+    # Light smooth (window=3 for 30 points)
+    window = 3
+    if len(losses) > window:
+        smooth = np.convolve(losses, np.ones(window)/window, mode='valid')
+        smooth_steps = steps[window//2 : window//2 + len(smooth)]
+    else:
+        smooth = losses
+        smooth_steps = steps
 
     fig, ax = plt.subplots(figsize=(4.5, 2.6))
-    ax.plot(steps, losses, color='#cccccc', linewidth=0.5, alpha=0.6, label='Raw')
+    ax.scatter(steps, losses, color='#cccccc', s=15, alpha=0.7, label='Per-step')
     ax.plot(smooth_steps, smooth, color=C[0], linewidth=1.2, label='Smoothed')
     ax.set_xlabel("Step", fontsize=9)
     ax.set_ylabel("DPO Loss", fontsize=9)
     ax.tick_params(labelsize=8)
     ax.grid(True, linestyle='--', alpha=0.3)
     ax.legend(fontsize=7, loc='upper right')
+    # Epoch boundaries
     epoch_bounds = [0]
     for i in range(1, len(epochs)):
         if epochs[i] != epochs[i-1]:
@@ -53,7 +58,7 @@ if os.path.exists(loss_path):
     plt.tight_layout()
     plt.savefig(os.path.join(OUT, "fig2_loss_curve.eps"), format='eps')
     plt.close()
-    print(f"Saved fig2_loss_curve.eps ({len(steps)} raw pts, {len(smooth)} smoothed)")
+    print(f"Saved fig2_loss_curve.eps ({len(steps)} pts, window={window})")
 
 # ====== Fig.3: LCSTS ======
 methods = ['Base', 'SFT', 'DPO', 'KTO', 'MFRL(w/o MF)', 'MFRL']
