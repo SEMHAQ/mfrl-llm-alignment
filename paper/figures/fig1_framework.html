@@ -90,7 +90,7 @@ body{background:#fff;font-family:'Times New Roman','SimSun',serif;display:flex;j
 
 <div class="m m-m"><div class="sub">Multi-form Feedback Collector</div><div class="hd">MFC</div>
 <div class="sl">规则反馈分支</div>
-<div class="ar"><div class="at" style="flex:1">ROUGE-1<div class="fm">unigram F<sub>1</sub></div></div><div class="at" style="flex:1">ROUGE-2<div class="fm">bigram F<sub>1</sub></div></div><div class="at" style="flex:1">ROUGE-L<div class="fm">LCS F<sub>1</sub></div></div></div>
+<div class="ar"><div class="at" style="flex:1;white-space:nowrap">ROUGE-1 <span style="font-size:10px;color:#374151;font-style:italic">unigram F<sub>1</sub></span></div><div class="at" style="flex:1;white-space:nowrap">ROUGE-2 <span style="font-size:10px;color:#374151;font-style:italic">bigram F<sub>1</sub></span></div><div class="at" style="flex:1;white-space:nowrap">ROUGE-L <span style="font-size:10px;color:#374151;font-style:italic">LCS F<sub>1</sub></span></div></div>
 <div class="dv"></div>
 <div class="sl">自奖励分支</div>
 <div class="ar"><div class="at" style="flex:1">Token LogP<div class="fm">log P(y<sub>t</sub>|x)</div></div><div class="at" style="flex:1">Seq LogP<div class="fm">avg &Sigma;log P</div></div></div>
@@ -131,9 +131,9 @@ body{background:#fff;font-family:'Times New Roman','SimSun',serif;display:flex;j
 <div class="col col-r"><div class="g g-g"><div class="gl">偏好优化微调 (POF)</div>
 <div class="m m-g"><div class="sub" style="white-space:nowrap;font-size:9px">Preference Optimization Fine-tuning</div><div class="hd">POF</div>
 <div class="sb" style="margin-bottom:4px"><span class="sl" style="margin-top:0">DPO 损失</span><div class="fm">L<sub>DPO</sub>=-E[log &sigma;(&beta;r(y<sup>+</sup>)-&beta;r(y<sup>&minus;</sup>))]</div>
-<svg width="44" height="16" style="margin-top:2px"><line x1="4" y1="1" x2="44" y2="1" stroke="#bbb" stroke-width="0.4"/><line x1="4" y1="1" x2="4" y2="14" stroke="#bbb" stroke-width="0.4"/>
-<path d="M4,10 Q20,10 26,3 Q30,6 42,2" fill="none" stroke="#059669" stroke-width="1.2"/>
-<text x="40" y="13" font-size="4.5" fill="#6b7280">iter</text><text x="5" y="14" font-size="4.5" fill="#6b7280">loss</text></svg>
+<svg width="60" height="18" style="margin-top:2px"><line x1="2" y1="1" x2="58" y2="1" stroke="#bbb" stroke-width="0.3"/><line x1="2" y1="1" x2="2" y2="16" stroke="#bbb" stroke-width="0.3"/>
+<path d="M4,13 L18,7 L34,5 L52,3" fill="none" stroke="#059669" stroke-width="1"/>
+<text x="55" y="15" font-size="5" fill="#888">iter</text><text x="4" y="16" font-size="5" fill="#888">loss</text></svg>
 <div style="font-size:10px;color:#6b7280;font-style:italic;margin-top:1px">(&beta;=0.1)</div></div>
 <div class="sb"><span class="sl" style="margin-top:0">LoRA 参数更新</span><div class="fm">(rank=<b>8</b>, &alpha;=<b>16</b>)</div>
 <div style="display:flex;gap:3px;justify-content:center;align-items:center;margin-top:3px">
