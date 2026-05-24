@@ -117,8 +117,8 @@ body{background:#fff;font-family:'Times New Roman','SimSun',serif;display:flex;j
 <div class="sb" style="width:90%;margin:0 auto 4px auto"><span class="sl" style="margin-top:0">分数融合</span><div class="fm">s<sub>fused</sub>=w<sub>rule</sub>s<sub>rule</sub>+w<sub>self</sub>s<sub>self</sub></div>
 <svg width="28" height="14" style="margin-top:2px"><line x1="4" y1="2" x2="10" y2="10" stroke="#d97706" stroke-width="1.2"/><line x1="24" y1="2" x2="18" y2="10" stroke="#d97706" stroke-width="1.2"/><circle cx="14" cy="10" r="2.5" fill="#d97706"/></svg></div>
 <div class="dv"></div>
-<div class="sr"><div class="sb" style="flex:1;border:2px solid #10b981;box-shadow:0 2px 4px rgba(0,0,0,0.08);min-width:100px;padding:14px 14px"><span style="font-weight:700;color:#10b981">y<sup>+</sup></span><div class="fm">argmax s<sub>fused</sub></div></div>
-<div class="sb" style="flex:1;border:2px solid #ef4444;min-width:100px;padding:14px 14px"><span style="font-weight:700;color:#ef4444">y<sup>&minus;</sup></span><div class="fm">argmin s<sub>fused</sub></div></div></div>
+<div class="sb" style="border:2px solid #10b981;box-shadow:0 2px 4px rgba(0,0,0,0.08);padding:14px 14px;margin-bottom:4px"><span style="font-weight:700;color:#10b981">y<sup>+</sup></span> &mdash; <span class="fm">argmax s<sub>fused</sub></span></div>
+<div class="sb" style="border:2px solid #ef4444;padding:14px 14px"><span style="font-weight:700;color:#ef4444">y<sup>&minus;</sup></span> &mdash; <span class="fm">argmin s<sub>fused</sub></span></div>
 </div></div></div>
 
 <!-- CONNECTOR AFF->POF -->
@@ -139,7 +139,7 @@ body{background:#fff;font-family:'Times New Roman','SimSun',serif;display:flex;j
 <div style="border:0.8px solid #059669;padding:2px 4px;font-size:7px;background:#fff">K</div>
 <div style="border:0.8px solid #059669;padding:2px 4px;font-size:7px;background:#fff">V</div>
 <div style="font-size:6px;color:#6b7280">&rarr;</div>
-<div style="border:0.5px dashed #059669;padding:2px 5px;font-size:6px;color:#059669">LoRA</div></div></div></div>
+<div style="border:0.5px dashed #059669;padding:2px 5px;font-size:6px;color:#059669">LoRA</div></div><div style="font-size:9px;color:#6b7280;margin-top:4px;text-align:center">lr=5e-6 &middot; epochs=3 &middot; batch=16</div></div></div>
 
 <div class="arw" style="margin-top:2px"><svg width="12" height="14"><line x1="6" y1="0" x2="6" y2="9" stroke="#333" stroke-width="2.5"/><polygon points="0,7 6,14 12,7" fill="#333"/></svg></div>
 <div class="out"><svg width="16" height="12" style="vertical-align:middle;margin-right:4px"><rect x="1" y="1" width="4" height="10" fill="none" stroke="#fff" stroke-width="0.8" opacity="0.6"/><rect x="6" y="1" width="4" height="10" fill="none" stroke="#fff" stroke-width="0.8" opacity="0.8"/><rect x="11" y="1" width="4" height="10" fill="none" stroke="#fff" stroke-width="0.8"/></svg>Optimized &pi;<sub>&theta;</sub></div></div></div>
