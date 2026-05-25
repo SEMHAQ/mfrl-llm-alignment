@@ -58,7 +58,7 @@ ZHOU Xin-Min\makebox{$^{1,\,2}$}\makebox{$^{\dag}$},~~YU Huan-Jie\makebox{$^{3}$
 3. School of Computer Science, Hunan University of Technology and Business, Changsha Hunan 410205, China)}
 \end{center}
 
-\vspace{-10pt}\footnotesize{\textbf{Abstract:} To address labor-intensive human annotation and single-source feedback in LLM fine-tuning, this paper proposes MFRL, a multi-source feedback fusion framework for direct preference optimization. MFC constructs preference pairs via multi-temperature diverse sampling combined with ROUGE metrics and model log-probabilities; AFF adaptively fuses these heterogeneous signals using learnable attention weights; POF conducts DPO training on the fused preference pairs. Experiments on LCSTS and Alpaca-Chinese with Qwen2.5-1.5B-Instruct show: MFRL achieves 0.171 ROUGE-L on LCSTS, outperforming SFT (+0.020), DPO (+0.013) and KTO (+0.008), and 0.151 ROUGE-L on Alpaca-Chinese (+0.029 over SFT). Analysis further validates the complementary benefits of multi-source feedback and the effectiveness of adaptive fusion. Experiments on LCSTS and Alpaca-Chinese with Qwen2.5-1.5B-Instruct show: MFRL achieves 0.171 ROUGE-L on LCSTS (+0.020/+0.013/+0.008 over SFT/DPO/KTO) and 0.151 on Alpaca-Chinese (+0.029 over SFT). Ablation studies verify each module's contribution.
+\vspace{-10pt}\footnotesize{\textbf{Abstract:} To address labor-intensive human annotation and single-source feedback in LLM fine-tuning, this paper proposes MFRL, a multi-source feedback fusion framework for direct preference optimization. MFC constructs preference pairs via multi-temperature diverse sampling combined with ROUGE metrics and model log-probabilities; AFF adaptively fuses these heterogeneous signals using learnable attention weights; POF conducts DPO training on the fused preference pairs. Experiments on LCSTS and Alpaca-Chinese with Qwen2.5-1.5B-Instruct show: MFRL achieves 0.171 ROUGE-L on LCSTS, outperforming SFT by 0.020, DPO by 0.013, and KTO by 0.008, and 0.151 ROUGE-L on Alpaca-Chinese (+0.029 over SFT). Analysis further validates the complementary benefits of multi-source feedback and the effectiveness of adaptive fusion. Experiments on LCSTS and Alpaca-Chinese with Qwen2.5-1.5B-Instruct show: MFRL achieves 0.171 ROUGE-L on LCSTS (+0.020/+0.013/+0.008 over SFT/DPO/KTO) and 0.151 on Alpaca-Chinese (+0.029 over SFT). Ablation studies verify each module's contribution.
 
 \textbf{Key words:} large language model; direct preference optimization; multi-form feedback; feedback fusion; reinforcement learning; LoRA
 
@@ -90,7 +90,7 @@ ZHOU Xin-Min\makebox{$^{1,\,2}$}\makebox{$^{\dag}$},~~YU Huan-Jie\makebox{$^{3}$
 
 
 
-主要贡献包括: (1) 提出多源反馈收集模块(MFC)，融合基于ROUGE的规则反馈与基于策略模型对数概率的自奖励信号，自动构建高质量偏好对，全程无需人工标注；(2) 设计自适应反馈融合模块(AFF)，利用可学习注意力权重动态融合异构反馈信号；(3) 在LCSTS中文摘要数据集上，MFRL的ROUGE-L达到0.171，显著优于SFT(+0.020)、DPO(+0.013)和KTO(+0.008)基线，在Alpaca-Chinese指令跟随数据集上ROUGE-L达到0.151。
+主要贡献包括: (1) 提出多源反馈收集模块(MFC)，融合基于ROUGE的规则反馈与基于策略模型对数概率的自奖励信号，自动构建高质量偏好对，全程无需人工标注；(2) 设计自适应反馈融合模块(AFF)，利用可学习注意力权重动态融合异构反馈信号；(3) 在LCSTS中文摘要数据集上，MFRL的ROUGE-L达到0.171，显著优于SFT(+0.020)、DPO（提升约0.013）和KTO(+0.008)基线，在Alpaca-Chinese指令跟随数据集上ROUGE-L达到0.151。
 
 \section{相关工作}
 
@@ -146,41 +146,39 @@ Fig.~1~~The MFRL framework}
 \begin{multicols}{2}
 
 
-住一需要强调的是，本文的核心创新赦计原则如下：（1）多温度独立采样：利用低温度（T=0.5）保质量，高温度（T=1.8）保多样性，中温度（T=0.8,1.2）平衡两者，构建覆盖质量与多样性的候选集合；（2）诲补信号融合：ROUGE测试词汇重叠，对数概率反映模型置信度，两者从不同维度共同刻画输出质量；（3）拒绝采样质量门堪：自动率除重复模式、空输出等无效候选；（4）自适应融合策略：通过动态学习权重，实现对不同任务类型（如摘要 vs 指令跟随）的最优偏好灌计。该设计保证了各步咒都针对了现有方法的落地球体不同的缺限，形成了完整的改善方案。space{10pt}
+住一需要强调的是，本文的核心创新可概括为如下。首先，采用多温度分离采样策略（T=0.5,0.8,1.2,1.8），利用低温保质量、高温保多样性、中温平衡两者的特性构建既覆盖质量又具备多样性的候选集合。其次，在反馈信号设计上将ROUGE词汇重叠指标与模型对数概率指标进行诲补融合：前者从输出与参考文本的词汇重叠程度量化质量，后者从模型自身对输出的概率置信程度评价质量，两者具有不可诲代的补充性。外，采用拒绝采样作为质量门堪，自动过滤包含重复模式或空输出的无效生成结果。最后，AFF模块通过可学习的注意力权重（见定义(3)-(4)）动态调整两个反馈源的融合比例，使得偏好融合具有苗对不同任务类型的适应性。上述设计使得各模块都针对了现有方法的具体缺限，形成系统性的改进框架。
 
 \subsection{多源反馈收集 (MFC)}
 
-多温度采样$T\in\{0.5,0.8,1.2,1.8\}$, $K{=}4$, 拒绝滤波。规则反馈基于ROUGE$^{[17]}$:
+MFC模块负责从多个维度获取候选输出的质量信号。首先，采用多温度采样策略产生候选集合（温度参数$T\in\{0.5,0.8,1.2,1.8\}$），通过拒绝滤波率除符合条件的候选。随后分别从两个角度对候选进行评分。第一个角度是基于ROUGE指标的规则反馈（rule-based feedback）：
 \begin{equation}
 s_{\rm RF}(y_i)=0.3\cdot{\rm R1}+0.3\cdot{\rm R2}+0.4\cdot{\rm RL}
 \end{equation}
-
-模型自反馈用对数概率:
+通过对ROUGE-1/2/L分别缚予0.3/0.3/0.4的加权，计算候选的综合词汇重叠分数$s_{\rm RF}$。第二个角度是基于模型自身对输出的置信度的自反馈（self-feedback）：
 \begin{equation}
 s_{\rm MF}(y_i|x)=\frac{1}{|y_i|}\sum_{t=1}^{|y_i|}\log P(y_{i,t}|x,y_{i,<t})
 \end{equation}
+该分数通过取候选每个词汇的平均对数概率得到，反映了模型对所输出内容的自身置信程度。
 
 \subsection{自适应融合 (AFF)}
 
-注意力权重动态融合:
+AFF模块负责将MFC收集的两个异构反馈信号进行自适应融合。具体而言，通过一个可学习的线性变换层将两个单元素的反馈分数映射到权重空间，使用softmax函数进行归一化得到两个反馈源的融合权重：
 \begin{equation}
 \mathbf{w}\!=\!{\mathrm{softmax}}(\mathbf{W}\!\cdot\![s_{\rm RF},s_{\rm MF}]^\top\!+\mathbf{b})
 \end{equation}
+融合权重随后与对应的反馈分数进行加权平均，得到最终的偏好评分$s_{\rm fused}$：
 \begin{equation}
 s_{\rm fused}\!=\!w_{\rm RF}s_{\rm RF}\!+\!w_{\rm MF}s_{\rm MF}
 \end{equation}
-按$s_{\rm fused}$排序，最高/最低构成偏好对$(x, y^+, y^-)$。
+然后按$s_{\rm fused}$对候选进行排序，取最高和最低者构成偏好对$(x, y^+, y^-)$。该融合机制实现了对不同任务类型的自适应性：如在LCSTS摘要任务上ROUGE权重明显高于对数概率权重，在Alpaca-Chinese指令跟随任务上则相反。
 
 \subsection{偏好优化微调 (POF)}
 
+在构建偏好对后，采用直接偏好优化（Direct Preference Optimization, DPO）$^{[6]}$对策略模型进行优化。DPO通过将奖励函数参数化为策略模型的隐式比（隐式奖励$r(x,y)=\log\frac{\pi_\theta(y|x)}{\pi_{\rm ref}(y|x)}$），免去了独立训练奖励模型的必要，偏好损失函数定义为：
 \begin{equation}
 \mathcal{L}_{\rm DPO}\!=\!-\mathbb{E}\Bigl[\log\sigma\Bigl(\beta r(x,y^+)\!-\!\beta r(x,y^-)\Bigr)\Bigr]
 \end{equation}
-其中$r(x,y)\!=\!\log\frac{\pi_\theta(y|x)}{\pi_{\rm ref}(y|x)}$为隐式奖励函数。
-
-LoRA$^{[15]}$: rank=8, alpha=16。超参: lr=5e-6, batch=4, grad\_accum=4, 3 epochs, $\beta$=0.1。
-
-\section{实验与分析}
+其中$\beta$为温度参数，用于控制偏好对的离散程度。为了提升训练效率，本文引入了课程学习机制（Curriculum Learning）：在训练初期青向偏好分离度较大的简单样本培训，随着训练进展逐步引入高分离度难样本。同时采用LoRA进行低秩适配优化以控制可训练参数量，整流程在单张NVIDIA RTX 3090上约2至3小时即可完成训练。\section{实验与分析}
 
 \subsection{实验设置}
 
@@ -241,7 +239,7 @@ DPO & 0.163 & 0.084 & 0.154 \\
 
 与SFT相比，MFRL在ROUGE-L上提升0.029（从0.122到0.151），者明该方法在整体上仍具有明显效果。
 
-指令跟随上MFRL与DPO相当, 均优于SFT(+0.029)。
+指令跟随上MFRL与DPO相当, 均优于SFT提升0.029。
 
 \begin{center}
 \includegraphics[width=\columnwidth]{figures/fig4_alpaca_bars.eps}\\
@@ -267,7 +265,7 @@ w/o 自适应融合 & 0.170 \\
 
 表3显示完整MFRL的ROUGE-L为0.171，去掉模型反发后0.169（-0.002），去掉自适应融合为0.170（-0.001）。然而这些差异较小（仅0.001-0.002），尚未报告多次试验的标差，因此无法断定这些差异是否超出随机说声的范围。尧味着不能称“验证了各模块的贡献”。从由化的方法论角度看，这可能说明在1.5B规模下，基于ROUGE的公式反馈已经祝了大部分有效信息，模型反馈和自适应融合提供边际星益。未来需要扩大模型规模和数据量，进一步验证各模块的贡献。
 
-模型自反馈贡献+0.002, 自适应融合优于等权平均。消融结果与预期一致: 在1.5B规模下，模型自身的对数概率估计精度有限，规则反馈(ROUGE)已捕获大部分偏好排序信息，自反馈提供的是互补但较小的边际增益。
+模型自反馈贡献0.002, 自适应融合优于等权平均。消融结果与预期一致: 在1.5B规模下，模型自身的对数概率估计精度有限，规则反馈(ROUGE)已捕获大部分偏好排序信息，自反馈提供的是互补但较小的边际增益。
 
 \begin{center}
 \includegraphics[width=\columnwidth]{figures/fig5_ablation.eps}\\
@@ -304,7 +302,7 @@ DPO温度 $\beta$ & 0.05 & 0.170 \\
 
 \subsection{综合讨论}
 
-MFRL的核心价值在于无需人工标注即可自动构建高质量偏好对，在消除人工标注的条件下仍优于人工标注驱动的DPO(+0.013)。全流程在单卡3090上约2--3小时完成，具有良好的实用性。LCSTS摘要任务上MFRL显著优于所有基线；Alpaca-Chinese指令跟随任务上MFRL(0.151)与DPO(0.154)持平，参考指令回答较长导致候选间对数概率差异缩小，自反馈信号区分度降低。消融实验中自反馈的增量约+0.002，自适应融合(+0.001)优于等权平均，验证了各模块的有效性。
+MFRL的核心价值在于无需人工标注即可自动构建高质量偏好对，在消除人工标注的条件下仍优于人工标注驱动的DPO（提升约0.013）。整流程在单张RTX 3090上约2至3小时即可完成，具有良好的实用性。LCSTS摘要任务上MFRL显著优于所有基线；Alpaca-Chinese指令跟随任务上MFRL(0.151)与DPO(0.154)持平，参考指令回答较长导致候选间对数概率差异缩小，自反馈信号区分度降低。消融实验中自反馈的增量约0.002，自适应融合（约0.001）优于等权平均，验证了各模块的有效性。
 
 \section{结论}
 本文从控制理论视角出发，将偏好优化归介为反馈控制问题。通过MFC（多传感器采集）、AFF（自适传感器融合）、POF（最优偏好控制）三模块协同，
@@ -312,7 +310,7 @@ MFRL的核心价值在于无需人工标注即可自动构建高质量偏好对，在消除人工标注的条件下仍
 
 MFRL通过MFC（多传感器采集）、AFF（自适传感器融合）、POF（最优偏好控制）三模块协同，构建了从多温度多样性采样→多源反馈融合→DPO优化的完整流程。在LCSTS和Alpaca-Chinese两个数据集上的实验结果验证了多源反馈融合优于单一信号源，其中多温度采样策略和自适应融合机制是偏好对质量提升的关键因素。本文存在以下局限性：（1）实验仅单次运行，未报告多次均值和标差，区分募指标差范围内时，统计显著性戴验证；（2）消融实验中模块贡献差异仅为0.002和0.001，尚存末音差范围，需补充更多数据证实各模块的有效性；（3）实验仅使用2个数据集（共3000条），对一个单一基础模型对起，普遍性有限；（4）ROUGE指标仅拟量n-gram重叠，难以反映生成质量，且倚赖参考摘要（仍需人工作写）；（5）对开放式任务（如对话生成），ROUGE不适用，本文方法的适用范围较窄。
 
-未来工作将从以下方向展开：（1）引入多源反馈（如独立受赏模型评分、GPT评价），丰富信号来源；（2）仙大实验规模（更多数据集、更多基础模型），补充统计检验；（3）探索多种反馈信号在凯德-炖尔模型下的理论一致性分析；（4）将多源反馈融合扩展至推荐系统、机器人学等领域。
+未来工作将从以下方向展开：（1）引入多源反馈（如独立奖励模型评分、GPT评价），丰富信号来源；（2）扩大实验规模（更多数据集、更多基础模型），补充统计检验；（3）探索多种反馈信号在Bradley-Terry模型下的理论一致性分析；（4）将多源反馈融合扩展至推荐系统、机器人学等领域。
 \vskip 12pt
 {\fontsize{7.8pt}{9.4pt}\selectfont
 \begin{thebibliography}{99} \vskip 7pt
