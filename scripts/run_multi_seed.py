@@ -255,7 +255,14 @@ def train_mfrl(config: dict, dpo_data: list, test_data: list, out_dir: str, seed
         with open(cand_path, "r", encoding="utf-8") as f:
             candidates = json.load(f)
         pairs = rule_feedback.generate_preference_pairs(inputs, refs, candidates)
-        dpo_data = pairs  # rule-only
+        # 格式化为DPO训练所需格式
+        dpo_data = []
+        for p in pairs:
+            dpo_data.append({
+                "prompt": f"请为以下文本生成简洁准确的摘要：\n{p.get('input', '')}\n摘要：",
+                "chosen": p["chosen"], "rejected": p["rejected"],
+                "reference": p.get("reference", ""),
+            })
     elif not use_adaptive_fusion:
         # 等权融合（w/o AFF消融）
         # 直接从dpo_data使用等权融合后的数据
