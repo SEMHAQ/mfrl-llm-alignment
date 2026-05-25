@@ -94,6 +94,7 @@ class MFRLTrainer:
         )
 
         # 配置LoRA
+        torch.manual_seed(self.config.seed)
         lora_config = LoraConfig(
             task_type=TaskType.CAUSAL_LM,
             r=self.config.lora_r,
