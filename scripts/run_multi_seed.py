@@ -139,7 +139,7 @@ def train_sft(config: dict, dpo_data: list, test_data: list, out_dir: str, seed:
         max_length=config["dpo"]["max_length"],
         max_prompt_length=config["dpo"]["max_prompt_length"],
         logging_steps=10, save_strategy="epoch",
-        data_seed=seed,
+        seed=seed, data_seed=seed,
         report_to="none",
     )
     trainer = DPOTrainer(model=model, ref_model=None, args=dpo_cfg,
@@ -177,7 +177,7 @@ def train_dpo(config: dict, dpo_data: list, test_data: list, out_dir: str, seed:
         max_length=config["dpo"]["max_length"],
         max_prompt_length=config["dpo"]["max_prompt_length"],
         logging_steps=10, save_strategy="epoch",
-        data_seed=seed,
+        seed=seed, data_seed=seed,
         report_to="none",
     )
     trainer = DPOTrainer(model=model, ref_model=None, args=dpo_cfg,
@@ -217,7 +217,7 @@ def train_kto(config: dict, dpo_data: list, test_data: list, out_dir: str, seed:
         gradient_accumulation_steps=config["dpo"]["gradient_accumulation"],
         max_length=config["dpo"]["max_length"],
         max_prompt_length=config["dpo"]["max_prompt_length"],
-        logging_steps=10, data_seed=seed, report_to="none",
+        logging_steps=10, seed=seed, data_seed=seed, report_to="none",
     )
     trainer = KTOTrainer(model=model, ref_model=None, args=kto_cfg,
                          processing_class=tokenizer,

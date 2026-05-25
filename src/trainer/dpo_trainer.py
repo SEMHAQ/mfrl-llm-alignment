@@ -129,6 +129,7 @@ class MFRLTrainer:
             bf16=(self.config.model_dtype == "bfloat16"),
             fp16=(self.config.model_dtype == "float16"),
             gradient_checkpointing=True,
+            seed=self.config.seed,
             data_seed=self.config.seed,
             report_to="none",
             remove_unused_columns=False,
